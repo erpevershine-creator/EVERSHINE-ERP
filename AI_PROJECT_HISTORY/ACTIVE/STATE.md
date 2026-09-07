@@ -63,3 +63,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - D125: daily backup time confirmed as 18:00 Asia/Yangon. Requirement recorded; no scheduler configured.
 - D126: automatic backup catch-up after computer/connectivity recovery confirmed. Recorded requirement only; no scheduler or delivery integration implemented.
 - D127-D128: no separately entered backup recovery key; restore approval by Owner and delegated approved Admins confirmed. Recorded only; backup encryption/key custody and restore workflows remain unimplemented.
+- 2026-09-08 D129: Owner approved 7 daily / 3 monthly / 1 yearly backup retention. Requirement recorded; no backup job, upload or deletion performed.

@@ -155,6 +155,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 | D127 | Owner rejected requiring a separately entered Backup Recovery Key; restoration must be controlled by approval. This does not approve plaintext backup storage. System-managed encryption was suggested, but its recoverable key custody and disaster-recovery design are not yet implemented or verified. Approval alone cannot decrypt an encrypted backup when its key is lost. |
 | D128 | Restore approval is permitted to Owner and approved Admins with delegated Backup/Restore authority. Existing Owner-only self-approval and reason/audit rules continue to apply. Telegram Backup Channel membership alone does not grant restore authority. |
 
+| D129 | On 2026-09-08 Owner accepted backup retention: last 7 daily backups (7 days), last 3 month-end backups (3 months), and last 1 year-end backup (1 year). A daily snapshot may also serve as the month/year-end snapshot without duplicate content. Verify the new backup is readable before pruning expired backup files. This is backup retention, not authorization to delete live business records or audit history. Free-plan fit must be checked against actual archive size and available storage; no scheduler, delivery or deletion has been implemented. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
