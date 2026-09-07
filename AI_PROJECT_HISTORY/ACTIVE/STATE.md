@@ -58,3 +58,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - D119 confirmed emergency-code password recovery for Owner lock or expiry. Recorded only; recovery implementation is pending.
 - D120: Owner confirmed MMK as base currency; recorded requirement only, with runtime implementation still pending.
 - D121: Owner confirmed Asia/Yangon (UTC+06:30) for ERP dates, times, reports and approval deadlines. Requirement recorded; runtime implementation pending.
+- D122-D123: backup destination requirements recorded: Owner Gmail Google Drive and dedicated Telegram private channel with Owner and approved Admins. No integration or transfer performed.

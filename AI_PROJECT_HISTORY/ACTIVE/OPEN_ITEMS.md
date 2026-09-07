@@ -3,7 +3,7 @@
 
 Owner confirmed successful login and D119: emergency-code self-recovery for Owner account lock or password expiry. The rule is recorded; the recovery UI/server workflow is not implemented yet. Never ask Owner to repeat setup or disclose credentials.
 
-Continue real account management, permissions, lock/expiry/recovery and device-session enforcement before live business entry. Ask only unresolved essentials one at a time; base currency is confirmed as MMK (D120). Company timezone is confirmed as Asia/Yangon (D121). Backup destination/frequency remain open.
+Continue real account management, permissions, lock/expiry/recovery and device-session enforcement before live business entry. Ask only unresolved essentials one at a time; base currency is confirmed as MMK (D120). Company timezone is confirmed as Asia/Yangon (D121). Backup destinations are Owner Gmail Google Drive and a dedicated Telegram private Backup Channel with Owner and approved Admins (D122-D123). Schedule, encryption, retention, restore authority and exact integration configuration remain open. No channel creation, connection or external transfer has occurred.
 
 Later business modules require individual confirmation. Transfer request approval, separate-actor dispatch/receipt, discrepancy resolution, partial receipt, cancellation and reversal details remain open.
 

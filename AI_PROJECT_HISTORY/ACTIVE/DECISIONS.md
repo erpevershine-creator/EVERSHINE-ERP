@@ -143,6 +143,9 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D121 | Owner confirmed Myanmar Standard Time, Asia/Yangon (UTC+06:30), for ERP dates, times, reports and approval deadlines. This governs business-time interpretation and display; implementation and runtime verification remain pending. |
 
+| D122 | Owner selected the Google Drive belonging to the Owner Gmail account and Telegram as ERP backup destinations. Exact folders, delivery method, schedule, encryption and retention remain unspecified; no connection or transfer has occurred. |
+| D123 | Telegram backups will use a dedicated private Backup Channel containing Owner and approved Admins. Channel membership does not by itself grant ERP restore, deletion or configuration authority. Exact channel and integration access remain to be configured. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
