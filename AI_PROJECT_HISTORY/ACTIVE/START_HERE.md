@@ -12,4 +12,4 @@ Independent project: `C:/Users/DELL/Desktop/EVERSHINE-ERP`. Original workspace `
 
 M1 is **sample UI/workflow review**, with browser-tab records and a local-only production guard. It is not real login, database authorization, durable audit, backup, email, quota monitoring or business functionality. Owner screen/workflow acceptance must precede the next implementation stage. Production requires separate final confirmation; Vercel Hobby commercial-use restriction is unresolved.
 
-Resume: read this handoff and STATE.md. Verify existing server before starting another one. Continue only the authorized milestone, report actual completion and remaining work, and preserve decisions D01–D113.
+Resume: read this handoff and STATE.md. Verify existing server before starting another one. Continue only the authorized milestone, report actual completion and remaining work, and preserve decisions D01–D116. The latest request authorizes agent-run checks, persistent sidebar controls, a complete sample account/profile form and approved per-page visibility. It does not accept real Auth/backend work yet.

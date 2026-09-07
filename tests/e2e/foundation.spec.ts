@@ -135,9 +135,10 @@ test("Admin cannot approve own request or manage permissions beyond delegated sc
     page.getByRole("button", { name: "Approve", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Close dialog" }).click();
-  await page
-    .getByRole("link", { name: "Positions & Permissions", exact: true })
-    .click();
+  await expect(
+    page.getByRole("link", { name: "Positions & Permissions", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/permissions");
   await expect(
     page.getByRole("heading", { name: "Access restricted" }),
   ).toBeVisible();

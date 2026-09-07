@@ -7,7 +7,7 @@ Owner authorized coding on 2026-09-06 with “စပါ”, then “Continue Tas
 | Workspace and navigation | Compact responsive screens                                                                              | Owner UI acceptance                                                     |
 | Themes and tables        | Local light/dark/system, search/filter/sort/columns, sample CSV                                         | Per-user settings / server export authorization                         |
 | Login/Auth               | Login layout; password collection disabled                                                              | Real local Auth, Owner setup/recovery, session/password/device controls |
-| Accounts/Positions       | Sample lists/detail and illustrative permission matrix                                                  | Durable account control, template snapshots, handover                   |
+| Accounts/Positions       | Sample photo/profile creation and approved per-page visibility                                                  | Real Auth, durable permissions/audit, action templates, handover                   |
 | Approval Center          | Sample Draft/Submit/Approve/Reject/Revise; reason, scope/self-approval restrictions, preserved versions | Transactional backend, concurrency, durable permissions, real jobs      |
 | Audit/History            | Sample before/after events                                                                              | Append-protected database audit, PDF + Excel retention export/deletion  |
 | Notifications            | Scoped sample lists, read state                                                                         | Durable in-app delivery, 3-hour scheduler, Gmail provider               |
@@ -31,3 +31,15 @@ No legacy business code, schema, users, passwords or data were copied. The only 
 Evidence images: `docs/evidence/workspace-light.png`, `workspace-dark.png`, `approval-detail.png`, `mobile-approvals.png`.
 
 Passing local checks does not certify production security or accept business workflows. Final installation/restart evidence is in the active STATE.md.
+
+## Owner-requested refinements — 2026-09-06
+
+Implemented D114–D116: sticky sidebar controls on desktop/mobile, a complete sample account/photo form, and explicit position page visibility with exact-account approval snapshots. The account form validates Gmail, confirmed password rules, matching confirmation and duplicate usernames; passwords never enter storage/audit/CSV. Sample profiles and photos survive same-tab reload. Preview actors can be switched without sharing another account's scope.
+
+The page matrix submits one request for individual review. Before approval, current visibility stays unchanged. Approval updates the template and only the included accounts, preserves existing individual overrides, and rejects changed template/account snapshots. Direct URLs, sidebar links and dashboard shortcuts check the same preview page rules. Read access does not grant action authority. Structured permission payloads cannot be revised as arbitrary text; subsequent page changes use the matrix.
+
+Verification completed: 11 browser scenarios passed across the suite and targeted reruns; five policy tests, strict TypeScript, ESLint and final optimized build passed. Initial refinement-test failures were selector ambiguity (column controls, route announcer and combined record labels); corrected selectors target the visible dialog and exact intended controls. Browser checks cover account creation/password non-persistence/CSV, duplicate identifiers, role scope, approval application, excluded accounts, direct-route denial, migration, sticky desktop/mobile controls and the original M1 flows. Unit coverage includes stale snapshots, individual overrides and Owner immutability.
+
+Five current screenshots are in docs/evidence: account-form-desktop.png, account-form-mobile.png, account-form-mobile-end.png, page-visibility-desktop.png and sidebar-scrolled-mobile.png. `node scripts/capture-refinements.mjs` reproduces these in isolated local Chrome, checks page errors/overflow and confirms mobile form actions remain reachable. Screenshot review caught vertical checkbox alignment; it was corrected before final capture/build.
+
+Real login provisioning, server authorization/RLS, durable audit, backup/restore and email remain outside this milestone. This verification does not claim production security. Owner screen/workflow acceptance remains pending; no service was deployed or paid resource created.

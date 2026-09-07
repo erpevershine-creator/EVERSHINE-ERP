@@ -1,6 +1,6 @@
 # Next confirmation
 
-Last confirmed: D113 Owner explicitly authorized Milestone 1 coding on 2026-09-06 (“စပါ”), followed by “Continue Task”. No additional coding permission is needed within this milestone.
+Last confirmed: D114–D116 delegate testing to Codex and authorize persistent sidebar controls, all requested account/profile fields, and explicit per-page position visibility. No additional coding permission is needed for these Milestone 1 refinements. Owner screen/workflow acceptance is still separate from live Auth/backend and Production approval.
 
 Next Owner confirmation: review the foundation layout and sample approval flow at http://localhost:3000, and accept it or request specific changes. This is screen/workflow acceptance, not production acceptance.
 

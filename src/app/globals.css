@@ -319,6 +319,10 @@ svg {
   min-width: 0;
 }
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
   height: 64px;
   padding: 0 28px;
   border-bottom: 1px solid var(--border);
@@ -329,6 +333,7 @@ svg {
   gap: 14px;
 }
 .breadcrumb {
+  margin-right: auto;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -968,6 +973,115 @@ tbody tr:hover {
 .key-values dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.avatar-profile {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  font-size: 24px;
+}
+.profile-summary,
+.photo-field {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.profile-summary {
+  overflow-wrap: anywhere;
+}
+.account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+.account-form label,
+.reason-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 500;
+  min-width: 0;
+}
+.account-form input,
+.account-form select {
+  width: 100%;
+  min-width: 0;
+}
+.account-form small,
+.affected-accounts small {
+  color: var(--muted);
+  font-weight: 400;
+}
+.photo-field label {
+  flex: 1;
+}
+.photo-field input[type="file"] {
+  max-width: 100%;
+}
+.checkbox-label {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  font-weight: 400;
+}
+.permission-matrix tbody th {
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text);
+}
+.checkbox-label input {
+  flex-shrink: 0;
+}
+.affected-accounts {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.affected-accounts legend {
+  padding: 0 6px;
+  font-weight: 500;
+}
+.affected-accounts .checkbox-label {
+  display: flex;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+@media (min-width: 901px) {
+  .sidebar.sidebar-collapsed {
+    display: none;
+  }
+  .workspace.workspace-expanded {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 900px) {
+  .desktop-sidebar-toggle {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .account-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .photo-field {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .photo-field .avatar-profile {
+    width: 48px;
+    height: 48px;
+  }
 }
 .permission-matrix {
   margin-top: 20px;

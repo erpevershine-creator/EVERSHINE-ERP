@@ -10,13 +10,11 @@ import {
 import { useReview } from "@/components/review-provider";
 import { ThemeControl } from "@/components/theme";
 import { Badge, KeyValues, PageHeading } from "@/components/ui";
-import { AccessRestricted } from "./administration";
 import { policy, quotaPolicy } from "@/lib/policy";
 
 export function Settings() {
   const { actor, reset } = useReview();
   const [tab, setTab] = useState("Company");
-  if (actor.role !== "Owner") return <AccessRestricted />;
   return (
     <>
       <PageHeading
@@ -169,6 +167,7 @@ export function Settings() {
                 </p>
               </div>
               <button
+                disabled={actor.role !== "Owner"}
                 onClick={() => {
                   if (
                     window.confirm(
@@ -188,8 +187,6 @@ export function Settings() {
   );
 }
 export function Backups() {
-  const { actor } = useReview();
-  if (actor.role !== "Owner") return <AccessRestricted />;
   return (
     <>
       <PageHeading
@@ -233,9 +230,7 @@ export function Backups() {
   );
 }
 export function Usage() {
-  const { actor } = useReview();
   const [percent, setPercent] = useState(79);
-  if (actor.role !== "Owner") return <AccessRestricted />;
   const result = quotaPolicy(percent);
   return (
     <>

@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  initialAccounts,
+  initialPositions,
+  applyPageAccessChange,
+  canViewPage,
+  validGmail,
+  type PageAccessChange,
+} from "../src/lib/administration.ts";
+import {
   actors,
   canApprove,
   canRevise,
@@ -76,4 +84,56 @@ test("confirmed password minimum and spreadsheet formula neutralization", () => 
   assert.equal(csvCell("=1+1"), '"\'=1+1"');
   assert.equal(csvCell("  @SUM(A1)"), '"\'  @SUM(A1)"');
   assert.equal(csvCell('ordinary "note"'), '"ordinary ""note"""');
+});
+
+test("page access approval preserves excluded accounts and individual overrides; stale requests fail", () => {
+  const positions = structuredClone(initialPositions);
+  const accounts = initialAccounts();
+  const employee = accounts.find((a) => a.id === "employee")!;
+  employee.pages.usage = true; // An existing individual override.
+  accounts.push({ ...employee, id: "excluded", pages: { ...employee.pages } });
+  const position = positions.find((p) => p.id === employee.positionId)!;
+  const change: PageAccessChange = {
+    positionId: position.id,
+    before: { ...position.pages },
+    after: { ...position.pages, audit: false, accounts: true },
+    accountIds: ["employee"],
+    accountBefore: { employee: { ...employee.pages } },
+  };
+  const updated = applyPageAccessChange(positions, accounts, change);
+  const actual = updated.accounts.find((a) => a.id === "employee")!;
+  assert.equal(actual.pages.audit, false);
+  assert.equal(actual.pages.accounts, true);
+  assert.equal(actual.pages.usage, true);
+  assert.deepEqual(
+    updated.accounts.find((a) => a.id === "excluded"),
+    accounts.find((a) => a.id === "excluded"),
+  );
+  assert.equal(canViewPage(actual, "audit"), false);
+  assert.equal(canViewPage({ ...actual, status: "Inactive" }, "usage"), false);
+  assert.throws(
+    () => applyPageAccessChange(updated.positions, updated.accounts, change),
+    /template changed/,
+  );
+  assert.throws(
+    () =>
+      applyPageAccessChange(positions, accounts, { ...change, accountIds: [] }),
+    /Select the affected/,
+  );
+  assert.throws(
+    () =>
+      applyPageAccessChange(positions, accounts, {
+        ...change,
+        positionId: "owner-position",
+      }),
+    /not permitted/,
+  );
+  const stale = structuredClone(accounts);
+  stale.find((a) => a.id === "employee")!.pages.dashboard = false;
+  assert.throws(
+    () => applyPageAccessChange(positions, stale, change),
+    /included account changed/,
+  );
+  assert.equal(validGmail("person@gmail.com"), true);
+  assert.equal(validGmail("person@example.com"), false);
 });

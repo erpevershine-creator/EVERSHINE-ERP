@@ -5,8 +5,17 @@ import {
   type Module,
   type PreviewActor,
 } from "./policy";
+import {
+  initialAccounts,
+  initialPositions,
+  applyPageAccessChange,
+  type ReviewAccount,
+  type ReviewPosition,
+  type PageAccessChange,
+} from "./administration";
 
 export type ReviewRequest = {
+  pageAccessChange?: PageAccessChange;
   id: string;
   title: string;
   module: Module;
@@ -45,6 +54,8 @@ export type ReviewNotification = {
   requestId?: string;
 };
 export type ReviewState = {
+  accounts: ReviewAccount[];
+  positions: ReviewPosition[];
   schema: 1;
   requests: ReviewRequest[];
   audit: AuditEvent[];
@@ -55,6 +66,8 @@ export function initialState(): ReviewState {
   const now = Date.now();
   const at = (hours: number) => new Date(now + hours * 3600000).toISOString();
   return {
+    accounts: initialAccounts(),
+    positions: structuredClone(initialPositions),
     schema: 1,
     requests: [
       {
@@ -210,6 +223,43 @@ export function transition(
     );
   if (["submit", "revise"].includes(action) && !details.trim())
     throw new Error("Enter the requested changes.");
+  if (request.pageAccessChange && action === "revise")
+    throw new Error(
+      "Use Positions & Permissions to request a new page access change.",
+    );
+  if (
+    request.pageAccessChange &&
+    action === "submit" &&
+    details.trim() !== request.proposed
+  )
+    throw new Error(
+      "Page access details must match the selected template and accounts.",
+    );
+  const accessUpdate =
+    request.pageAccessChange && action === "approve"
+      ? applyPageAccessChange(
+          state.positions,
+          state.accounts,
+          request.pageAccessChange,
+        )
+      : null;
+  if (
+    request.pageAccessChange &&
+    action === "approve" &&
+    actor.role === "Admin"
+  ) {
+    const approver = state.accounts.find(
+      (a) => a.id === actor.id && a.status === "Active",
+    );
+    if (
+      !approver ||
+      Object.entries(request.pageAccessChange.after).some(
+        ([page, visible]) =>
+          visible && !approver.pages[page as keyof typeof approver.pages],
+      )
+    )
+      throw new Error("This change exceeds your delegated page access.");
+  }
   const newId = () => crypto.randomUUID();
   const updated: ReviewRequest = {
     ...request,
@@ -273,6 +323,7 @@ export function transition(
       : state.requests.map((item) => (item.id === id ? updated : item));
   return {
     ...state,
+    ...(accessUpdate ?? {}),
     requests,
     audit: [...events, ...state.audit],
     notifications: [

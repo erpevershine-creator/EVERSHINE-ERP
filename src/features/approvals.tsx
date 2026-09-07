@@ -267,7 +267,8 @@ function RequestDetail({
   const [details, setDetails] = useState(request.proposed);
   const [error, setError] = useState<string | null>(null);
   const permitted = canApprove(actor, request);
-  const revisable = canRevise(actor, request.module);
+  const revisable =
+    canRevise(actor, request.module) && !request.pageAccessChange;
   const editable =
     (request.status === "Draft" && request.requesterId === actor.id) ||
     (["Approved", "Revised"].includes(request.status) && revisable);
@@ -305,7 +306,7 @@ function RequestDetail({
             </div>
             <div>
               <h3>Requested changes</h3>
-              {editable ? (
+              {editable && !request.pageAccessChange ? (
                 <textarea
                   aria-label="Requested changes"
                   rows={3}

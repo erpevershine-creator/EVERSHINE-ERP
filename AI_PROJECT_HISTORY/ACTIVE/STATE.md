@@ -6,10 +6,19 @@ Updated 2026-09-06. Milestone 1 foundation skeleton implemented and tested; inde
 - Ten screens: Workspace, Login, Account Management, Positions & Permissions, Approval Center, Audit & History, Notifications, Settings, Backup & Restore, Usage Monitor.
 - Compact responsive layout, Light/Dark/System; working sample tables/CSV, scoped sample notifications and individual sample request decisions/revisions.
 - Draft → submit → decision, reason required, Owner-only self-approval, Admin module scope, rejection returns to Draft, preserved versions. Only synthetic tab-local state is changed.
-- Login controls disabled; no credential collection. No real Auth/database/production permissions. Provider usage is unknown, with a separate sample 80% policy control. Backup/restore actions disabled until implemented.
+- Login controls remain disabled. The new sample account form validates an entered ERP password and confirmation in transient form memory only; neither enters sample storage, audit or exports. No real Auth/database/production permissions. Provider usage is unknown, with a separate sample 80% policy control. Backup/restore actions disabled until implemented.
 - TypeScript, ESLint, four unit tests, optimized build and production dependency audit passed. All six browser acceptance scenarios passed across the full run and the targeted mobile fix retest. No runtime external requests/page errors in the all-route check. See docs/MILESTONE-1.md for evidence and acceptance boundaries.
 
 Pending: Owner screen/workflow acceptance; then local Docker/Supabase Auth/database design, server authorization/audit, live account controls and tested recovery. No business module or production deployment is accepted.
+
+## Latest authorized M1 refinements (D114–D116)
+- Header remains sticky; desktop sidebar can collapse/expand, mobile navigation remains reachable after scrolling and closes with Escape.
+- Account Management has a working sample creation form: required profile photo, employee name, position, department, ERP role, Gmail username, password/confirmation and contact. Owner/Admin scope, single Owner, duplicate username and password rules are checked. Photo/profile survive same-tab reload; passwords are never persisted, audited or exported. No real login account is provisioned.
+- Position page visibility uses a typed approval snapshot with the exact included accounts. Approval applies the template/pages atomically in sample state, preserves excluded accounts and individual overrides, and rejects stale snapshots. Sidebar/dashboard shortcuts and direct-route preview access agree. Page viewing grants no account creation/approval authority. Structured page access requests use the matrix for new changes; free-text revision is disabled for those payloads.
+- Existing sample sessions migrate without discarding requests/audit/notifications. The selected preview actor persists across direct navigation/reload.
+- Verification: all 11 browser scenarios passed across the initial suite and targeted selector-correction reruns; five policy tests, TypeScript, lint and final optimized build passed. Five refinement screenshots captured; desktop page matrix and mobile form/end controls were visually inspected. Earlier failing selectors matched unrelated column checkboxes or the Next route announcer; they were scoped to the actual dialog/controls.
+- Evidence: docs/evidence/account-form-desktop.png, account-form-mobile.png, account-form-mobile-end.png, page-visibility-desktop.png, sidebar-scrolled-mobile.png. The capture script also checks mobile dialog overflow, reachable form actions and page errors.
+- Testing used isolated synthetic browser contexts; the Owner's sample records were not reset. No cloud, email, database, credentials file or deployment was used. Live Auth/security/backup/email remain unimplemented and cannot yet be certified by these UI tests.
 
 ## Final installation evidence
 - Final path: C:/Users/DELL/Desktop/EVERSHINE-ERP. Temporary build directory removed by moving the complete independent project; node_modules is a real directory, not a link.

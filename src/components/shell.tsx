@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   UsersRound,
@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { ThemeControl } from "./theme";
 import { useReview } from "./review-provider";
-import { actors } from "@/lib/policy";
 export const navigation = [
   {
     path: "dashboard",
@@ -69,7 +68,21 @@ export const navigation = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menu, setMenu] = useState(false);
-  const { state, actor, setActor, storageAvailable } = useReview();
+  const [collapsed, setCollapsed] = useState(false);
+  const { state, actor, previewActors, setActor, storageAvailable, canView } =
+    useReview();
+  const visibleNavigation = navigation.filter((item) => canView(item.path));
+  useEffect(() => {
+    if (!menu) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenu(false);
+        document.querySelector<HTMLButtonElement>(".mobile-menu")?.focus();
+      }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [menu]);
   const unread =
     state?.notifications.filter(
       (n) => n.recipients.includes(actor.id) && !n.readBy.includes(actor.id),
@@ -86,7 +99,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           aria-label="Close navigation"
         />
       ) : null}
-      <aside className={`sidebar ${menu ? "sidebar-open" : ""}`}>
+      <aside
+        id="workspace-sidebar"
+        className={`sidebar ${menu ? "sidebar-open" : ""} ${collapsed ? "sidebar-collapsed" : ""}`}
+      >
         <Link
           href="/dashboard"
           className="brand"
@@ -105,9 +121,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <X size={18} />
         </button>
         <nav aria-label="Main navigation">
-          {navigation.map((item, index) => (
+          {visibleNavigation.map((item, index) => (
             <div key={item.path}>
-              {index === 0 || item.group !== navigation[index - 1].group ? (
+              {index === 0 ||
+              item.group !== visibleNavigation[index - 1].group ? (
                 <div className="nav-group">{item.group}</div>
               ) : null}
               <Link
@@ -132,11 +149,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
           Local foundation <span className="milestone">M1</span>
         </div>
       </aside>
-      <div className="workspace">
+      <div className={`workspace ${collapsed ? "workspace-expanded" : ""}`}>
         <header className="topbar">
+          <button
+            className="desktop-sidebar-toggle icon-button"
+            aria-label={collapsed ? "Show sidebar" : "Hide sidebar"}
+            aria-expanded={!collapsed}
+            aria-controls="workspace-sidebar"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <Menu size={20} />
+          </button>
           <button
             className="mobile-menu icon-button"
             aria-label="Open navigation"
+            aria-expanded={menu}
+            aria-controls="workspace-sidebar"
             onClick={() => setMenu(true)}
           >
             <Menu size={20} />
@@ -148,14 +176,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="topbar-end">
             <span className="sample-label">Sample data</span>
             <ThemeControl />
-            <Link
-              className="icon-button notification-shortcut"
-              href="/notifications"
-              aria-label="Open notifications"
-            >
-              <Bell size={18} />
-              {unread ? <i /> : null}
-            </Link>
+            {canView("notifications") ? (
+              <Link
+                className="icon-button notification-shortcut"
+                href="/notifications"
+                aria-label="Open notifications"
+              >
+                <Bell size={18} />
+                {unread ? <i /> : null}
+              </Link>
+            ) : null}
             <label className="preview-actor">
               <span className="avatar">{actor.role.slice(0, 1)}</span>
               <select
@@ -163,9 +193,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 value={actor.id}
                 onChange={(e) => setActor(e.target.value)}
               >
-                {actors.map((a) => (
+                {previewActors.map((a) => (
                   <option value={a.id} key={a.id}>
-                    {a.role} preview
+                    {["owner", "admin", "employee"].includes(a.id)
+                      ? `${a.role} preview`
+                      : a.name}
                   </option>
                 ))}
               </select>
@@ -188,7 +220,18 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </p>
           ) : null}
           {state ? (
-            children
+            canView(pathname.split("/")[1]) ? (
+              children
+            ) : (
+              <section className="panel restricted">
+                <ShieldCheck size={24} />
+                <h1>Access restricted</h1>
+                <p>
+                  This page is outside the selected sample account’s
+                  permissions.
+                </p>
+              </section>
+            )
           ) : (
             <div
               className="workspace-placeholder"

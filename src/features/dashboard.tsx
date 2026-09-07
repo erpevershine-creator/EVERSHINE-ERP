@@ -13,7 +13,7 @@ import { useReview } from "@/components/review-provider";
 import { Badge, formatTime, PageHeading } from "@/components/ui";
 import { visibleRequest } from "@/lib/review-data";
 export function Dashboard() {
-  const { state, actor } = useReview();
+  const { state, actor, canView } = useReview();
   if (!state) return <PageHeading title="Workspace" />;
   const requests = state.requests.filter((r) => visibleRequest(actor, r));
   const pending = requests
@@ -70,57 +70,61 @@ export function Dashboard() {
         }
       />
       <div className="metric-grid">
-        {metrics.map((m) => (
-          <Link href={m.href} className="metric" key={m.label}>
-            <div>
-              <span>{m.label}</span>
-              <m.icon size={18} />
-            </div>
-            <strong>{m.value.toString().padStart(2, "0")}</strong>
-            <small>
-              {m.hint}
-              <ArrowUpRight size={14} />
-            </small>
-          </Link>
-        ))}
+        {metrics
+          .filter((m) => canView(m.href.slice(1)))
+          .map((m) => (
+            <Link href={m.href} className="metric" key={m.label}>
+              <div>
+                <span>{m.label}</span>
+                <m.icon size={18} />
+              </div>
+              <strong>{m.value.toString().padStart(2, "0")}</strong>
+              <small>
+                {m.hint}
+                <ArrowUpRight size={14} />
+              </small>
+            </Link>
+          ))}
       </div>
       <div className="dashboard-grid">
-        <section className="panel">
-          <div className="panel-heading">
-            <h2>Needs attention</h2>
-            <Link className="text-link" href="/approvals">
-              View all <ArrowUpRight size={14} />
-            </Link>
-          </div>
-          <div className="attention-list">
-            {pending.length ? (
-              pending.slice(0, 5).map((r) => (
-                <Link key={r.id} href="/approvals" className="attention-row">
-                  <span className="request-icon">
-                    <ClipboardCheck size={18} />
-                  </span>
-                  <div>
-                    <strong>{r.title}</strong>
-                    <small>
-                      {r.module} · {r.requester}
-                    </small>
-                  </div>
-                  <div className="attention-meta">
-                    <Badge>{r.status}</Badge>
-                    <small>{formatTime(r.createdAt)}</small>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <div className="empty-state">
-                No requests waiting for your review.
-              </div>
-            )}
-          </div>
-          <div className="panel-note">
-            Each request is reviewed and approved individually.
-          </div>
-        </section>
+        {canView("approvals") ? (
+          <section className="panel">
+            <div className="panel-heading">
+              <h2>Needs attention</h2>
+              <Link className="text-link" href="/approvals">
+                View all <ArrowUpRight size={14} />
+              </Link>
+            </div>
+            <div className="attention-list">
+              {pending.length ? (
+                pending.slice(0, 5).map((r) => (
+                  <Link key={r.id} href="/approvals" className="attention-row">
+                    <span className="request-icon">
+                      <ClipboardCheck size={18} />
+                    </span>
+                    <div>
+                      <strong>{r.title}</strong>
+                      <small>
+                        {r.module} · {r.requester}
+                      </small>
+                    </div>
+                    <div className="attention-meta">
+                      <Badge>{r.status}</Badge>
+                      <small>{formatTime(r.createdAt)}</small>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="empty-state">
+                  No requests waiting for your review.
+                </div>
+              )}
+            </div>
+            <div className="panel-note">
+              Each request is reviewed and approved individually.
+            </div>
+          </section>
+        ) : null}
         <section className="panel">
           <div className="panel-heading">
             <h2>Company structure</h2>
@@ -154,9 +158,11 @@ export function Dashboard() {
         <section className="panel">
           <div className="panel-heading">
             <h2>Recent activity</h2>
-            <Link className="text-link" href="/audit">
-              View history <ArrowUpRight size={14} />
-            </Link>
+            {canView("audit") ? (
+              <Link className="text-link" href="/audit">
+                View history <ArrowUpRight size={14} />
+              </Link>
+            ) : null}
           </div>
           <div className="activity-list">
             {events.slice(0, 4).map((e) => (
@@ -179,18 +185,24 @@ export function Dashboard() {
             <span className="muted">Milestone 1</span>
           </div>
           <div className="review-links">
-            <Link href="/accounts">
-              <span>Accounts & access</span>
-              <ArrowUpRight size={16} />
-            </Link>
-            <Link href="/settings">
-              <span>Company & security settings</span>
-              <ArrowUpRight size={16} />
-            </Link>
-            <Link href="/usage">
-              <span>Services & usage status</span>
-              <ArrowUpRight size={16} />
-            </Link>
+            {canView("accounts") ? (
+              <Link href="/accounts">
+                <span>Accounts & access</span>
+                <ArrowUpRight size={16} />
+              </Link>
+            ) : null}
+            {canView("settings") ? (
+              <Link href="/settings">
+                <span>Company & security settings</span>
+                <ArrowUpRight size={16} />
+              </Link>
+            ) : null}
+            {canView("usage") ? (
+              <Link href="/usage">
+                <span>Services & usage status</span>
+                <ArrowUpRight size={16} />
+              </Link>
+            ) : null}
             <Link href="/login">
               <span>Login screen</span>
               <ArrowUpRight size={16} />

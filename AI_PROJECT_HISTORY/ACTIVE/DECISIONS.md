@@ -127,7 +127,15 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D113 | Owner explicitly authorized coding Milestone 1 local foundation skeleton on 2026-09-06 with “စပါ”, then “Continue Task”. Screen/workflow acceptance and Production approval remain separate. |
 
-## Proposed, not individually confirmed
+## Latest confirmed refinements
+
+| ID | Owner-confirmed decision |
+| --- | --- |
+| D114 | Owner delegated the remaining local foundation checks to Codex and requested that sidebar On/Off remain accessible when scrolling. This authorizes M1 refinements, not live backend or Production acceptance. |
+| D115 | Account creation must include Profile Photo, Employee Name, Position, Department, ERP Role, company-assigned @gmail.com Username, Password, Confirm Password and Contact. Existing Owner/Admin creation authority and the confirmed password policy still apply. |
+| D116 | Positions & Permissions must explicitly control which pages are visible/hidden. Page visibility is separate from action authority; apply the already-confirmed template approval with exact included accounts and preserved excluded accounts/individual overrides. |
+
+## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
 ## Historical conditional preference — resolved for login by D23

@@ -21,6 +21,10 @@ Use the **Owner / Admin / Employee preview** control to inspect sample access di
 
 Sample changes survive reload/navigation **in the same browser tab** through sessionStorage. They are not durable ERP records and are readable/editable by the local browser user. Reset via Settings → Appearance → Reset samples. Theme preference is saved separately on this browser.
 
+Account Management → Create account now provides the requested profile and employee fields. Use synthetic details: the form checks a company-assigned Gmail identifier and password/confirmation, but passwords are never added to sample storage, audit or CSV. It creates a preview profile, not a working login. Photos are resized locally; JPG/PNG/WebP up to 2 MB is the current preview limit.
+
+Positions & Permissions → open a position → select visible pages, exact affected accounts and a reason → Submit for approval. Review and approve that request individually in Approval Center. Included accounts then receive the template change; excluded accounts and existing individual overrides stay unchanged. Stale snapshots are rejected. Both sidebar links and direct page navigation use the selected preview account's page visibility. Viewing a page does not grant permission to create accounts or approve requests. Use the matrix for new page changes; free-text Revise is unavailable for structured page-access requests so their approved payload cannot be misrepresented.
+
 ## Verification
 
 `npm run typecheck` · `npm run lint` · `npm test` · `npm run build`
