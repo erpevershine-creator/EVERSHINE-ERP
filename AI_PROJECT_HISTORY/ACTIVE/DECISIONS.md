@@ -139,6 +139,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D119 | Owner confirmed self-recovery using the previously issued Emergency Recovery Code to set a new ERP password when the Owner account is locked after failed logins or its password has expired. This is an Owner-only exception, not Admin reset authority. Existing D28 code replacement and D29-D30 session history/logout rules still apply. This confirms the rule; implementation and verification remain pending. |
 
+| D120 | Owner confirmed Myanmar Kyat (MMK) as the ERP base currency. Foreign-currency support, exchange-rate rules, decimal precision and rounding are not determined by this decision. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

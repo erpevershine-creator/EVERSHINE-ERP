@@ -56,3 +56,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 ## Owner confirmation update
 - Owner reports successful login; real Owner setup is complete. Accounts/business screens still use sample state.
 - D119 confirmed emergency-code password recovery for Owner lock or expiry. Recorded only; recovery implementation is pending.
+- D120: Owner confirmed MMK as base currency; recorded requirement only, with runtime implementation still pending.
