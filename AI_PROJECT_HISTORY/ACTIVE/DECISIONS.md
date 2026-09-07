@@ -148,6 +148,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D124 | Owner confirmed automatic backup once daily, constrained to free-plan usage with no paid upgrades or overage authorized. Exact execution time, retention, encryption and missed-run handling remain open. Once-daily frequency alone does not establish quota compliance; validate backup size and provider limits during integration. This is a product requirement, not a request to create a Codex scheduled task. |
 
+| D125 | Owner confirmed daily automatic backup at 18:00 (6 PM), Asia/Yangon (UTC+06:30). This sets the ERP backup schedule requirement; no scheduler is configured yet. Missed-run handling remains unconfirmed. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
