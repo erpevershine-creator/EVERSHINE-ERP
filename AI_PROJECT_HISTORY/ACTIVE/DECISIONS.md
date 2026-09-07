@@ -157,6 +157,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D129 | On 2026-09-08 Owner accepted backup retention: last 7 daily backups (7 days), last 3 month-end backups (3 months), and last 1 year-end backup (1 year). A daily snapshot may also serve as the month/year-end snapshot without duplicate content. Verify the new backup is readable before pruning expired backup files. This is backup retention, not authorization to delete live business records or audit history. Free-plan fit must be checked against actual archive size and available storage; no scheduler, delivery or deletion has been implemented. |
 
+| D130 | Owner confirmed that a restore workflow offers a choice: automatically back up current data before restore, or restore without taking that backup. If backup is selected, restore proceeds only after that backup succeeds. D128 restore approval authority and existing reason/audit rules remain applicable to either choice. This is a workflow requirement, not authorization to execute a restore or delete data now. Default choice and whether the choice must be bound to the approval request remain unconfirmed. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
