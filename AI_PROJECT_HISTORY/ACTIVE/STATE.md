@@ -47,3 +47,8 @@ Pending: the Owner must create the real Owner account privately in the local for
 - KOE KOE ERP/AI_PROJECT_HISTORY/ACTIVE now contains routing pointers only. Prior summaries are preserved under its legacy-snapshot-20260906/milestone1-cutover directory. This new project's active handoff is the only current planning authority.
 - No hosted resources, email, actual user accounts, business records or paid integrations were created. No production release or business module acceptance.
 `n## Owner setup runtime fix — 2026-09-07`n- Moved initial state objects from use-server modules into client forms for both setup and login. Changed Referrer-Policy to same-origin so native same-origin form POSTs preserve Origin and pass Next.js CSRF validation.`n- Verified actual Owner form submission in an isolated browser with a deliberately invalid password: expected server validation returned; no account created. Earlier build/page-load checks did not cover this submission path.
+
+## Email login configuration repair — 2026-09-07
+- Auth logs identified 422 Email logins are disabled, not invalid credentials. Enabled auth.email.enable_signup (email provider switch in this local CLI) while retaining global auth.enable_signup=false.
+- Restarted only M2 using preserved volumes. Auth settings now report external.email=true and disable_signup=true; one active confirmed Owner remains. Typecheck/lint passed. User must retry private login to verify successful authentication.
+- Login now distinguishes invalid_credentials, rate limits and service failures.

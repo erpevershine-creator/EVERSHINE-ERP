@@ -33,7 +33,7 @@ export async function login(
   if (error || !data.user) {
     return {
       status: "error",
-      message: "Username or ERP password is incorrect.",
+      message: error?.code === "invalid_credentials" ? "Username or ERP password is incorrect." : error?.status === 429 ? "Too many login attempts. Please try again shortly." : "Sign-in service is unavailable. Please contact your administrator.",
     };
   }
 
