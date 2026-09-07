@@ -66,3 +66,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - 2026-09-08 D129: Owner approved 7 daily / 3 monthly / 1 yearly backup retention. Requirement recorded; no backup job, upload or deletion performed.
 - D130: restore may include or skip a current-data backup; selected backup must succeed first. Requirement recorded only; no restore or data mutation performed.
 - D131: pre-restore backup choice is part of the approval snapshot; changing it after approval requires a new request. Requirement recorded only; implementation pending.
+- D132: block other users from data creation/editing and approval during restore; reopen after restore succeeds. Requirement recorded only; maintenance/restore not implemented or activated.
