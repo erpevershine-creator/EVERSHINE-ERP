@@ -1,10 +1,9 @@
-# Next confirmation
 
-Last confirmed: D118 authorizes the localhost-only one-time Owner setup. The form, transactional profile/recovery/audit provisioning, real sign-in/sign-out and protected workspace boundary are implemented and verified without creating a real account or exposing secrets.
+# Next work
 
-Immediate Owner action: open `http://localhost:3000/setup/owner`, enter the private details, create the account, and save the emergency recovery code shown once. Do not send the password or recovery code in chat. Codex then verifies the database effects, closed setup route, actual login/logout and protected-page access without reading or printing secrets.
+Owner confirmed successful login and D119: emergency-code self-recovery for Owner account lock or password expiry. The rule is recorded; the recovery UI/server workflow is not implemented yet. Never ask Owner to repeat setup or disclose credentials.
 
-After successful account verification, ask one genuinely unresolved essential at a time, beginning with what recovery path the sole Owner may use when the account is locked by five failed passwords or by password expiry. Then continue with warehouse scope detail, timezone/currency, and backup destination/frequency/encryption/recovery objectives. Do not ask again about previously settled password/retention/device/template policies.
+Continue real account management, permissions, lock/expiry/recovery and device-session enforcement before live business entry. Ask only unresolved essentials one at a time; base currency, timezone and backup destination/frequency remain open.
 
 Later business modules require individual confirmation. Transfer request approval, separate-actor dispatch/receipt, discrepancy resolution, partial receipt, cancellation and reversal details remain open.
 

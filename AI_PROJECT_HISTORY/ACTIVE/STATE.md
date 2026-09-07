@@ -52,3 +52,7 @@ Pending: the Owner must create the real Owner account privately in the local for
 - Auth logs identified 422 Email logins are disabled, not invalid credentials. Enabled auth.email.enable_signup (email provider switch in this local CLI) while retaining global auth.enable_signup=false.
 - Restarted only M2 using preserved volumes. Auth settings now report external.email=true and disable_signup=true; one active confirmed Owner remains. Typecheck/lint passed. User must retry private login to verify successful authentication.
 - Login now distinguishes invalid_credentials, rate limits and service failures.
+
+## Owner confirmation update
+- Owner reports successful login; real Owner setup is complete. Accounts/business screens still use sample state.
+- D119 confirmed emergency-code password recovery for Owner lock or expiry. Recorded only; recovery implementation is pending.
