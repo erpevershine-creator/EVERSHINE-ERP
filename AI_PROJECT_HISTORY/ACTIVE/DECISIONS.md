@@ -141,6 +141,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D120 | Owner confirmed Myanmar Kyat (MMK) as the ERP base currency. Foreign-currency support, exchange-rate rules, decimal precision and rounding are not determined by this decision. |
 
+| D121 | Owner confirmed Myanmar Standard Time, Asia/Yangon (UTC+06:30), for ERP dates, times, reports and approval deadlines. This governs business-time interpretation and display; implementation and runtime verification remain pending. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
