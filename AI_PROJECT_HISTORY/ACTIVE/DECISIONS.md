@@ -150,6 +150,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D125 | Owner confirmed daily automatic backup at 18:00 (6 PM), Asia/Yangon (UTC+06:30). This sets the ERP backup schedule requirement; no scheduler is configured yet. Missed-run handling remains unconfirmed. |
 
+| D126 | Owner confirmed automatic catch-up when a scheduled backup cannot finish because the computer is off or Internet is unavailable: retry the incomplete backup when the required computer/connectivity becomes available. This does not imply reconstructing historical database snapshots that were never captured. Backup execution and delivery remain unimplemented. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

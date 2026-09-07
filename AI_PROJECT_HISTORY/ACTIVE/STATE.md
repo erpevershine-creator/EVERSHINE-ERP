@@ -61,3 +61,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - D122-D123: backup destination requirements recorded: Owner Gmail Google Drive and dedicated Telegram private channel with Owner and approved Admins. No integration or transfer performed.
 - D124: once-daily automatic backup within free-plan constraints confirmed; requirement recorded only. No scheduler or external delivery configured.
 - D125: daily backup time confirmed as 18:00 Asia/Yangon. Requirement recorded; no scheduler configured.
+- D126: automatic backup catch-up after computer/connectivity recovery confirmed. Recorded requirement only; no scheduler or delivery integration implemented.
