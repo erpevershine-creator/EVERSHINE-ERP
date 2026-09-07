@@ -68,3 +68,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - D131: pre-restore backup choice is part of the approval snapshot; changing it after approval requires a new request. Requirement recorded only; implementation pending.
 - D132: block other users from data creation/editing and approval during restore; reopen after restore succeeds. Requirement recorded only; maintenance/restore not implemented or activated.
 - D133: failed restore keeps maintenance restrictions active and notifies Owner/authorized Backup-Restore Admins. Requirement recorded only; no notification sent or runtime behavior implemented.
+- D134: failed-restore Retry is manually initiated by Owner or Backup/Restore-authorized Admin with a reason note. Requirement recorded only; no restore or retry executed.

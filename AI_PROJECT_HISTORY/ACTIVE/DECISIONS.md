@@ -165,6 +165,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D133 | Owner confirmed that if restore fails, the D132 maintenance restrictions remain active and a failure notification is sent to Owner and Admins authorized for Backup/Restore. This does not authorize automatic rollback, permission bypass, reopening writes after failure, or an unspecified external messaging integration. Recovery/retry procedure and notification delivery resilience remain to be implemented. |
 
+| D134 | Owner confirmed failed-restore Retry is manually initiated by Owner or an Admin with Backup/Restore authority, with a required reason note. Existing audit and maintenance restrictions apply. This does not authorize a restore now or bypass D131: changing the approved pre-restore backup choice still requires a new approval request. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
