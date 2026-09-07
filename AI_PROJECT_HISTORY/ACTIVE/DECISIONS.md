@@ -163,6 +163,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D132 | Owner confirmed that while restore is running, other users cannot create data, edit data or perform approvals. Those operations reopen only after restore succeeds. A failed or interrupted restore must not automatically reopen these operations; the recovery procedure remains to be designed. This confirms behavior only and does not execute a restore or activate maintenance mode now. |
 
+| D133 | Owner confirmed that if restore fails, the D132 maintenance restrictions remain active and a failure notification is sent to Owner and Admins authorized for Backup/Restore. This does not authorize automatic rollback, permission bypass, reopening writes after failure, or an unspecified external messaging integration. Recovery/retry procedure and notification delivery resilience remain to be implemented. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
