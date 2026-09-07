@@ -11,10 +11,6 @@ export type OwnerSetupState = {
   recoveryCode?: string;
 };
 
-export const initialOwnerSetupState: OwnerSetupState = {
-  status: "idle",
-  message: "",
-};
 
 const photoExtensions: Record<string, string> = {
   "image/jpeg": "jpg",

@@ -7,7 +7,6 @@ export type LoginState = {
   status: "idle" | "error" | "success";
   message: string;
 };
-export const initialLoginState: LoginState = { status: "idle", message: "" };
 
 export async function login(
   _previous: LoginState,

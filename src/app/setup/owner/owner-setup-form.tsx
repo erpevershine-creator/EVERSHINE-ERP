@@ -3,7 +3,9 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, Clipboard, ImagePlus, KeyRound } from "lucide-react";
-import { initialOwnerSetupState, setupOwner } from "./actions";
+import { setupOwner, type OwnerSetupState } from "./actions";
+
+const initialOwnerSetupState: OwnerSetupState = { status: "idle", message: "" };
 
 export function OwnerSetupForm() {
   const [state, action, pending] = useActionState(

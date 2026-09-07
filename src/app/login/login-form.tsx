@@ -2,7 +2,9 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { initialLoginState, login } from "./actions";
+import { login, type LoginState } from "./actions";
+
+const initialLoginState: LoginState = { status: "idle", message: "" };
 
 export function LoginForm() {
   const router = useRouter();
