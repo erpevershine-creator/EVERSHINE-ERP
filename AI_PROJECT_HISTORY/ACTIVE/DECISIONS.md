@@ -159,6 +159,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D130 | Owner confirmed that a restore workflow offers a choice: automatically back up current data before restore, or restore without taking that backup. If backup is selected, restore proceeds only after that backup succeeds. D128 restore approval authority and existing reason/audit rules remain applicable to either choice. This is a workflow requirement, not authorization to execute a restore or delete data now. Default choice and whether the choice must be bound to the approval request remain unconfirmed. |
 
+| D131 | Owner confirmed the pre-restore backup yes/no choice must be included in the restore approval request. After approval, changing that choice requires a new approval request; execution must use the approved choice. This specifically resolves D130 approval binding, and is not bypassed by the general approved-record Revise rule. Existing Owner-only self-approval and audit requirements apply. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

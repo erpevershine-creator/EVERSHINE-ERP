@@ -65,3 +65,4 @@ Pending: the Owner must create the real Owner account privately in the local for
 - D127-D128: no separately entered backup recovery key; restore approval by Owner and delegated approved Admins confirmed. Recorded only; backup encryption/key custody and restore workflows remain unimplemented.
 - 2026-09-08 D129: Owner approved 7 daily / 3 monthly / 1 yearly backup retention. Requirement recorded; no backup job, upload or deletion performed.
 - D130: restore may include or skip a current-data backup; selected backup must succeed first. Requirement recorded only; no restore or data mutation performed.
+- D131: pre-restore backup choice is part of the approval snapshot; changing it after approval requires a new request. Requirement recorded only; implementation pending.
