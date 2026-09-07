@@ -12,13 +12,14 @@ import {
   Settings2,
   DatabaseBackup,
   Gauge,
-  LogIn,
+  LogOut,
   Menu,
   X,
   ChevronRight,
 } from "lucide-react";
 import { ThemeControl } from "./theme";
 import { useReview } from "./review-provider";
+import { logout } from "@/app/login/actions";
 export const navigation = [
   {
     path: "dashboard",
@@ -65,7 +66,13 @@ export const navigation = [
   },
   { path: "usage", label: "Usage Monitor", icon: Gauge, group: "SYSTEM" },
 ];
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({
+  children,
+  authenticatedUser,
+}: {
+  children: React.ReactNode;
+  authenticatedUser: { employeeName: string; username: string; role: string };
+}) {
   const pathname = usePathname();
   const [menu, setMenu] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -186,6 +193,18 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 {unread ? <i /> : null}
               </Link>
             ) : null}
+            <span
+              className="authenticated-user"
+              title={authenticatedUser.username}
+            >
+              <span className="avatar">
+                {authenticatedUser.employeeName.slice(0, 1).toUpperCase()}
+              </span>
+              <span>
+                <strong>{authenticatedUser.employeeName}</strong>
+                <small>{authenticatedUser.role}</small>
+              </span>
+            </span>
             <label className="preview-actor">
               <span className="avatar">{actor.role.slice(0, 1)}</span>
               <select
@@ -202,14 +221,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 ))}
               </select>
             </label>
-            <Link
-              href="/login"
-              className="icon-button"
-              aria-label="View login screen"
-              title="View login screen"
-            >
-              <LogIn size={18} />
-            </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="icon-button"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut size={18} />
+              </button>
+            </form>
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>

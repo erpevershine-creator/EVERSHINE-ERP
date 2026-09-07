@@ -1,7 +1,35 @@
-import Link from "next/link";
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { redirect } from "next/navigation";
+import { LockKeyhole } from "lucide-react";
 import { ThemeControl } from "@/components/theme";
-export default function LoginPage() {
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { LoginForm } from "./login-form";
+
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage() {
+  const admin = createAdminClient();
+  const { data: owner, error: ownerError } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("erp_role", "owner")
+    .neq("status", "inactive")
+    .maybeSingle();
+  if (ownerError) throw new Error("Owner setup status could not be verified.");
+  if (!owner) redirect("/setup/owner");
+
+  const supabase = await createClient();
+  const { data: claimData } = await supabase.auth.getClaims();
+  if (claimData?.claims?.sub) {
+    const { data: signedInProfile } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("id", claimData.claims.sub)
+      .eq("status", "active")
+      .maybeSingle();
+    if (signedInProfile) redirect("/dashboard");
+  }
+
   return (
     <main className="login-layout">
       <div className="login-brand">
@@ -17,40 +45,10 @@ export default function LoginPage() {
         <LockKeyhole size={23} className="muted" />
         <h1>Welcome back</h1>
         <p className="muted">Sign in with your company-assigned account.</p>
-        <label>
-          Email address
-          <input
-            type="email"
-            placeholder="name@gmail.com"
-            autoComplete="off"
-            disabled
-          />
-        </label>
-        <label>
-          ERP password
-          <input
-            type="password"
-            placeholder="Password"
-            autoComplete="off"
-            disabled
-          />
-        </label>
-        <button className="primary" disabled>
-          Sign in
-        </button>
-        <div className="login-preview">
-          <span className="eyebrow">MILESTONE 1</span>
-          <p>
-            Account sign-in is not connected yet. Review the foundation with
-            sample records.
-          </p>
-          <Link href="/dashboard" className="button">
-            Open local preview <ArrowRight size={16} />
-          </Link>
-        </div>
+        <LoginForm />
       </section>
       <small className="login-footer">
-        EVERSHINE ERP 2.1 · Local foundation
+        EVERSHINE ERP 2.1 · Local authentication
       </small>
     </main>
   );

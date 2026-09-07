@@ -4,6 +4,9 @@ const config: NextConfig = {
   agentRules: false,
   poweredByHeader: false,
   devIndicators: false,
+  experimental: {
+    serverActions: { bodySizeLimit: "3mb" },
+  },
   async headers() {
     return [
       {

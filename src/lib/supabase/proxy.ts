@@ -7,14 +7,16 @@ import {
 
 export async function updateSupabaseSession(request: NextRequest) {
   let response = NextResponse.next({ request });
-  if (!hasPublicSupabaseEnvironment()) return response;
+  if (!hasPublicSupabaseEnvironment()) return { response, userId: null };
 
   const { url, publishableKey } = getPublicSupabaseEnvironment();
   const supabase = createServerClient(url, publishableKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (cookiesToSet) => {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
@@ -24,6 +26,6 @@ export async function updateSupabaseSession(request: NextRequest) {
   });
 
   // Validating claims also refreshes an expiring session cookie when needed.
-  await supabase.auth.getClaims();
-  return response;
+  const { data } = await supabase.auth.getClaims();
+  return { response, userId: data?.claims?.sub ?? null };
 }

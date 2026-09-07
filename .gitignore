@@ -8,3 +8,4 @@ playwright-report/
 .runtime/
 .npm-cache/
 *.log
+.local-dev.pid

@@ -1,6 +1,6 @@
 # Milestone 2 — local Auth and data foundation
 
-Status: implemented and verified locally on 2026-09-07. This milestone establishes security and data boundaries. It does not create a real Owner account, replace the sample UI state, implement backup/email, or authorize Production.
+Status: foundation and initial Owner setup boundary implemented and verified locally on 2026-09-07. No real Owner account has been created yet; the Owner must enter private credentials in the local form. This milestone does not replace the sample business UI state, implement backup/email, or authorize Production.
 
 ## Local architecture
 
@@ -15,9 +15,15 @@ The single migration creates the confirmed foundation records and constraints fo
 
 Every exposed foundation table has RLS enabled. Default `anon` and `authenticated` table privileges are revoked and only the required reads and notification read-state update are granted. Authorization helpers use fixed search paths and execute only for authenticated users. Audit rows have a database-level append-only trigger. Recovery hashes are unavailable to browser roles; the server role has only select, insert and update access so it can generate, verify and invalidate a hash without directly deleting it. All business mutations will go through validated server actions using the server-only secret so UI visibility never becomes mutation authority.
 
-Profile photos use the private `profile-photos` bucket with a two MiB limit and JPEG, PNG and WebP MIME types. Direct client storage policies are intentionally absent; account-management server actions will validate and write photos.
+Profile photos use the private `profile-photos` bucket with a two MiB limit and JPEG, PNG and WebP MIME types. Direct client storage policies are intentionally absent; the initial setup's trusted server action validates and writes the Owner photo.
 
-Local Auth disables self-signup and anonymous sign-in. Its built-in baseline requires at least eight characters with a letter and number; the server account workflow will additionally require the confirmed uppercase letter. This avoids adding an unconfirmed lowercase requirement. The schema permits only one Owner profile. A real Owner user is deferred until the Owner confirms the one-time provisioning flow.
+Local Auth disables self-signup and anonymous sign-in. Its built-in baseline requires at least eight characters with a letter and number; the server setup action additionally requires the confirmed uppercase letter. This avoids adding an unconfirmed lowercase requirement. The schema and transactional provisioning function permit only one active Owner profile.
+
+## One-time setup and real login boundary
+
+`/setup/owner` is a localhost-only form containing Profile Photo, Employee Name, Department, fixed Owner Position/Role, company-approved Gmail Username, ERP Password/confirmation and Contact. Auth creation and photo upload occur on the trusted server. The profile, recovery-code hash and setup audit are committed in one locked database transaction, and normal cross-service failures trigger cleanup. The clear recovery code appears once on success and is never stored in audit/history or committed files. After an Owner exists, the setup page redirects away permanently.
+
+`/login` performs real Supabase password authentication and requires an active profile. SSR session cookies protect every workspace route, and sign-out clears the Auth session. Advanced lock, expiry, recovery and device-session rules remain later implementation work.
 
 ## Commands
 
@@ -38,7 +44,7 @@ npm run build
 ## Verification evidence
 
 - Clean migration reset: pass.
-- pgTAP schema, RLS, constraint, recovery-access and private-bucket tests: 34/34 pass.
+- pgTAP schema, RLS, constraint, recovery-access, private-bucket and Owner transaction tests: 47/47 pass.
 - Supabase database lint at warning level: no schema errors.
 - App policy tests: 5/5 pass.
 - TypeScript and ESLint: pass.
@@ -47,4 +53,4 @@ npm run build
 - DB, Auth, Storage and Kong container health: healthy; Auth, Storage and REST endpoints: HTTP 200.
 - API and database listeners: `127.0.0.1`/`::1` only; active LAN-IP probe blocked.
 
-The next implementation step is a localhost-only one-time Owner setup followed by real login/account-management server actions. Session limits, lock/unlock, recovery, approvals and audit effects must be exercised end to end before they can be described as working.
+The next action is private Owner account creation through the local form, followed by end-to-end login/logout verification. Session limits, lock/unlock, recovery, approvals and audit effects must be implemented and exercised before they can be described as working.

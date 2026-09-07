@@ -351,6 +351,34 @@ svg {
   align-items: center;
   gap: 16px;
 }
+.topbar-end > form {
+  display: flex;
+}
+.authenticated-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.authenticated-user > span:last-child {
+  display: flex;
+  flex-direction: column;
+  max-width: 130px;
+}
+.authenticated-user strong,
+.authenticated-user small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.authenticated-user strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+.authenticated-user small {
+  color: var(--muted);
+  text-transform: capitalize;
+}
 .sample-label {
   background: var(--accent-bg);
   color: var(--accent);
@@ -1456,6 +1484,21 @@ tbody tr:hover {
   margin-top: 22px;
   min-height: 38px;
 }
+.login-form {
+  display: grid;
+  gap: 17px;
+}
+.login-form label {
+  margin-top: 0;
+}
+.login-form button {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 5px;
+}
+.login-form .field-error {
+  margin: 0;
+}
 .login-preview {
   margin-top: 27px;
   padding-top: 22px;
@@ -1481,6 +1524,139 @@ tbody tr:hover {
   bottom: 25px;
   color: var(--muted);
   font-size: 10px;
+}
+.setup-layout {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  padding: 92px 20px 70px;
+}
+.setup-card {
+  width: min(780px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 28px 30px;
+}
+.setup-card > header {
+  display: flex;
+  gap: 13px;
+  padding-bottom: 22px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.setup-card header h1 {
+  margin: 3px 0 4px;
+}
+.setup-card header p {
+  color: var(--muted);
+  font-size: 12px;
+}
+.owner-setup-form {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 24px;
+}
+.setup-photo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.setup-photo label {
+  width: 112px;
+  height: 112px;
+  cursor: pointer;
+}
+.setup-photo label > span,
+.setup-photo img {
+  width: 112px;
+  height: 112px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+.setup-photo label > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+.setup-photo img {
+  object-fit: cover;
+  border-style: solid;
+}
+.setup-photo input {
+  width: 112px;
+  padding: 0;
+  font-size: 10px;
+}
+.setup-photo small {
+  color: var(--muted);
+}
+.setup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.setup-grid input[readonly] {
+  background: var(--soft);
+  color: var(--muted);
+}
+.setup-password-rule,
+.owner-setup-form > .field-error,
+.setup-submit {
+  grid-column: 2;
+}
+.setup-password-rule {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.setup-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--border);
+}
+.setup-submit > span {
+  color: var(--muted);
+  font-size: 11px;
+  max-width: 310px;
+}
+.setup-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+.setup-success > svg {
+  color: var(--positive);
+}
+.setup-success p {
+  color: var(--muted);
+  font-size: 12px;
+}
+.setup-success code {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--soft);
+  font-size: 15px;
+  letter-spacing: 0.8px;
+  overflow-wrap: anywhere;
+}
+.setup-actions {
+  display: flex;
+  gap: 10px;
 }
 .standalone {
   display: flex;
@@ -1617,6 +1793,9 @@ tbody tr:hover {
     gap: 6px;
   }
   .topbar-end > .theme-control {
+    display: none;
+  }
+  .authenticated-user > span:last-child {
     display: none;
   }
   .preview-actor select {
@@ -1814,6 +1993,41 @@ tbody tr:hover {
   }
   .footnote {
     font-size: 10px;
+  }
+}
+@media (max-width: 680px) {
+  .setup-layout {
+    display: block;
+    padding: 92px 14px 70px;
+  }
+  .setup-card {
+    padding: 22px 18px;
+  }
+  .owner-setup-form {
+    grid-template-columns: 1fr;
+  }
+  .setup-photo {
+    align-items: center;
+  }
+  .setup-grid {
+    grid-template-columns: 1fr;
+  }
+  .setup-password-rule,
+  .owner-setup-form > .field-error,
+  .setup-submit {
+    grid-column: 1;
+  }
+  .setup-submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .setup-submit button,
+  .setup-actions > * {
+    width: 100%;
+  }
+  .setup-actions {
+    width: 100%;
+    flex-direction: column;
   }
 }
 @media (prefers-reduced-motion: reduce) {

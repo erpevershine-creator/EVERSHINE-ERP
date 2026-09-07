@@ -22,7 +22,22 @@ export async function proxy(request: NextRequest) {
       },
     );
   }
-  return updateSupabaseSession(request);
+  const { response, userId } = await updateSupabaseSession(request);
+  const authRequired = process.env.EVERSHINE_AUTH_REQUIRED === "1";
+  const publicPath =
+    request.nextUrl.pathname === "/login" ||
+    request.nextUrl.pathname === "/setup/owner";
+
+  if (authRequired && !publicPath && !userId) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/login";
+    target.search = "";
+    const redirect = NextResponse.redirect(target);
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  }
+
+  return response;
 }
 export const config = {
   matcher: ["/((?!_next/static|_next/image|icon.svg).*)"],
