@@ -1,0 +1,1 @@
+-- Intentionally empty. Real users, credentials and company data are never seeded.

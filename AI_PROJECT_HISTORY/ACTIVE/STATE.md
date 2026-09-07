@@ -1,6 +1,6 @@
 # Current state and evidence
 
-Updated 2026-09-06. Milestone 1 foundation skeleton implemented and tested; independent installation verified. Owner screen/workflow acceptance is pending.
+Updated 2026-09-07. Milestone 2 isolated local Auth/data foundation is implemented and verified. No real Owner/user account has been provisioned yet.
 
 - Fresh source, exact package versions/lockfile, independent dependencies. No legacy runtime/data/schema copied.
 - Ten screens: Workspace, Login, Account Management, Positions & Permissions, Approval Center, Audit & History, Notifications, Settings, Backup & Restore, Usage Monitor.
@@ -9,7 +9,17 @@ Updated 2026-09-06. Milestone 1 foundation skeleton implemented and tested; inde
 - Login controls remain disabled. The new sample account form validates an entered ERP password and confirmation in transient form memory only; neither enters sample storage, audit or exports. No real Auth/database/production permissions. Provider usage is unknown, with a separate sample 80% policy control. Backup/restore actions disabled until implemented.
 - TypeScript, ESLint, four unit tests, optimized build and production dependency audit passed. All six browser acceptance scenarios passed across the full run and the targeted mobile fix retest. No runtime external requests/page errors in the all-route check. See docs/MILESTONE-1.md for evidence and acceptance boundaries.
 
-Pending: Owner screen/workflow acceptance; then local Docker/Supabase Auth/database design, server authorization/audit, live account controls and tested recovery. No business module or production deployment is accepted.
+## Milestone 2 local Auth/data foundation
+
+- Pinned Supabase client/SSR/CLI dependencies and created local project `evershine-erp-m2-local` on ports 55321/55322. Project start creates the dedicated Docker network recommended for untrusted networks, and the workstation's Docker `Localhost only` port policy is enabled. Local services therefore stay on this computer across WiFi/hotspot changes. The reset helper reconnects a recreated database to the project network. Old UAT containers and volumes remain separate and were not migrated or deleted.
+- Added reproducible schema migration for company settings, Head Office, Operations Warehouse, Reserve Warehouse, positions, page/action permissions, Auth-linked profiles, approval snapshots/accounts, individual page overrides, immutable audit events, scoped notifications, device sessions and private Owner recovery-code hashes.
+- Disabled self-signup and anonymous login. Local Auth enforces an eight-character letter-and-number baseline; the account server workflow must additionally enforce the confirmed uppercase-letter requirement. Admin operations require the server-only secret; browser code receives only the publishable key.
+- Enabled RLS on every public foundation table, revoked implicit table access, added explicit grants/policies and security-definer authorization helpers with fixed search paths. Audit rows have a database-level append-only trigger. Recovery hashes are unavailable to browser roles and have explicit server-role access without direct delete. `profile-photos` is a private, server-managed bucket limited to 2 MiB JPEG/PNG/WebP files.
+- Added browser/server/admin Supabase clients, SSR cookie refresh and a secret-free local environment sync command. `.env.local` is ignored and no secret is recorded in Git or active history.
+- Docker Desktop was updated in place from 4.87.0 to 4.89.0 using a valid Docker Inc.-signed delta updater after a Windows stale-socket startup failure. No factory reset, container-volume deletion or UAT data migration occurred. The original Docker settings were backed up before enabling `Localhost only`. Core M2 DB/Auth/REST/Storage/Kong services are running and healthy.
+- Verification on 2026-09-07: clean database reset through the reconnect helper passed; 34/34 pgTAP schema/RLS/storage tests passed; database lint found no errors; 5/5 app policy tests passed; TypeScript and ESLint passed; optimized Next.js build passed. The all-foundation-routes browser smoke test passed with meaningful content, no browser errors and no external runtime requests. Auth, Storage and REST health endpoints returned HTTP 200. Ports 55321/55322 listened only on `127.0.0.1`/`::1`; localhost succeeded and the active LAN-IP probe was blocked.
+
+Pending: confirm and implement localhost-only one-time Owner provisioning; connect login/account pages to real Auth and server-authorized database actions; then test session limits, lock/unlock, recovery, approval and audit flows. Backup/restore, email, quota monitoring, business modules and Production remain unimplemented and unaccepted.
 
 ## Latest authorized M1 refinements (D114–D116)
 - Header remains sticky; desktop sidebar can collapse/expand, mobile navigation remains reachable after scrolling and closes with Escape.

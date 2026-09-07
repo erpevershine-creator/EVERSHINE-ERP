@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isLocalReview } from "./lib/policy";
+import { updateSupabaseSession } from "./lib/supabase/proxy";
 
-// M1 deliberately exposes no real authentication or data API. Fail closed if hosted.
-export function proxy(request: NextRequest) {
+// Production remains closed until the Owner explicitly accepts and provisions Auth.
+export async function proxy(request: NextRequest) {
   if (
     !isLocalReview(
       process.env.NODE_ENV,
@@ -21,7 +22,7 @@ export function proxy(request: NextRequest) {
       },
     );
   }
-  return NextResponse.next();
+  return updateSupabaseSession(request);
 }
 export const config = {
   matcher: ["/((?!_next/static|_next/image|icon.svg).*)"],

@@ -1,6 +1,6 @@
 # EVERSHINE ERP — active handoff
 
-Updated: 2026-09-06, Asia/Rangoon. Phase: **Milestone 1 local foundation skeleton**. Owner authorized coding with “စပါ” and “Continue Task”. This is the sole active project handoff.
+Updated: 2026-09-07, Asia/Rangoon. Phase: **Milestone 2 local Auth/data foundation**. Owner authorized the local technical foundation after the Milestone 1 UI review. This is the sole active project handoff.
 
 1. Read this file and DECISIONS.md once. Read STATE.md for implementation evidence and OPEN_ITEMS.md for the next confirmation.
 2. Read only the affected source files. Do not replay old transcripts or use legacy UAT approvals as acceptance of the clean ERP.
@@ -10,6 +10,6 @@ Updated: 2026-09-06, Asia/Rangoon. Phase: **Milestone 1 local foundation skeleto
 
 Independent project: `C:/Users/DELL/Desktop/EVERSHINE-ERP`. Original workspace `C:/Users/DELL/Desktop/KOE KOE ERP` is reference-only for this new effort. No old application code, data, keys, schema or node_modules junction is part of this foundation.
 
-M1 is **sample UI/workflow review**, with browser-tab records and a local-only production guard. It is not real login, database authorization, durable audit, backup, email, quota monitoring or business functionality. Owner screen/workflow acceptance must precede the next implementation stage. Production requires separate final confirmation; Vercel Hobby commercial-use restriction is unresolved.
+M1 remains a **sample UI/workflow review**. M2 now supplies an isolated local Supabase Auth/database/storage foundation, explicit RLS/grants, server-only administration helpers and tested schema. No real Owner or employee Auth user exists yet, and the UI still uses sample state. Owner setup, live account actions, backup and email remain later work. Production requires separate final confirmation; Vercel Hobby commercial-use restriction is unresolved.
 
-Resume: read this handoff and STATE.md. Verify existing server before starting another one. Continue only the authorized milestone, report actual completion and remaining work, and preserve decisions D01–D116. The latest request authorizes agent-run checks, persistent sidebar controls, a complete sample account/profile form and approved per-page visibility. It does not accept real Auth/backend work yet.
+Resume: read this handoff and STATE.md. Verify Docker, local Supabase and the existing app server before starting another process. Continue only the authorized milestone, report actual completion and remaining work, and preserve decisions D01–D117. Next ask one question only: whether initial Owner provisioning will use a localhost-only, one-time setup form in which the Owner enters the password privately. Do not create an Owner user or enable enforced login until that is confirmed.
