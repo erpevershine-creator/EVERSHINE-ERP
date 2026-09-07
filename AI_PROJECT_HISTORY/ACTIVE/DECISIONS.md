@@ -146,6 +146,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 | D122 | Owner selected the Google Drive belonging to the Owner Gmail account and Telegram as ERP backup destinations. Exact folders, delivery method, schedule, encryption and retention remain unspecified; no connection or transfer has occurred. |
 | D123 | Telegram backups will use a dedicated private Backup Channel containing Owner and approved Admins. Channel membership does not by itself grant ERP restore, deletion or configuration authority. Exact channel and integration access remain to be configured. |
 
+| D124 | Owner confirmed automatic backup once daily, constrained to free-plan usage with no paid upgrades or overage authorized. Exact execution time, retention, encryption and missed-run handling remain open. Once-daily frequency alone does not establish quota compliance; validate backup size and provider limits during integration. This is a product requirement, not a request to create a Codex scheduled task. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
