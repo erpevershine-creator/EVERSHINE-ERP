@@ -152,6 +152,9 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D126 | Owner confirmed automatic catch-up when a scheduled backup cannot finish because the computer is off or Internet is unavailable: retry the incomplete backup when the required computer/connectivity becomes available. This does not imply reconstructing historical database snapshots that were never captured. Backup execution and delivery remain unimplemented. |
 
+| D127 | Owner rejected requiring a separately entered Backup Recovery Key; restoration must be controlled by approval. This does not approve plaintext backup storage. System-managed encryption was suggested, but its recoverable key custody and disaster-recovery design are not yet implemented or verified. Approval alone cannot decrypt an encrypted backup when its key is lost. |
+| D128 | Restore approval is permitted to Owner and approved Admins with delegated Backup/Restore authority. Existing Owner-only self-approval and reason/audit rules continue to apply. Telegram Backup Channel membership alone does not grant restore authority. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
