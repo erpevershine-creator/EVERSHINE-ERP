@@ -1,3 +1,4 @@
+import { acquireBackupLock } from "./backup-lock.mjs";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
@@ -159,17 +160,24 @@ async function storageIndex(container = STORAGE, dir = "/mnt") {
     .trim();
 }
 async function main() {
-  if (process.platform !== "win32" || process.argv[2] !== "run")
+  if (
+    process.platform !== "win32" ||
+    !["run", "tick"].includes(process.argv[2])
+  )
     throw Error("LOCAL_WINDOWS_ONLY");
-  const id = validBackupId(process.argv[3] ?? "");
+  let id =
+    process.argv[2] === "run" ? validBackupId(process.argv[3] ?? "") : null;
   if (
     !fs
       .readFileSync(path.join(root, "supabase/config.toml"), "utf8")
       .includes('project_id = "evershine-erp-m2-local"')
   )
     throw Error("WRONG_PROJECT");
-  const folder = path.join(root, ".runtime/backups", id),
-    clone = "evershine-restorecheck-" + id;
+  const workerLock = await acquireBackupLock(
+    path.join(root, ".runtime/backup-worker.lock"),
+  );
+  if (!workerLock) return;
+  let folder, clone;
   let snapshot,
     cloneCreated = false,
     ownedJob = false,
@@ -177,9 +185,34 @@ async function main() {
     stage = "Preparing";
   const update = async (status, extra = "") =>
     query(
-      `update public.local_backup_runs set status='${status}',stage='${stage}'${extra} where id='${id}';`,
+      `update public.local_backup_runs set status='${status}',stage='${stage}'${extra} where id='${id}' and status='running';`,
     );
   try {
+    if (process.argv[2] === "tick") {
+      const tick = JSON.parse(
+        (await query("select private.prepare_local_backup_tick();"))
+          .toString()
+          .trim(),
+      );
+      for (const abandonedId of tick.abandoned) {
+        const oldClone = "evershine-restorecheck-" + validBackupId(abandonedId);
+        const label = (
+          await command([
+            "inspect",
+            "--format",
+            '{{index .Config.Labels "evershine.restorecheck"}}',
+            oldClone,
+          ]).catch(() => Buffer.from(""))
+        )
+          .toString()
+          .trim();
+        if (label === abandonedId) await command(["rm", "-f", "-v", oldClone]);
+      }
+      if (!tick.job) return;
+      id = validBackupId(tick.job);
+    }
+    folder = path.join(root, ".runtime/backups", id);
+    clone = "evershine-restorecheck-" + id;
     const claimed = JSON.parse(
       (
         await query(
@@ -463,7 +496,7 @@ async function main() {
       )
     ).reduce((a, b) => a + b, 0);
     await query(
-      `begin; update public.local_backup_runs set status='verified',stage='${stage}',finished_at=now(),archive_bytes=${bytes},table_count=${tables.length},storage_files=${manifest.storageFiles},manifest_sha256='${digest}' where id='${id}'; insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,p.employee_name,'Local backup restore verified','local_backup',b.id::text,b.reason,jsonb_build_object('backup_id',b.id,'tables',b.table_count,'storage_files',b.storage_files,'manifest_sha256',b.manifest_sha256) from public.local_backup_runs b join public.profiles p on p.id=b.requester_id where b.id='${id}'; commit;`,
+      `begin; update public.local_backup_runs set status='verified',stage='${stage}',finished_at=now(),archive_bytes=${bytes},table_count=${tables.length},storage_files=${manifest.storageFiles},manifest_sha256='${digest}' where id='${id}' and status='running'; insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,coalesce(p.employee_name,'Local backup scheduler'),'Local backup restore verified','local_backup',b.id::text,b.reason,jsonb_build_object('backup_id',b.id,'tables',b.table_count,'storage_files',b.storage_files,'manifest_sha256',b.manifest_sha256) from public.local_backup_runs b left join public.profiles p on p.id=b.requester_id where b.id='${id}' and b.status='verified'; commit;`,
     );
     console.log(
       JSON.stringify({
@@ -478,7 +511,7 @@ async function main() {
     const code = /^[A-Z_]+$/.test(e.message) ? e.message : "BACKUP_FAILED";
     if (ownedJob)
       await query(
-        `begin; update public.local_backup_runs set status='failed',stage='${stage}',error_code='${code}',finished_at=now() where id='${id}' and status in ('queued','running'); insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,p.employee_name,'Local backup failed','local_backup',b.id::text,b.reason,jsonb_build_object('error_code',b.error_code) from public.local_backup_runs b join public.profiles p on p.id=b.requester_id where b.id='${id}' and b.status='failed'; commit;`,
+        `begin; update public.local_backup_runs set status='failed',stage='${stage}',error_code='${code}',finished_at=now() where id='${id}' and status in ('queued','running'); insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,coalesce(p.employee_name,'Local backup scheduler'),'Local backup failed','local_backup',b.id::text,b.reason,jsonb_build_object('error_code',b.error_code) from public.local_backup_runs b left join public.profiles p on p.id=b.requester_id where b.id='${id}' and b.status='failed'; commit;`,
       ).catch(() => {});
     if (ownedJob)
       await fsp
@@ -509,6 +542,7 @@ async function main() {
       if (label === id)
         await command(["rm", "-f", "-v", clone]).catch(() => {});
     }
+    workerLock.release();
   }
 }
 main().catch(() => {

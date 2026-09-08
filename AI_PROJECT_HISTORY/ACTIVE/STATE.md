@@ -1,6 +1,6 @@
 # Current implementation and evidence
 
-Updated 2026-09-08. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains. The Owner subsequently created one real employee Admin; browser inspection confirms one Owner and one Admin. Codex did not create or change that employee account during D137 verification. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
+Updated 2026-09-09. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains. The Owner subsequently created one real employee Admin; browser inspection confirms one Owner and one Admin. Codex did not create or change that employee account during D137 verification. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
 
 ## Runtime
 - Clean independent source: C:/Users/DELL/Desktop/EVERSHINE-ERP. Local Next.js on 127.0.0.1:3000, isolated Supabase project evershine-erp-m2-local on API 55321 / DB 55322, network evershine-local-loopback. Old UAT stack untouched.
@@ -32,7 +32,7 @@ See docs/ERP-ROLES.md for current D136 verification and runtime evidence. The fo
 - Real Owner password change and an end-to-end Auth+Storage employee creation were deliberately not exercised against the Owner's account. Database RPC/security tests and UI inspection are not a claim of full real-account acceptance. M1 Playwright tests target the previous sample flow and must be adapted for live scenarios.
 
 ## Remaining
-See OPEN_ITEMS.md. Business modules, live restore, scheduled/offsite backups, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; no scheduler is configured.
+See OPEN_ITEMS.md. Business modules, live restore, retention/offsite backups, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; the local scheduler now runs alongside npm run dev (see D139 below).
 
 ## Local backup continuation — 2026-09-08 (D138)
 - /backups now uses real local_backup_runs records. Owner or scoped Admin requests capture with a reason; the trusted local worker rechecks the requester's active session/page/action before reading data. No client can write a verified status.
@@ -41,3 +41,12 @@ See OPEN_ITEMS.md. Business modules, live restore, scheduled/offsite backups, re
 - 137/137 pgTAP tests, 5 policy tests, 3 crypto tests, typecheck, lint and optimized build passed. Security advisors reported no issues. DB lint has only preexisting unused create_position parameter warnings. Browser showed verified status, size and details.
 - Two earlier failed test runs remain in audit/history. PostgreSQL 17 role restoration requires matching the source bootstrap role (supabase_admin); corrected in the isolated target only. Docker restart needed both stale socket-only folders preserved/renamed together; no volumes reset.
 - No live restore/maintenance flow, scheduler/catch-up, retention pruning, cloud transfer or external notification was run. See docs/LOCAL-BACKUPS.md for key-custody and interrupted-worker limitations and next work.
+
+## Daily local scheduler — 2026-09-09 (D139)
+- npm run dev now starts/stops a hidden local scheduler. It checks every 60 seconds after the previous worker exits; latest check is displayed on /backups. Browser login is not required for scheduled jobs. This is not a Windows boot/background service: local server, Docker and the Windows profile must be available.
+- Deadline is 18:00 Asia/Yangon. Restart catches up the latest due slot using current data. A verified manual snapshot taken after that deadline also satisfies that day; no repeated daily snapshots. Failed scheduled captures back off 30 minutes.
+- Every worker and scheduler tick uses one Windows FileShare.None lock. Only after acquiring that lock may a tick reconcile a previously running job as failed, audit the interruption, notify the active Owner/scoped Backup Admins, and clean an exactly labelled disposable clone. Queued manual work is resumed with the requester's current permissions/session rechecked. Lost lock terminates its worker; terminal states cannot be changed back by progress updates.
+- Scheduled jobs have system origin and no requester/session identity. Internal scheduler/authority functions are denied to anon/authenticated/service_role; browser clients cannot forge jobs, heartbeat or verification.
+- Validation: 156/156 transaction-only pgTAP tests, 9 Node tests (including real Windows lock contention/loss), typecheck/lint/build passed. Security advisors: no issues; DB lint only preexisting create_position unused parameter warnings. Actual capture c2283c9d-95b1-46a6-a9b3-4a47f08cace3 verified 54 tables and 2 Storage files. Browser shows verified and active scheduler heartbeat on 2026-09-09. No forced live failure or real user permission change.
+- Future deadline/catch-up cases were tested with rollback fixtures; the real daily deadline has not yet occurred since enablement. Existing verified manual capture correctly satisfied the current due slot. No time manipulation or fake verified record was used in the live database.
+- Remaining: retention pruning, offsite key custody, Google Drive/Telegram, full live restore/maintenance/retry flow and broader identity/device work. Local DPAPI/profile dependency remains.

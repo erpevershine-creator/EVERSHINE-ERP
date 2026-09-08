@@ -1,0 +1,41 @@
+begin;
+select plan(19);
+-- Isolate scheduler history inside this rollback-only transaction.
+delete from public.local_backup_runs;
+update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
+do $$ declare who uuid:=gen_random_uuid(); begin
+insert into auth.users(id,email,role,aud,email_confirmed_at) values(who,'schedule.owner.test@gmail.com','authenticated','authenticated',now());
+insert into public.profiles(id,employee_name,position_id,department,erp_role,username,contact,avatar_path)
+values(who,'Schedule Test Owner',(select id from public.positions where erp_role_code='owner'),'Test','owner','schedule.owner.test@gmail.com','test',who||'/photo.png');
+end; $$;
+update public.local_backup_schedule set activated_on='2100-01-01',enabled=true;
+select ok(not has_function_privilege('authenticated','private.prepare_local_backup_tick(timestamptz)','execute'),'users cannot impersonate scheduled operator');
+select ok(not has_table_privilege('authenticated','public.local_backup_schedule','update'),'clients cannot change schedule activation');
+select ok(not has_table_privilege('authenticated','public.local_backup_runs','insert'),'clients cannot forge system-origin jobs');
+select is(private.prepare_local_backup_tick('2100-01-01 11:29:59+00')->>'job',null,'no capture before 18:00 Myanmar time');
+create temporary table sched(id uuid);
+insert into sched select (private.prepare_local_backup_tick('2100-01-01 11:30:00+00')->>'job')::uuid;
+select ok((select id is not null from sched),'deadline queues one job');
+select is((select scheduled_for from public.local_backup_runs where id=(select id from sched)),'2100-01-01'::date,'schedule date uses Yangon timezone');
+select ok((select requester_id is null and requester_session is null and origin='scheduled' from public.local_backup_runs where id=(select id from sched)),'system job does not impersonate an Owner session');
+select is(private.prepare_local_backup_tick('2100-01-01 11:31:00+00')->>'job',(select id::text from sched),'repeated tick returns the same queued job');
+update public.local_backup_runs set status='running' where id=(select id from sched);
+select lives_ok($$select private.assert_local_backup_authority(id) from sched$$,'scheduled capture needs no user session');
+update public.local_backup_schedule set enabled=false;
+select throws_ok($$select private.assert_local_backup_authority(id) from sched$$,'42501','Schedule disabled','disabled schedule blocks worker');
+update public.local_backup_schedule set enabled=true;
+select ok(private.prepare_local_backup_tick(now())->'abandoned' ? (select id::text from sched),'exclusive-lock tick reconciles abandoned running job');
+select is((select status from public.local_backup_runs where id=(select id from sched)),'failed','abandoned job is failed, never verified');
+select is((select count(*) from public.audit_events where entity_id=(select id::text from sched) and action='Interrupted backup reconciled'),1::bigint,'interruption audit recorded once');
+select ok(exists(select 1 from public.notifications where notification_type='backup_failure' and message like '%'||(select id::text from sched)||'%'),'interruption generates in-app notification');
+update public.local_backup_runs set finished_at='2100-01-01 11:32:00+00' where id=(select id from sched);
+select is(private.prepare_local_backup_tick('2100-01-01 11:40:00+00')->>'job',null,'failed scheduled capture backs off');
+update sched set id=(private.prepare_local_backup_tick('2100-01-01 12:03:00+00')->>'job')::uuid;
+select ok((select id is not null from sched),'retry is allowed after backoff');
+update public.local_backup_runs set status='verified',finished_at='2100-01-01 12:04:00+00',created_at='2100-01-01 12:03:00+00' where id=(select id from sched);
+select is(private.prepare_local_backup_tick('2100-01-01 13:00:00+00')->>'job',null,'verified capture satisfies day without duplication');
+update sched set id=(private.prepare_local_backup_tick('2100-01-05 01:00:00+00')->>'job')::uuid;
+select is((select scheduled_for from public.local_backup_runs where id=(select id from sched)),'2100-01-04'::date,'restart after several days catches up latest due slot, not fabricated historical snapshots');
+select is((select count(*) from public.local_backup_runs where status='queued'),1::bigint,'multi-day catchup queues a single current snapshot');
+select finish();
+rollback;

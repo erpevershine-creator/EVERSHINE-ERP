@@ -5,6 +5,8 @@ import { PageHeading, Modal, Badge } from "@/components/ui";
 import { createLocalBackup } from "@/app/backups/actions";
 import type { Result } from "@/app/live/actions";
 export type BackupRun = {
+  origin: "manual" | "scheduled";
+  scheduled_for: string | null;
   id: string;
   reason: string;
   status: string;
@@ -26,7 +28,9 @@ const time = (s: string) =>
 export function LiveBackups({
   runs,
   canCreate,
+  schedule,
 }: {
+  schedule: { enabled: boolean; last_checked_at: string | null } | null;
   runs: BackupRun[];
   canCreate: boolean;
 }) {
@@ -38,10 +42,10 @@ export function LiveBackups({
   } as Result);
   const running = runs.some((r) => ["queued", "running"].includes(r.status));
   useEffect(() => {
-    if (!running) return;
-    const timer = setInterval(() => router.refresh(), 4000);
+    if (!running && !schedule?.enabled) return;
+    const timer = setInterval(() => router.refresh(), running ? 4000 : 60000);
     return () => clearInterval(timer);
-  }, [running, router]);
+  }, [running, router, schedule?.enabled]);
   const detail = runs.find((r) => r.id === selected);
   return (
     <>
@@ -50,6 +54,13 @@ export function LiveBackups({
         subtitle="Local encrypted backups with a separate restore check."
       />
       <section className="panel">
+        <p className="muted">
+          Daily · 18:00 Myanmar time ·{" "}
+          {schedule?.enabled ? "Enabled while local server runs" : "Disabled"}
+          {schedule?.last_checked_at
+            ? " · Last check " + time(schedule.last_checked_at)
+            : " · Waiting for scheduler"}
+        </p>
         {canCreate && (
           <form action={action} className="account-form">
             <label>
@@ -121,6 +132,12 @@ export function LiveBackups({
           <dl>
             <dt>Backup ID</dt>
             <dd>{detail.id}</dd>
+            <dt>Source</dt>
+            <dd>
+              {detail.origin === "scheduled"
+                ? "Daily schedule · " + detail.scheduled_for
+                : "Manual request"}
+            </dd>
             <dt>Started</dt>
             <dd>{time(detail.created_at)}</dd>
             <dt>Verified tables</dt>

@@ -19,13 +19,19 @@ export async function LivePage({ section }: { section: string }) {
     const { data, error } = await db
       .from("local_backup_runs")
       .select(
-        "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code",
+        "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code,origin,scheduled_for",
       )
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw new Error("Backup history could not be loaded.");
+    const { data: schedule, error: scheduleError } = await db
+      .from("local_backup_schedule")
+      .select("enabled,last_checked_at")
+      .maybeSingle();
+    if (scheduleError) throw new Error("Backup schedule could not be loaded.");
     return (
       <LiveBackups
+        schedule={schedule}
         runs={data}
         canCreate={
           ["owner", "admin"].includes(access.role) &&

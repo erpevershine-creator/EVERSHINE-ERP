@@ -24,12 +24,33 @@ const child = spawn(
     },
   },
 );
+const scheduler =
+  process.platform === "win32"
+    ? spawn(
+        process.execPath,
+        [path.join(root, "scripts/backup-scheduler.mjs")],
+        { cwd: root, windowsHide: true, stdio: ["pipe", "ignore", "ignore"] },
+      )
+    : null;
+scheduler?.on("error", () =>
+  console.error("Local backup scheduler unavailable"),
+);
+scheduler?.stdin.on("error", () => {});
+const stopScheduler = () => scheduler?.stdin.end();
 child.on("error", (error) => {
+  stopScheduler();
   console.error(error.message);
   process.exitCode = 1;
 });
 child.on("exit", (code) => {
+  stopScheduler();
   process.exitCode = code ?? 1;
 });
-process.on("SIGINT", () => child.kill("SIGINT"));
-process.on("SIGTERM", () => child.kill("SIGTERM"));
+process.on("SIGINT", () => {
+  stopScheduler();
+  child.kill("SIGINT");
+});
+process.on("SIGTERM", () => {
+  stopScheduler();
+  child.kill("SIGTERM");
+});

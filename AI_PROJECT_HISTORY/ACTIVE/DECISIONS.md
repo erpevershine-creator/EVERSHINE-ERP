@@ -175,6 +175,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D138 | Owner chose to continue the foundation-first work before Business and instructed Continue Task. This authorizes local Backup/Restore foundation implementation and verification against a separate disposable database. D120–D134 remain the business policies. No live restore, data reset, scheduled/cloud transfer, new recovery-key requirement, paid resource or Production deployment is authorized by this test slice. System-managed Windows DPAPI encryption is a local implementation detail, not an accepted cross-computer disaster-recovery design. |
 
+| D139 | Owner continued the foundation backup task after D138. Implement the previously confirmed D124–D126 daily 18:00 Asia/Yangon schedule and availability catch-up with safe interrupted-worker reconciliation. The local development server supervises the scheduler; no Windows login password, user session impersonation, paid service or external delivery is introduced. Catch-up captures current data for the latest due slot, not fabricated past-day snapshots. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 
