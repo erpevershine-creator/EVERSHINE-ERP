@@ -85,6 +85,7 @@ export function Shell({
     "approvals",
     "audit",
     "notifications",
+    "backups",
   ].includes(pathname.split("/")[1]);
   const visibleNavigation = navigation.filter((item) => canView(item.path));
   useEffect(() => {

@@ -1,3 +1,5 @@
+import { LiveBackups } from "./live-backups";
+import { allows } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
 import { requireAccess } from "@/lib/access";
 import {
@@ -13,6 +15,25 @@ const profileColumns =
 export async function LivePage({ section }: { section: string }) {
   const access = await requireAccess(section);
   const db = await createClient();
+  if (section === "backups") {
+    const { data, error } = await db
+      .from("local_backup_runs")
+      .select(
+        "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code",
+      )
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error("Backup history could not be loaded.");
+    return (
+      <LiveBackups
+        runs={data}
+        canCreate={
+          ["owner", "admin"].includes(access.role) &&
+          allows(access, "Backup & Restore", "create")
+        }
+      />
+    );
+  }
   if (section === "accounts" || section === "permissions") {
     const [ps, people] = await Promise.all([
       db

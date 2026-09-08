@@ -32,4 +32,12 @@ See docs/ERP-ROLES.md for current D136 verification and runtime evidence. The fo
 - Real Owner password change and an end-to-end Auth+Storage employee creation were deliberately not exercised against the Owner's account. Database RPC/security tests and UI inspection are not a claim of full real-account acceptance. M1 Playwright tests target the previous sample flow and must be adapted for live scenarios.
 
 ## Remaining
-See OPEN_ITEMS.md. Business modules, backup/restore, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; no scheduler is configured.
+See OPEN_ITEMS.md. Business modules, live restore, scheduled/offsite backups, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; no scheduler is configured.
+
+## Local backup continuation — 2026-09-08 (D138)
+- /backups now uses real local_backup_runs records. Owner or scoped Admin requests capture with a reason; the trusted local worker rechecks the requester's active session/page/action before reading data. No client can write a verified status.
+- AES-256-GCM archives contain the database, role definitions without role passwords, Storage files/inventory and local runtime configuration. HMAC-authenticated manifest. Key is system-managed under Windows CurrentUser DPAPI; no user-entered Backup Recovery Key. Machine/profile loss is not covered by this design.
+- Actual run e7dd5d22-4361-4046-94b1-206b00e84d7d verified: 53 restored tables and 2 stored files matched the snapshot/checksums, 2,832,230 archive bytes. The matching-image restore container had no network/published ports/live mounts and was removed after verification. Actual Owner and Admin remain active, one each.
+- 137/137 pgTAP tests, 5 policy tests, 3 crypto tests, typecheck, lint and optimized build passed. Security advisors reported no issues. DB lint has only preexisting unused create_position parameter warnings. Browser showed verified status, size and details.
+- Two earlier failed test runs remain in audit/history. PostgreSQL 17 role restoration requires matching the source bootstrap role (supabase_admin); corrected in the isolated target only. Docker restart needed both stale socket-only folders preserved/renamed together; no volumes reset.
+- No live restore/maintenance flow, scheduler/catch-up, retention pruning, cloud transfer or external notification was run. See docs/LOCAL-BACKUPS.md for key-custody and interrupted-worker limitations and next work.

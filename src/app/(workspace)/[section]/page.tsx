@@ -52,9 +52,14 @@ export default async function Section({
       </section>
     );
   if (
-    ["accounts", "permissions", "approvals", "audit", "notifications"].includes(
-      section,
-    )
+    [
+      "accounts",
+      "permissions",
+      "approvals",
+      "audit",
+      "notifications",
+      "backups",
+    ].includes(section)
   )
     return <LivePage section={section} />;
   const Component = pages[section as keyof typeof pages];
