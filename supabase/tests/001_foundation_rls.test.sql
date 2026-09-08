@@ -41,9 +41,9 @@ select results_eq(
   'foundation pages are seeded'
 );
 select results_eq(
-  $$ select count(*)::bigint from public.position_page_permissions $$,
-  array[27::bigint],
-  'each initial position has an explicit page row'
+  $$ select count(*)::bigint from public.position_page_permissions pp join public.positions p on p.id=pp.position_id where p.is_active and p.erp_role_code is not null $$,
+  array[54::bigint],
+  'each of six ERP roles has explicit page rows'
 );
 select results_eq(
   $$ select count(*)::bigint from public.position_page_permissions ppp join public.positions p on p.id = ppp.position_id where p.code = 'owner' and ppp.can_view $$,

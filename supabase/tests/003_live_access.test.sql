@@ -15,7 +15,10 @@ select ok(not has_function_privilege('anon','public.my_access()','execute'),'ano
 select ok(not has_function_privilege('authenticated','public.begin_owner_recovery(text,text)','execute'),'clients cannot invoke service recovery RPC');
 select ok(not has_function_privilege('authenticated','public.record_login_attempt(text,boolean,uuid)','execute'),'clients cannot reset lockout counter');
 select ok(not has_table_privilege('authenticated','private.recovery_operations','select'),'recovery operations remain private');
-update fixture set position_id=public.create_position('Test Warehouse Staff','test-live-warehouse');
+update fixture set position_id=(select id from public.positions where erp_role_code='sales');
+update public.positions set version=1 where id=(select position_id from fixture);
+update public.position_page_permissions set can_view=false where position_id=(select position_id from fixture);
+delete from public.position_action_permissions where position_id=(select position_id from fixture);
 insert into public.position_action_permissions(position_id,module,action,allowed)
 select position_id,'Workspace','view',true from fixture;
 update public.position_page_permissions set can_view=true where position_id=(select position_id from fixture) and page_id='dashboard';
@@ -23,9 +26,9 @@ insert into auth.users(id,email,role,aud,email_confirmed_at,raw_app_meta_data)
 select staff1,'live.staff1.test@gmail.com','authenticated','authenticated',now(),jsonb_build_object('provisioned_by',owner_id) from fixture
 union all select staff2,'live.staff2.test@gmail.com','authenticated','authenticated',now(),jsonb_build_object('provisioned_by',owner_id) from fixture
 union all select admin_id,'live.admin.test@gmail.com','authenticated','authenticated',now(),jsonb_build_object('provisioned_by',owner_id) from fixture;
-select is(public.provision_employee(staff1,position_id,'Test Staff 1','Test','employee','live.staff1.test@gmail.com','test',staff1||'/photo.png'),staff1,'authorized account transaction creates employee') from fixture;
-select public.provision_employee(staff2,position_id,'Test Staff 2','Test','employee','live.staff2.test@gmail.com','test',staff2||'/photo.png') from fixture;
-select public.provision_employee(admin_id,(select id from public.positions where code='account-administrator'),'Test Admin','Test','admin','live.admin.test@gmail.com','test',admin_id||'/photo.png') from fixture;
+select is(public.provision_employee(staff1,'sales','Test Staff 1','Sales Representative','Test','live.staff1.test@gmail.com','test',staff1||'/photo.png'),staff1,'authorized account transaction creates employee') from fixture;
+select public.provision_employee(staff2,'sales','Test Staff 2','Senior Sales Representative','Test','live.staff2.test@gmail.com','test',staff2||'/photo.png') from fixture;
+select public.provision_employee(admin_id,'admin','Test Admin','Account Administrator','Test','live.admin.test@gmail.com','test',admin_id||'/photo.png') from fixture;
 select ok((select page_access->>'dashboard'='true' from public.profiles where id=(select staff1 from fixture)),'new account receives position snapshot');
 insert into auth.sessions(id,user_id,created_at,updated_at) select staff_session,staff1,now(),now() from fixture union all select admin_session,admin_id,now(),now() from fixture;
 update fixture set request_id=public.draft_permission_change(position_id,1,'{"dashboard":true,"settings":true}','{"Workspace":["view"]}',array[staff1],'Test selected account change');

@@ -6,17 +6,18 @@ import { Badge, Modal, PageHeading } from "@/components/ui";
 import {
   createAccount,
   accountStatus,
-  addPosition,
   savePermissionDraft,
   decideRequest,
   getAffectedAccounts,
   type Result,
 } from "@/app/live/actions";
+import { erpRoles, roleLabel, permissionLabel } from "@/lib/erp-roles";
 import type { Access } from "@/lib/access";
 
 export type Profile = {
   id: string;
   employee_name: string;
+  company_position: string;
   username: string;
   department: string;
   erp_role: string;
@@ -29,6 +30,7 @@ export type Position = {
   id: number;
   name: string;
   code: string;
+  erp_role_code: string | null;
   is_owner_position: boolean;
   version: number;
 };
@@ -162,15 +164,19 @@ export function LiveAccounts({
           },
           {
             key: "position",
-            label: "Position",
-            value: (p) => positionName(p.position_id),
+            label: "Company Position",
+            value: (p) => p.company_position,
           },
           {
             key: "department",
             label: "Department",
             value: (p) => p.department,
           },
-          { key: "role", label: "ERP role", value: (p) => p.erp_role },
+          {
+            key: "role",
+            label: "ERP Role",
+            value: (p) => roleLabel(p.erp_role),
+          },
           { key: "username", label: "Username", value: (p) => p.username },
           {
             key: "status",
@@ -194,7 +200,8 @@ export function LiveAccounts({
           onClose={() => setSelectedId(null)}
         >
           <p>
-            {selected.username} · {positionName(selected.position_id)}
+            {selected.username} · {selected.company_position} ·{" "}
+            {positionName(selected.position_id)}
           </p>
           <p>
             {selected.department} · {selected.contact}
@@ -269,29 +276,39 @@ function CreateAccount({
           />
         </label>
         <label>
-          Position
-          <select name="position" required defaultValue="">
-            <option value="" disabled>
-              Select position
-            </option>
-            {positions
-              .filter((p) => !p.is_owner_position)
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-          </select>
+          Company Position
+          <input
+            name="companyPosition"
+            required
+            maxLength={120}
+            placeholder="e.g. Sales Manager"
+          />
         </label>
         <label>
           Department
           <input name="department" required maxLength={120} />
         </label>
         <label>
-          ERP role
-          <select name="role" defaultValue="employee">
-            <option value="employee">Employee</option>
-            {owner && <option value="admin">Admin</option>}
+          ERP Role
+          <select name="role" required defaultValue="">
+            <option value="" disabled>
+              Select ERP Role
+            </option>
+            {erpRoles.map((role) => (
+              <option
+                key={role.code}
+                value={role.code}
+                disabled={
+                  role.code === "owner" ||
+                  (role.code === "admin" && !owner) ||
+                  !positions.some((p) => p.erp_role_code === role.code)
+                }
+              >
+                {role.code === "owner"
+                  ? "Owner (one account only)"
+                  : role.label}
+              </option>
+            ))}
           </select>
         </label>
         <label>
@@ -360,31 +377,23 @@ export function LivePermissions({
   actionPermissions: ActionPermission[];
   access: Access;
 }) {
-  const [selected, setSelected] = useState<Position | null>(null);
-  const [create, setCreate] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selected = positions.find((p) => p.id === selectedId);
   return (
     <>
-      <PageHeading
-        title="Positions & Permissions"
-        action={
-          can(access, "Positions & Permissions", "create") ? (
-            <button className="primary" onClick={() => setCreate(true)}>
-              New position
-            </button>
-          ) : undefined
-        }
-      />
+      <PageHeading title="ERP Roles & Permissions" />
       <DataTable
-        name="Positions"
+        name="ERP Roles"
         sample={false}
         exportAllowed={can(access, "Positions & Permissions", "export")}
         rows={positions.map((p) => ({ ...p, id: String(p.id) }))}
-        onOpen={(row) =>
-          setSelected(positions.find((p) => String(p.id) === row.id) ?? null)
-        }
+        onOpen={(row) => setSelectedId(Number(row.id))}
         columns={[
-          { key: "name", label: "Position", value: (p) => p.name },
-          { key: "code", label: "Code", value: (p) => p.code },
+          {
+            key: "name",
+            label: "ERP Role",
+            value: (p) => roleLabel(p.erp_role_code ?? p.code),
+          },
           { key: "version", label: "Version", value: (p) => String(p.version) },
           {
             key: "accounts",
@@ -396,40 +405,28 @@ export function LivePermissions({
           },
         ]}
       />
-      {create && (
-        <Modal title="New position" onClose={() => setCreate(false)}>
-          <ActionForm run={addPosition}>
-            <label>
-              Position name
-              <input name="name" required maxLength={120} />
-            </label>
-            <label>
-              Code
-              <input
-                name="code"
-                required
-                pattern="[a-z][a-z0-9-]*"
-                placeholder="warehouse-manager"
-              />
-            </label>
-          </ActionForm>
-        </Modal>
-      )}
       {selected && (
-        <Modal title={selected.name} onClose={() => setSelected(null)} wide>
+        <Modal
+          title={roleLabel(selected.erp_role_code ?? selected.code)}
+          onClose={() => setSelectedId(null)}
+          wide
+        >
           {selected.is_owner_position ? (
             <p>
               Owner has company-wide access. Only one Owner account is allowed.
             </p>
           ) : (
             <PermissionForm
-              key={`${selected.id}-${selected.version}`}
+              key={selected.id + "-" + selected.version}
               position={selected}
               profiles={profiles.filter((a) => a.position_id === selected.id)}
               pages={pages}
               pagePermissions={pagePermissions}
               actionPermissions={actionPermissions}
-              editable={can(access, "Positions & Permissions", "edit")}
+              editable={
+                ["owner", "admin"].includes(access.role) &&
+                can(access, "Positions & Permissions", "edit")
+              }
             />
           )}
         </Modal>
@@ -514,7 +511,7 @@ function PermissionForm({
                   setViews({ ...views, [p.id]: e.target.checked })
                 }
               />
-              {p.label}
+              {permissionLabel(p.label)}
             </label>
           ))}
         </div>
@@ -522,7 +519,7 @@ function PermissionForm({
           <summary>Action permissions</summary>
           {pages.map((p) => (
             <fieldset key={p.id}>
-              <legend>{p.label}</legend>
+              <legend>{permissionLabel(p.label)}</legend>
               <div className="live-check-grid">
                 {actionChoices.map((a) => (
                   <label key={a}>
@@ -551,11 +548,12 @@ function PermissionForm({
             profiles.map((p) => (
               <label key={p.id}>
                 <input name="accounts" type="checkbox" value={p.id} />{" "}
-                {p.employee_name} · {p.username} · version {p.version}
+                {p.employee_name} · {p.company_position} · {p.username} ·
+                version {p.version}
               </label>
             ))
           ) : (
-            <p className="muted">No accounts currently use this position.</p>
+            <p className="muted">No accounts currently use this ERP role.</p>
           )}
           <small>
             Unchecked accounts keep their current permissions. New accounts use
@@ -582,14 +580,14 @@ function PermissionSummary({
       <p>
         {pages
           .filter((p) => data.pages?.[p.id])
-          .map((p) => p.label)
+          .map((p) => permissionLabel(p.label))
           .join(", ") || "No pages"}
       </p>
       {Object.entries(data.actions ?? {})
         .filter(([, v]) => v.length)
         .map(([m, a]) => (
           <p key={m}>
-            <strong>{m}:</strong> {a.join(", ")}
+            <strong>{permissionLabel(m)}:</strong> {a.join(", ")}
           </p>
         ))}
     </>

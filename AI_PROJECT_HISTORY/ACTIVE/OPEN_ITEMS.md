@@ -2,7 +2,7 @@
 
 Owner authorized real local account/permissions/recovery coding (D135); the first live slice is complete. Do not repeat Owner setup or request credentials in chat.
 
-1. Review the live flow: position configuration → draft → submit → individual approval → real account creation. Use synthetic isolated test fixtures for remaining Auth/Storage end-to-end automation; do not reset the live Owner database.
+1. Review the live flow: ERP Role permission configuration → draft → submit → individual approval → real account creation. Use synthetic isolated test fixtures for remaining Auth/Storage end-to-end automation; do not reset the live Owner database.
 2. Complete account detail/admin password editing, rejected-request re-draft/revise, explicit individual permission exceptions, list pagination and handover according to confirmed rules.
 3. Enforce two-device limit, third-device approval with oldest-session replacement, 24-hour pending expiry, seven-day idle reapproval, and daily password-expiry notices. Current session rows are Auth-session history, not trusted device identification.
 4. Add a safe operator reconciliation procedure for interrupted Owner recovery. Current durable fence must remain until the Auth outcome is established. Full security/rate-limit/retention tests are still required.

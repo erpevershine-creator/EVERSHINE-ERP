@@ -9,7 +9,7 @@ import { PageHeading } from "@/components/ui";
 import { markNotificationRead } from "@/app/live/actions";
 
 const profileColumns =
-  "id,employee_name,username,department,erp_role,position_id,status,contact,version";
+  "id,employee_name,company_position,username,department,erp_role,position_id,status,contact,version";
 export async function LivePage({ section }: { section: string }) {
   const access = await requireAccess(section);
   const db = await createClient();
@@ -17,8 +17,9 @@ export async function LivePage({ section }: { section: string }) {
     const [ps, people] = await Promise.all([
       db
         .from("positions")
-        .select("id,name,code,is_owner_position,version")
+        .select("id,name,code,erp_role_code,is_owner_position,version")
         .eq("is_active", true)
+        .not("erp_role_code", "is", null)
         .order("id"),
       db
         .from("profiles")

@@ -32,11 +32,13 @@ export async function createAccount(
     contact = value(form, "contact"),
     username = value(form, "username").toLowerCase();
   const role = value(form, "role"),
-    position = Number(value(form, "position"));
+    companyPosition = value(form, "companyPosition");
   const password = String(form.get("password") ?? ""),
     confirm = String(form.get("confirmPassword") ?? "");
   if (
-    [name, department, contact].some((v) => !v || v.length > 120) ||
+    [name, department, contact, companyPosition].some(
+      (v) => !v || v.length > 120,
+    ) ||
     !/^[a-z0-9][a-z0-9._%+\-]*@gmail\.com$/.test(username)
   )
     return failure(
@@ -51,7 +53,7 @@ export async function createAccount(
       "Passwords must match and contain 8–128 characters, one uppercase letter and one number.",
     );
   if (
-    !["admin", "employee"].includes(role) ||
+    !["admin", "sales", "delivery", "finance", "inventory"].includes(role) ||
     (role === "admin" && access.role !== "owner")
   )
     return failure("Only Owner can appoint an Admin.");
@@ -78,10 +80,10 @@ export async function createAccount(
   const { data: pos } = await db
     .from("positions")
     .select("id,is_owner_position,is_active")
-    .eq("id", position)
+    .eq("erp_role_code", role)
     .maybeSingle();
   if (!pos || pos.is_owner_position || !pos.is_active)
-    return failure("Select an available employee position.");
+    return failure("Select an available ERP role.");
   const admin = createAdminClient();
   const { data: created, error } = await admin.auth.admin.createUser({
     email: username,
@@ -108,7 +110,7 @@ export async function createAccount(
     if (upload.error) throw new Error("Photo upload failed");
     const provision = await db.rpc("provision_employee", {
       p_id: id,
-      p_position: position,
+      p_company_position: companyPosition,
       p_name: name,
       p_department: department,
       p_role: role,
@@ -132,7 +134,7 @@ export async function createAccount(
       await admin.storage.from("profile-photos").remove([path]);
       await admin.auth.admin.deleteUser(id);
       return failure(
-        "Account was not activated. Check position permissions and retry.",
+        "Account was not activated. Check ERP role permissions and retry.",
       );
     }
   }
@@ -160,24 +162,6 @@ export async function accountStatus(form: FormData): Promise<Result> {
   return {
     status: "success",
     message: "Account updated. Previous sessions are no longer authorized.",
-  };
-}
-export async function addPosition(form: FormData): Promise<Result> {
-  await requireAccess("permissions");
-  const db = await createClient();
-  const { error } = await db.rpc("create_position", {
-    p_name: value(form, "name"),
-    p_code: value(form, "code"),
-  });
-  if (error)
-    return failure(
-      "Position was not created. Use a unique name/code and check your permissions.",
-    );
-  refresh();
-  return {
-    status: "success",
-    message:
-      "Position created with no access. Configure its permissions for approval.",
   };
 }
 export async function savePermissionDraft(form: FormData): Promise<Result> {
@@ -221,7 +205,7 @@ export async function decideRequest(form: FormData): Promise<Result> {
   );
   if (error)
     return failure(
-      "Request was not changed. Check authority and whether its position or accounts changed since drafting. Only Owner may self-approve.",
+      "Request was not changed. Check authority and whether its ERP role or accounts changed since drafting. Only Owner may self-approve.",
     );
   refresh();
   return {

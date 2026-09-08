@@ -21,7 +21,7 @@ const titles: Record<string, string> = {
   dashboard: "Workspace",
   approvals: "Approval Center",
   accounts: "Account Management",
-  permissions: "Positions & Permissions",
+  permissions: "ERP Roles & Permissions",
   audit: "Audit & History",
   notifications: "Notifications",
   settings: "Settings",

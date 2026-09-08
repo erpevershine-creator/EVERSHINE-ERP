@@ -169,6 +169,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D135 | Owner authorized the proposed live local Account Management, Permissions and Owner Recovery implementation with “စမယ်။” and continued the task. Preserve existing Owner/data and prior business decisions. This authorizes the coding/test slice, not Production, paid services, external delivery or an actual reset of the Owner password. |
 
+| D136 | Owner confirmed manual Company Position and a fixed ERP Role catalogue: Owner (one account), Admin, Sales, Delivery, Finance, Inventory. ERP Role derives its permission template; Company Position is descriptive and never grants authority. Rename the visible screen to ERP Roles & Permissions. Owner and delegated approved Admins may customize additional page/action permissions on selected roles within their authority. Preserve draft/submit/individual approval, Owner-only self-approval, exact included-account snapshots and excluded/override preservation. This authorizes the local implementation, not Production. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { roleLabel } from "@/lib/erp-roles";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -46,7 +47,7 @@ export const navigation = [
   },
   {
     path: "permissions",
-    label: "Positions & Permissions",
+    label: "ERP Roles & Permissions",
     icon: ShieldCheck,
     group: "ADMINISTRATION",
   },
@@ -208,7 +209,7 @@ export function Shell({
               </span>
               <span>
                 <strong>{authenticatedUser.employeeName}</strong>
-                <small>{authenticatedUser.role}</small>
+                <small>{roleLabel(authenticatedUser.role)}</small>
               </span>
             </span>
             <form action={logout}>
