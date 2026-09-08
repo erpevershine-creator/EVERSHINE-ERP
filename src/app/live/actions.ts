@@ -245,3 +245,43 @@ export async function getAffectedAccounts(requestId: number) {
     if (data.length < 500) return rows;
   }
 }
+
+export async function getIndividualPermissions(profileId: string) {
+  const access = await requireAccess("permissions");
+  if (access.role !== "owner")
+    throw new Error("Only Owner can manage individual permissions.");
+  const db = await createClient();
+  const { data, error } = await db.rpc("get_individual_permissions", {
+    p_profile: profileId,
+  });
+  if (error) throw new Error("Account permissions could not be loaded.");
+  return data as import("@/features/individual-permissions").IndividualAccess;
+}
+export async function approveIndividualPermissions(
+  form: FormData,
+): Promise<Result> {
+  const access = await requireAccess("permissions");
+  if (access.role !== "owner")
+    return failure("Only Owner can manage individual permissions.");
+  try {
+    const db = await createClient();
+    const { error } = await db.rpc("approve_individual_permissions", {
+      p_profile: value(form, "profile"),
+      p_expected: Number(value(form, "version")),
+      p_pages: JSON.parse(value(form, "pages")),
+      p_actions: JSON.parse(value(form, "actions")),
+      p_reason: value(form, "reason"),
+    });
+    if (error)
+      return failure(
+        "Permissions were not changed. Reload the account and check the reason and selected permissions.",
+      );
+  } catch {
+    return failure("Invalid individual permission request.");
+  }
+  refresh();
+  return {
+    status: "success",
+    message: "Individual permissions approved and saved.",
+  };
+}

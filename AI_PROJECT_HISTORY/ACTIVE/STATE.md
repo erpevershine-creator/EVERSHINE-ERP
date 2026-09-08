@@ -1,6 +1,6 @@
 # Current implementation and evidence
 
-Updated 2026-09-08. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains; no employee business account was invented. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
+Updated 2026-09-08. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains. The Owner subsequently created one real employee Admin; browser inspection confirms one Owner and one Admin. Codex did not create or change that employee account during D137 verification. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
 
 ## Runtime
 - Clean independent source: C:/Users/DELL/Desktop/EVERSHINE-ERP. Local Next.js on 127.0.0.1:3000, isolated Supabase project evershine-erp-m2-local on API 55321 / DB 55322, network evershine-local-loopback. Old UAT stack untouched.
@@ -18,6 +18,9 @@ Updated 2026-09-08. Milestone 2.2 live local identity/permissions slice is imple
 - /recover contains the Emergency Recovery Code input and calls server-only verification plus Auth admin password update. Recovery fences account access first; success clears lock/expiry and rejects every prior session, including refreshed old JWTs. It preserves history and the existing emergency-code hash. No clear recovery code/password is persisted or audited.
 - Recovery uncertainty is fail-closed: an interrupted/ambiguous Auth update leaves a durable running operation requiring local operator reconciliation. There is intentionally no timeout that blindly unlocks the account. A dedicated reconciliation procedure/UI is still needed; do not clear a running operation without checking the Auth outcome.
 - Session revocation uses Auth session creation time plus explicit device-session status. This is session history/revocation, **not yet** two-device enforcement, third-device approval, oldest-session replacement or seven-day idle reapproval.
+
+## Latest individual-permission refinement
+D137 Owner-only additional page/action grants are implemented. Account-specific grants are stored separately from base snapshots and survive template approvals. Owner explicitly approves and saves with a reason; one approved request, before/after account snapshot, audit and recipient notification commit atomically. Version checks reject stale individual edits and stale template approvals. Removing extras preserves base grants. Server access, RPC authority, delegated scope checks and approval notifications include additional permissions. See docs/INDIVIDUAL-PERMISSIONS.md for 120/120 pgTAP, browser and build evidence. No real grant was selected or saved by Codex.
 
 ## Latest role refinement
 See docs/ERP-ROLES.md for current D136 verification and runtime evidence. The following M2.2 verification predates this refinement.

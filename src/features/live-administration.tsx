@@ -12,6 +12,7 @@ import {
   type Result,
 } from "@/app/live/actions";
 import { erpRoles, roleLabel, permissionLabel } from "@/lib/erp-roles";
+import { IndividualPermissions } from "./individual-permissions";
 import type { Access } from "@/lib/access";
 
 export type Profile = {
@@ -49,16 +50,21 @@ export type ActionPermission = {
 export type Request = {
   id: number;
   requester_id: string;
+  request_type: string;
   target_id: string;
   reason: string;
   status: string;
   current_data: {
     pages: Record<string, boolean>;
     actions: Record<string, string[]>;
+    extraPages?: Record<string, boolean>;
+    extraActions?: Record<string, string[]>;
   };
   proposed_data: {
     pages: Record<string, boolean>;
     actions: Record<string, string[]>;
+    extraPages?: Record<string, boolean>;
+    extraActions?: Record<string, string[]>;
   };
   decision_reason: string | null;
 };
@@ -381,7 +387,14 @@ export function LivePermissions({
   const selected = positions.find((p) => p.id === selectedId);
   return (
     <>
-      <PageHeading title="ERP Roles & Permissions" />
+      <PageHeading
+        title="ERP Roles & Permissions"
+        action={
+          access.role === "owner" ? (
+            <IndividualPermissions profiles={profiles} pages={pages} />
+          ) : undefined
+        }
+      />
       <DataTable
         name="ERP Roles"
         sample={false}
@@ -654,14 +667,43 @@ export function LiveApprovals({
           <p>{selected.reason}</p>
           <div className="account-form-grid">
             <section>
-              <h3>Current template</h3>
+              <h3>
+                {selected.request_type === "individual_permissions"
+                  ? "Previous account access"
+                  : "Current template"}
+              </h3>
               <PermissionSummary data={selected.current_data} pages={pages} />
             </section>
             <section>
-              <h3>Requested template</h3>
+              <h3>
+                {selected.request_type === "individual_permissions"
+                  ? "Approved account access"
+                  : "Requested template"}
+              </h3>
               <PermissionSummary data={selected.proposed_data} pages={pages} />
             </section>
           </div>
+          {selected.request_type === "individual_permissions" && (
+            <details>
+              <summary>Individual grants before / after</summary>
+              <h4>Before</h4>
+              <PermissionSummary
+                pages={pages}
+                data={{
+                  pages: selected.current_data.extraPages ?? {},
+                  actions: selected.current_data.extraActions ?? {},
+                }}
+              />
+              <h4>After</h4>
+              <PermissionSummary
+                pages={pages}
+                data={{
+                  pages: selected.proposed_data.extraPages ?? {},
+                  actions: selected.proposed_data.extraActions ?? {},
+                }}
+              />
+            </details>
+          )}
           <h3>Included accounts</h3>
           {!complete && (
             <p role="status">
