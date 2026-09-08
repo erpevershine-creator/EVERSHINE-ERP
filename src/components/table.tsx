@@ -22,6 +22,7 @@ export function DataTable<T extends { id: string }>({
   filter,
   actions,
   exportAllowed = true,
+  sample = true,
   initialSort,
   onOpen,
 }: {
@@ -31,6 +32,7 @@ export function DataTable<T extends { id: string }>({
   filter?: ReactNode;
   actions?: ReactNode;
   exportAllowed?: boolean;
+  sample?: boolean;
   initialSort?: string;
   onOpen?: (row: T) => void;
 }) {
@@ -70,7 +72,7 @@ export function DataTable<T extends { id: string }>({
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = `EVERSHINE-sample-${name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}.csv`;
+    link.download = `EVERSHINE-${sample ? "sample-" : ""}${name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}.csv`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -149,7 +151,10 @@ export function DataTable<T extends { id: string }>({
       </div>
       <div className="table-scroll">
         <table>
-          <caption className="sr-only">{name} — sample records</caption>
+          <caption className="sr-only">
+            {name}
+            {sample ? " — sample records" : ""}
+          </caption>
           <thead>
             <tr>
               {visible.map((c) => (

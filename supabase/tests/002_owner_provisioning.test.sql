@@ -1,4 +1,6 @@
 begin;
+-- Transaction-only fixture isolation; rollback preserves the existing Owner unchanged.
+update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
 select plan(13);
 
 select has_function(
@@ -79,7 +81,7 @@ select results_eq(
 );
 
 select results_eq(
-  $$ select count(*)::bigint from public.audit_events where action = 'owner.setup.completed' $$,
+  $$ select count(*)::bigint from public.audit_events where action = 'owner.setup.completed' and entity_id = '11111111-1111-4111-8111-111111111111' $$,
   array[1::bigint],
   'provisioning records the setup audit event'
 );

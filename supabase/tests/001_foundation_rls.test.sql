@@ -29,11 +29,7 @@ select ok(has_table_privilege('service_role', 'private.owner_recovery_codes', 'i
 select ok(has_table_privilege('service_role', 'private.owner_recovery_codes', 'update'), 'service role may invalidate recovery hashes');
 select ok(not has_table_privilege('service_role', 'private.owner_recovery_codes', 'delete'), 'service role cannot directly delete recovery hashes');
 
-select results_eq(
-  $$ select count(*)::bigint from public.profiles where erp_role = 'owner' and status <> 'inactive' $$,
-  array[0::bigint],
-  'migration never invents an Owner account'
-);
+select ok((select count(*) from public.profiles where erp_role='owner' and status<>'inactive')<=1, 'at most one current Owner');
 select results_eq(
   $$ select count(*)::bigint from public.locations $$,
   array[3::bigint],

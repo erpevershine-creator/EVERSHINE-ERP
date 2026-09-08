@@ -18,7 +18,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { ThemeControl } from "./theme";
-import { useReview } from "./review-provider";
 import { logout } from "@/app/login/actions";
 export const navigation = [
   {
@@ -69,15 +68,23 @@ export const navigation = [
 export function Shell({
   children,
   authenticatedUser,
+  allowedPages,
 }: {
   children: React.ReactNode;
   authenticatedUser: { employeeName: string; username: string; role: string };
+  allowedPages: Record<string, boolean>;
 }) {
   const pathname = usePathname();
   const [menu, setMenu] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const { state, actor, previewActors, setActor, storageAvailable, canView } =
-    useReview();
+  const canView = (page: string) => Boolean(allowedPages[page]);
+  const live = [
+    "accounts",
+    "permissions",
+    "approvals",
+    "audit",
+    "notifications",
+  ].includes(pathname.split("/")[1]);
   const visibleNavigation = navigation.filter((item) => canView(item.path));
   useEffect(() => {
     if (!menu) return;
@@ -90,10 +97,7 @@ export function Shell({
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, [menu]);
-  const unread =
-    state?.notifications.filter(
-      (n) => n.recipients.includes(actor.id) && !n.readBy.includes(actor.id),
-    ).length ?? 0;
+  const unread = 0;
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -153,7 +157,7 @@ export function Shell({
         </nav>
         <div className="sidebar-bottom">
           <span className="local-dot" />
-          Local foundation <span className="milestone">M1</span>
+          Local ERP <span className="milestone">M2.2</span>
         </div>
       </aside>
       <div className={`workspace ${collapsed ? "workspace-expanded" : ""}`}>
@@ -181,7 +185,9 @@ export function Shell({
             <span>Head Office</span>
           </span>
           <div className="topbar-end">
-            <span className="sample-label">Sample data</span>
+            <span className="sample-label">
+              {live ? "Local database" : "Sample review"}
+            </span>
             <ThemeControl />
             {canView("notifications") ? (
               <Link
@@ -205,22 +211,6 @@ export function Shell({
                 <small>{authenticatedUser.role}</small>
               </span>
             </span>
-            <label className="preview-actor">
-              <span className="avatar">{actor.role.slice(0, 1)}</span>
-              <select
-                aria-label="Preview as"
-                value={actor.id}
-                onChange={(e) => setActor(e.target.value)}
-              >
-                {previewActors.map((a) => (
-                  <option value={a.id} key={a.id}>
-                    {["owner", "admin", "employee"].includes(a.id)
-                      ? `${a.role} preview`
-                      : a.name}
-                  </option>
-                ))}
-              </select>
-            </label>
             <form action={logout}>
               <button
                 type="submit"
@@ -234,41 +224,17 @@ export function Shell({
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>
-          {!storageAvailable ? (
-            <p className="inline-notice" role="status">
-              Browser storage is unavailable. Sample changes will last until you
-              reload.
-            </p>
-          ) : null}
-          {state ? (
-            canView(pathname.split("/")[1]) ? (
-              children
-            ) : (
-              <section className="panel restricted">
-                <ShieldCheck size={24} />
-                <h1>Access restricted</h1>
-                <p>
-                  This page is outside the selected sample account’s
-                  permissions.
-                </p>
-              </section>
-            )
-          ) : (
-            <div
-              className="workspace-placeholder"
-              role="status"
-              aria-label="Opening workspace"
-            >
-              <span />
-              <span />
-            </div>
-          )}
+          {children}
         </main>
         <footer className="app-footer">
           <span>
             EVERSHINE ERP <span className="muted">/ Foundation review</span>
           </span>
-          <span>Local only · Sample changes stay in this browser tab</span>
+          <span>
+            {live
+              ? "Local database · Myanmar time"
+              : "Local only · Sample review"}
+          </span>
         </footer>
       </div>
     </div>

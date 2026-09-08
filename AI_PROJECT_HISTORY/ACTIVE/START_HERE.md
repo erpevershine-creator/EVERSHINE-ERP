@@ -1,15 +1,12 @@
-# EVERSHINE ERP — active handoff
+# EVERSHINE ERP — sole active handoff
 
-Updated: 2026-09-07, Asia/Rangoon. Phase: **Milestone 2.1 initial Owner setup and real login boundary**. Owner authorized and confirmed the localhost-only one-time setup. This is the sole active project handoff.
+Updated 2026-09-08, Asia/Yangon. Phase: **Milestone 2.2 live local account, permission approval and Owner recovery slice**. Owner authorized coding with “စမယ်။” and continued it. Independent project: C:/Users/DELL/Desktop/EVERSHINE-ERP.
 
-1. Read this file and DECISIONS.md once. Read STATE.md for implementation evidence and OPEN_ITEMS.md for the next confirmation.
-2. Read only the affected source files. Do not replay old transcripts or use legacy UAT approvals as acceptance of the clean ERP.
-3. Ask one unresolved business question at a time in Burmese. Never reopen a settled decision just because an earlier row says “unconfirmed”; later confirmed decisions resolve it.
-4. Current user instructions > explicit confirmed decisions > verified runtime evidence > handoff summaries > legacy references.
-5. Keep history concise and free of credentials. No agent delegation unless Owner asks. Do not claim zero bugs, security certification, or fixed credit savings.
+1. Read this file, STATE.md and relevant DECISIONS.md entries. Read affected code only; old chats are reference-only.
+2. Current user instructions > confirmed decisions > verified runtime evidence > summaries. Preserve D01–D135. Ask only one unresolved business question at a time; do not reopen confirmed rules.
+3. Preserve the real Owner account. Never reset this database, repeat Owner setup, request secrets in chat, or copy old project code/data/credentials. No delegation unless Owner asks.
+4. Keep updates and history concise and credential-free. Do not claim perfect security, full ERP completion, full end-to-end acceptance or guaranteed free hosted Production.
 
-Independent project: `C:/Users/DELL/Desktop/EVERSHINE-ERP`. Original workspace `C:/Users/DELL/Desktop/KOE KOE ERP` is reference-only for this new effort. No old application code, data, keys, schema or node_modules junction is part of this foundation.
+Five screens now use live local database data: accounts, permissions, approvals, audit and notifications. Login, private profile photos, position snapshots, individual permission request decisions, failed ERP-login locking and emergency Owner recovery are connected. Workspace/settings/backups/usage remain sample review. The actual Owner password and recovery code were not changed during development.
 
-M1 remains a **sample UI/workflow review**. M2 supplies an isolated local Supabase Auth/database/storage foundation, explicit RLS/grants, server-only administration helpers and tested schema. M2.1 adds the confirmed one-time Owner form, transactional profile/recovery/audit provisioning, real Supabase sign-in/sign-out and protected workspace routes. One active Owner account exists; Owner has confirmed successful login. Other account actions, complete session/lock/recovery policies, backup and email remain later work. Production requires separate final confirmation; Vercel Hobby commercial-use restriction is unresolved.
-
-Resume: read this handoff and STATE.md. Verify Docker, local Supabase and the existing app server before starting another process. Continue only the authorized milestone, report actual completion and remaining work, and preserve decisions D01–D134. Owner has confirmed login works and D119 resolves Owner lock/password-expiry recovery. Continue the real account-management foundation; do not repeat Owner setup or ask for credentials. Recovery implementation and full session-policy tests remain pending. Ask one unresolved business question at a time.
+Resume from STATE.md and OPEN_ITEMS.md. No live business module entry yet. Device-limit/third-device approval, full account editing and administrator password changes, handover, complete session/retention/recovery operations, real backup/email/usage and Production are still pending. Production is fail-closed and requires separate approval. Existing M1 browser tests cover the old sample UI and are not real Auth acceptance tests.

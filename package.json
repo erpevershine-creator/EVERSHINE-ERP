@@ -19,7 +19,7 @@
     "supabase:status": "supabase status",
     "supabase:reset": "node scripts/local-supabase.mjs reset",
     "supabase:env": "node scripts/sync-local-supabase-env.mjs",
-    "db:test": "supabase test db --local",
+    "db:test": "supabase test db --local --network-id evershine-local-loopback",
     "db:lint": "supabase db lint --local --level warning"
   },
   "dependencies": {

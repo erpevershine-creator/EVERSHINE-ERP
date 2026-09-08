@@ -1,3 +1,5 @@
+import { requireAccess } from "@/lib/access";
+import { LivePage } from "@/features/live-pages";
 import { notFound } from "next/navigation";
 import { Dashboard } from "@/features/dashboard";
 import { Approvals } from "@/features/approvals";
@@ -41,6 +43,20 @@ export default async function Section({
 }) {
   const { section } = await params;
   if (!Object.hasOwn(pages, section)) notFound();
+  const access = await requireAccess();
+  if (!access.pages[section])
+    return (
+      <section className="panel restricted">
+        <h1>Access restricted</h1>
+        <p>This page is outside your assigned permissions.</p>
+      </section>
+    );
+  if (
+    ["accounts", "permissions", "approvals", "audit", "notifications"].includes(
+      section,
+    )
+  )
+    return <LivePage section={section} />;
   const Component = pages[section as keyof typeof pages];
   return <Component />;
 }

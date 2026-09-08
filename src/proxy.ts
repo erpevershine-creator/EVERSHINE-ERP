@@ -26,6 +26,7 @@ export async function proxy(request: NextRequest) {
   const authRequired = process.env.EVERSHINE_AUTH_REQUIRED === "1";
   const publicPath =
     request.nextUrl.pathname === "/login" ||
+    request.nextUrl.pathname === "/recover" ||
     request.nextUrl.pathname === "/setup/owner";
 
   if (authRequired && !publicPath && !userId) {

@@ -1,0 +1,71 @@
+# Current state and evidence
+
+Updated 2026-09-07. Milestone 2 isolated local Auth/data foundation is implemented and verified. No real Owner/user account has been provisioned yet.
+
+- Fresh source, exact package versions/lockfile, independent dependencies. No legacy runtime/data/schema copied.
+- Ten screens: Workspace, Login, Account Management, Positions & Permissions, Approval Center, Audit & History, Notifications, Settings, Backup & Restore, Usage Monitor.
+- Compact responsive layout, Light/Dark/System; working sample tables/CSV, scoped sample notifications and individual sample request decisions/revisions.
+- Draft → submit → decision, reason required, Owner-only self-approval, Admin module scope, rejection returns to Draft, preserved versions. Only synthetic tab-local state is changed.
+- Login controls remain disabled. The new sample account form validates an entered ERP password and confirmation in transient form memory only; neither enters sample storage, audit or exports. No real Auth/database/production permissions. Provider usage is unknown, with a separate sample 80% policy control. Backup/restore actions disabled until implemented.
+- TypeScript, ESLint, four unit tests, optimized build and production dependency audit passed. All six browser acceptance scenarios passed across the full run and the targeted mobile fix retest. No runtime external requests/page errors in the all-route check. See docs/MILESTONE-1.md for evidence and acceptance boundaries.
+
+## Milestone 2 local Auth/data foundation
+
+- Pinned Supabase client/SSR/CLI dependencies and created local project `evershine-erp-m2-local` on ports 55321/55322. Project start creates the dedicated Docker network recommended for untrusted networks, and the workstation's Docker `Localhost only` port policy is enabled. Local services therefore stay on this computer across WiFi/hotspot changes. The reset helper reconnects a recreated database to the project network. Old UAT containers and volumes remain separate and were not migrated or deleted.
+- Added reproducible schema migration for company settings, Head Office, Operations Warehouse, Reserve Warehouse, positions, page/action permissions, Auth-linked profiles, approval snapshots/accounts, individual page overrides, immutable audit events, scoped notifications, device sessions and private Owner recovery-code hashes.
+- Disabled self-signup and anonymous login. Local Auth enforces an eight-character letter-and-number baseline; the account server workflow must additionally enforce the confirmed uppercase-letter requirement. Admin operations require the server-only secret; browser code receives only the publishable key.
+- Enabled RLS on every public foundation table, revoked implicit table access, added explicit grants/policies and security-definer authorization helpers with fixed search paths. Audit rows have a database-level append-only trigger. Recovery hashes are unavailable to browser roles and have explicit server-role access without direct delete. `profile-photos` is a private, server-managed bucket limited to 2 MiB JPEG/PNG/WebP files.
+- Added browser/server/admin Supabase clients, SSR cookie refresh and a secret-free local environment sync command. `.env.local` is ignored and no secret is recorded in Git or active history.
+- Docker Desktop was updated in place from 4.87.0 to 4.89.0 using a valid Docker Inc.-signed delta updater after a Windows stale-socket startup failure. No factory reset, container-volume deletion or UAT data migration occurred. The original Docker settings were backed up before enabling `Localhost only`. Core M2 DB/Auth/REST/Storage/Kong services are running and healthy.
+- Verification on 2026-09-07: clean database reset through the reconnect helper passed; 34/34 pgTAP schema/RLS/storage tests passed; database lint found no errors; 5/5 app policy tests passed; TypeScript and ESLint passed; optimized Next.js build passed. The all-foundation-routes browser smoke test passed with meaningful content, no browser errors and no external runtime requests. Auth, Storage and REST health endpoints returned HTTP 200. Ports 55321/55322 listened only on `127.0.0.1`/`::1`; localhost succeeded and the active LAN-IP probe was blocked.
+
+## Milestone 2.1 one-time Owner setup and login boundary
+
+- Decision D118 is implemented locally. `/setup/owner` accepts the required photo and Owner details, fixes Position/ERP Role to Owner, validates the confirmed password rule and company-approved Gmail format, and is available only through the local-review host guard.
+- The trusted server creates the Auth user, uploads the private photo, then calls one database transaction that acquires an advisory lock and writes the single active Owner profile, SHA-256 recovery-code hash and append-only setup audit. A normal failure removes the uploaded photo and Auth user; database uniqueness and the transaction reject races or a second Owner.
+- The clear recovery code is returned to the successful setup screen once. Password and clear recovery code are excluded from profile/audit rows, local history and Git. Browser bundles contain neither the server-secret variable name nor its value.
+- `/login` now uses Supabase password Auth, verifies an active profile and sets SSR cookies. Workspace routes redirect unauthenticated requests to the setup/login boundary; sign-out clears the session. The workspace header identifies the authenticated user while the business UI remains clearly labelled sample data.
+- The pending migration was applied without deleting existing local data. Verification: 47/47 pgTAP tests, database lint with no errors, 5/5 policy tests, TypeScript, ESLint and optimized build passed. Browser inspection found every setup field, no console warning/error, and confirmed unauthenticated `/usage` redirects to `/setup/owner` while no Owner exists.
+
+Pending: the Owner must create the real Owner account privately in the local form and save the one-time recovery code. Then verify real sign-in/sign-out and closed setup route. Complete failed-login locking, password expiry/recovery interaction, two-device sessions, third-device approval and employee account actions in later confirmed steps. Backup/restore, email, quota monitoring, business modules and Production remain unimplemented and unaccepted.
+
+## Latest authorized M1 refinements (D114–D116)
+- Header remains sticky; desktop sidebar can collapse/expand, mobile navigation remains reachable after scrolling and closes with Escape.
+- Account Management has a working sample creation form: required profile photo, employee name, position, department, ERP role, Gmail username, password/confirmation and contact. Owner/Admin scope, single Owner, duplicate username and password rules are checked. Photo/profile survive same-tab reload; passwords are never persisted, audited or exported. No real login account is provisioned.
+- Position page visibility uses a typed approval snapshot with the exact included accounts. Approval applies the template/pages atomically in sample state, preserves excluded accounts and individual overrides, and rejects stale snapshots. Sidebar/dashboard shortcuts and direct-route preview access agree. Page viewing grants no account creation/approval authority. Structured page access requests use the matrix for new changes; free-text revision is disabled for those payloads.
+- Existing sample sessions migrate without discarding requests/audit/notifications. The selected preview actor persists across direct navigation/reload.
+- Verification: all 11 browser scenarios passed across the initial suite and targeted selector-correction reruns; five policy tests, TypeScript, lint and final optimized build passed. Five refinement screenshots captured; desktop page matrix and mobile form/end controls were visually inspected. Earlier failing selectors matched unrelated column checkboxes or the Next route announcer; they were scoped to the actual dialog/controls.
+- Evidence: docs/evidence/account-form-desktop.png, account-form-mobile.png, account-form-mobile-end.png, page-visibility-desktop.png, sidebar-scrolled-mobile.png. The capture script also checks mobile dialog overflow, reachable form actions and page errors.
+- Testing used isolated synthetic browser contexts; the Owner's sample records were not reset. No cloud, email, database, credentials file or deployment was used. Live Auth/security/backup/email remain unimplemented and cannot yet be certified by these UI tests.
+
+## Final installation evidence
+- Final path: C:/Users/DELL/Desktop/EVERSHINE-ERP. Temporary build directory removed by moving the complete independent project; node_modules is a real directory, not a link.
+- Final-path optimized build and TypeScript passed. Compiled production server was checked on temporary port 3001: /dashboard returned HTTP 503 as intended; that temporary server was stopped.
+- Local development launcher is running in the background on 127.0.0.1:3000. Dashboard returned HTTP 200 and was visibly verified in the Codex in-app browser. Start-Local.cmd and Stop-Local.cmd manage only this project.
+- Final startup took 748ms; first cold dashboard compilation took about 14 seconds, then the page was available. This is a local observation, not a performance guarantee.
+- Source is an independent local Git repository with no remote/deployment configured. Build/cache/runtime logs are ignored.
+- KOE KOE ERP/AI_PROJECT_HISTORY/ACTIVE now contains routing pointers only. Prior summaries are preserved under its legacy-snapshot-20260906/milestone1-cutover directory. This new project's active handoff is the only current planning authority.
+- No hosted resources, email, actual user accounts, business records or paid integrations were created. No production release or business module acceptance.
+`n## Owner setup runtime fix — 2026-09-07`n- Moved initial state objects from use-server modules into client forms for both setup and login. Changed Referrer-Policy to same-origin so native same-origin form POSTs preserve Origin and pass Next.js CSRF validation.`n- Verified actual Owner form submission in an isolated browser with a deliberately invalid password: expected server validation returned; no account created. Earlier build/page-load checks did not cover this submission path.
+
+## Email login configuration repair — 2026-09-07
+- Auth logs identified 422 Email logins are disabled, not invalid credentials. Enabled auth.email.enable_signup (email provider switch in this local CLI) while retaining global auth.enable_signup=false.
+- Restarted only M2 using preserved volumes. Auth settings now report external.email=true and disable_signup=true; one active confirmed Owner remains. Typecheck/lint passed. User must retry private login to verify successful authentication.
+- Login now distinguishes invalid_credentials, rate limits and service failures.
+
+## Owner confirmation update
+- Owner reports successful login; real Owner setup is complete. Accounts/business screens still use sample state.
+- D119 confirmed emergency-code password recovery for Owner lock or expiry. Recorded only; recovery implementation is pending.
+- D120: Owner confirmed MMK as base currency; recorded requirement only, with runtime implementation still pending.
+- D121: Owner confirmed Asia/Yangon (UTC+06:30) for ERP dates, times, reports and approval deadlines. Requirement recorded; runtime implementation pending.
+- D122-D123: backup destination requirements recorded: Owner Gmail Google Drive and dedicated Telegram private channel with Owner and approved Admins. No integration or transfer performed.
+- D124: once-daily automatic backup within free-plan constraints confirmed; requirement recorded only. No scheduler or external delivery configured.
+- D125: daily backup time confirmed as 18:00 Asia/Yangon. Requirement recorded; no scheduler configured.
+- D126: automatic backup catch-up after computer/connectivity recovery confirmed. Recorded requirement only; no scheduler or delivery integration implemented.
+- D127-D128: no separately entered backup recovery key; restore approval by Owner and delegated approved Admins confirmed. Recorded only; backup encryption/key custody and restore workflows remain unimplemented.
+- 2026-09-08 D129: Owner approved 7 daily / 3 monthly / 1 yearly backup retention. Requirement recorded; no backup job, upload or deletion performed.
+- D130: restore may include or skip a current-data backup; selected backup must succeed first. Requirement recorded only; no restore or data mutation performed.
+- D131: pre-restore backup choice is part of the approval snapshot; changing it after approval requires a new request. Requirement recorded only; implementation pending.
+- D132: block other users from data creation/editing and approval during restore; reopen after restore succeeds. Requirement recorded only; maintenance/restore not implemented or activated.
+- D133: failed restore keeps maintenance restrictions active and notifies Owner/authorized Backup-Restore Admins. Requirement recorded only; no notification sent or runtime behavior implemented.
+- D134: failed-restore Retry is manually initiated by Owner or Backup/Restore-authorized Admin with a reason note. Requirement recorded only; no restore or retry executed.

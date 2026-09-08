@@ -1,8 +1,9 @@
+import Link from "next/link";
+import { getAccess } from "@/lib/access";
 import { redirect } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 import { ThemeControl } from "@/components/theme";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
@@ -18,17 +19,8 @@ export default async function LoginPage() {
   if (ownerError) throw new Error("Owner setup status could not be verified.");
   if (!owner) redirect("/setup/owner");
 
-  const supabase = await createClient();
-  const { data: claimData } = await supabase.auth.getClaims();
-  if (claimData?.claims?.sub) {
-    const { data: signedInProfile } = await admin
-      .from("profiles")
-      .select("id")
-      .eq("id", claimData.claims.sub)
-      .eq("status", "active")
-      .maybeSingle();
-    if (signedInProfile) redirect("/dashboard");
-  }
+  const access = await getAccess();
+  if (access) redirect("/dashboard");
 
   return (
     <main className="login-layout">
@@ -46,6 +38,7 @@ export default async function LoginPage() {
         <h1>Welcome back</h1>
         <p className="muted">Sign in with your company-assigned account.</p>
         <LoginForm />
+        <Link href="/recover">Owner emergency recovery</Link>
       </section>
       <small className="login-footer">
         EVERSHINE ERP 2.1 · Local authentication

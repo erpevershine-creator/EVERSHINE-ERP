@@ -167,6 +167,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D134 | Owner confirmed failed-restore Retry is manually initiated by Owner or an Admin with Backup/Restore authority, with a required reason note. Existing audit and maintenance restrictions apply. This does not authorize a restore now or bypass D131: changing the approved pre-restore backup choice still requires a new approval request. |
 
+| D135 | Owner authorized the proposed live local Account Management, Permissions and Owner Recovery implementation with “စမယ်။” and continued the task. Preserve existing Owner/data and prior business decisions. This authorizes the coding/test slice, not Production, paid services, external delivery or an actual reset of the Owner password. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

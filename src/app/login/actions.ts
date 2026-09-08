@@ -1,4 +1,5 @@
 "use server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -31,20 +32,47 @@ export async function login(
     password,
   });
   if (error || !data.user) {
+    if (error?.code === "invalid_credentials") {
+      await createAdminClient().rpc("record_login_attempt", {
+        p_username: username,
+        p_success: false,
+      });
+    }
     return {
       status: "error",
-      message: error?.code === "invalid_credentials" ? "Username or ERP password is incorrect." : error?.status === 429 ? "Too many login attempts. Please try again shortly." : "Sign-in service is unavailable. Please contact your administrator.",
+      message:
+        error?.code === "invalid_credentials"
+          ? "Username or ERP password is incorrect."
+          : error?.status === 429
+            ? "Too many login attempts. Please try again shortly."
+            : "Sign-in service is unavailable. Please contact your administrator.",
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("status")
-    .eq("id", data.user.id)
-    .single();
-  if (profileError || profile?.status !== "active") {
-    await supabase.auth.signOut();
-    return { status: "error", message: "This ERP account is not active." };
+  const { data: claims } = await supabase.auth.getClaims();
+  const sessionId = claims?.claims?.session_id;
+  if (typeof sessionId === "string") {
+    const attempt = await createAdminClient().rpc("record_login_attempt", {
+      p_username: username,
+      p_success: true,
+      p_session: sessionId,
+    });
+    if (attempt.error) {
+      await supabase.auth.signOut({ scope: "local" });
+      return {
+        status: "error",
+        message: "Sign-in could not be recorded. Please retry.",
+      };
+    }
+  }
+  const { data: access, error: accessError } = await supabase.rpc("my_access");
+  if (accessError || !access) {
+    await supabase.auth.signOut({ scope: "local" });
+    return {
+      status: "error",
+      message:
+        "Account access is unavailable. Contact Owner or an authorized Admin; Owner may use emergency recovery.",
+    };
   }
 
   return { status: "success", message: "Signed in." };
@@ -52,6 +80,7 @@ export async function login(
 
 export async function logout() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  await supabase.rpc("end_my_session");
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/login");
 }

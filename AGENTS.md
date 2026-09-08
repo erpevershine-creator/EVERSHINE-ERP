@@ -1,11 +1,10 @@
 # EVERSHINE ERP
 
-Start at AI_PROJECT_HISTORY/ACTIVE/START_HERE.md, then DECISIONS.md. This is the clean independent foundation. Original V1/V2.1 projects are references, not dependencies or approvals.
+Start at AI_PROJECT_HISTORY/ACTIVE/START_HERE.md, then STATE.md and relevant DECISIONS.md. This is the independent clean project; old V1/V2.1 are references only.
 
-- Current scope: Milestone 1 local foundation skeleton. Owner must accept screens/workflow before implementing live account controls or business modules.
-- All current records are synthetic browser-tab samples. UI permission simulation is NOT security enforcement. Login, database, email, real audit, jobs and backup are not implemented.
-- Run npm run typecheck, npm run lint, npm test, npm run build. For browser tests, start npm run dev then npm run test:e2e (local Chrome).
-- Preserve fail-closed production/local-only guards until real authentication and server authorization are verified. No production deployment without separate Owner confirmation.
-- Never read/copy private credential files into this project or history. No node_modules junctions, old code bulk copies, global project changes, or paid integrations.
-- Ask one unresolved business question at a time; do not reopen confirmed decisions. Do not spawn agents unless Owner asks.
-- Report actual evidence and outstanding work; never call this a perfect ERP, production ready, or an authenticated application.
+- Current phase: M2.2 live local accounts/permissions/recovery slice. Five administration screens use real data; remaining workspace/settings/backup/usage screens are samples. Read STATE.md for exact boundaries.
+- Preserve the real Owner, Auth records and volumes. Do not run a database reset or repeat Owner setup. Use transaction-only test fixtures and rollback. Never copy credentials into history/source or browser bundles.
+- Run npm run typecheck, npm run lint, npm test, npm run build and npm run db:test for relevant auth/SQL changes. db:test uses the dedicated evershine-local-loopback Docker network. Existing sample M1 browser tests are not real Auth acceptance.
+- Keep localhost-only and Production fail-closed guards. No production deployment, paid resources, external messages or new business rules without their applicable user authorization.
+- Ask one unresolved business question at a time. Preserve settled decisions. No subagents unless Owner asks.
+- Report evidence and remaining work. Do not claim complete ERP, perfect security or full end-to-end verification from UI smoke tests.
