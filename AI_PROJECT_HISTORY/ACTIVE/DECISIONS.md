@@ -179,6 +179,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D140 | Owner explicitly confirmed that manually requested backups remain retained. Apply D129 automatic retention only to verified scheduled archives: 7 daily, 3 completed-month and 1 completed-year representatives. Preserve manual/failed archives, metadata and audit. Verify a newer replacement before removing any scheduled archive. Date-only Yangon folders remain DD-MM-YYYY with separate UUID identities. |
 
+| D141 | Owner authorizes continuing computer-loss backup recovery and Google Drive/Telegram integration, using newly created Google accounts. Future Production must use new Supabase, GitHub and Vercel accounts/resources. Do not reuse old connected identities, projects, tokens or destinations by inference. Owner supplied erp.evershine@gmail.com as the new backup Google account. Preserve the current local ERP, Owner, archives and confirmed policies. This does not authorize immediate Production, paid resources, changes to real credentials or migration of local test records into Production. Destination binding and recoverable system-key custody are not yet configured or verified. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

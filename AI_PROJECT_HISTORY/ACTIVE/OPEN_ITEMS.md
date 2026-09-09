@@ -13,3 +13,6 @@ Company timezone is confirmed as Asia/Yangon (D121). Backup destinations are Own
 Later business modules require individual confirmation. Transfer request approval, separate-actor dispatch/receipt, discrepancy resolution, partial receipt, cancellation and reversal details remain open.
 
 Production dependency: Vercel Hobby is non-commercial personal use only. A company ERP requires a compatible hosting choice; no paid plan or alternate host has been authorized. Outbound email provider, volume, schedule and sender remain open. Local foundation testing does not consume hosted provider quotas.
+
+## New external accounts — D141
+Owner authorized continuing offsite recovery/integration with new Google accounts and new Supabase/GitHub/Vercel Production resources. Owner supplied erp.evershine@gmail.com. Google Cloud sign-in is open in the in-app browser with that address selected; Owner must enter the password/OTP privately. Never ask for credentials or recovery codes in chat. Follow docs/OFFSITE-BACKUP-SETUP.md; existing connected accounts are not approved destinations. No upload or external connection has occurred.
