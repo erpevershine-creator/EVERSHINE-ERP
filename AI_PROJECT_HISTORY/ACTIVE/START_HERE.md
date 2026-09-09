@@ -1,18 +1,18 @@
 # EVERSHINE ERP — sole active handoff
 
-Updated 2026-09-09, Asia/Yangon. Phase: **Milestone 2.2 live local account, permission approval and Owner recovery slice**. Owner authorized coding with “စမယ်။” and continued it. Independent project: C:/Users/DELL/Desktop/EVERSHINE-ERP.
+Updated 2026-09-10, Asia/Yangon. Phase: FOUNDATION EXECUTION FIRST (D155).
 
-1. Read this file, STATE.md and relevant DECISIONS.md entries. Read affected code only; old chats are reference-only.
-2. Current user instructions > confirmed decisions > verified runtime evidence > summaries. Preserve D01–D141. Ask only one unresolved business question at a time; do not reopen confirmed rules.
-3. Preserve the real Owner account. Never reset this database, repeat Owner setup, request secrets in chat, or copy old project code/data/credentials. No delegation unless Owner asks.
-4. Keep updates and history concise and credential-free. Do not claim perfect security, full ERP completion, full end-to-end acceptance or guaranteed free hosted Production.
+1. Read docs/FOUNDATION-EXECUTION-PLAN.md, STATE.md and relevant DECISIONS.md. Preserve D01–D155. Current user instructions govern scope.
+2. Original source/data checkout: C:/Users/DELL/Desktop/EVERSHINE-ERP. Active implementation worktree: C:/Users/DELL/Desktop/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910, branch codex/foundation-gates-20260910. The worktree preserves nineteen pending source/document files with matching hashes; it contains no copied env files, backup archives or credentials. Do not merge until the relevant checks pass.
+3. Finish gates F0–F6 in the execution plan. Supplier/business questions and coding are paused until foundation acceptance. The previous no-adjustment Formula question is parked. After foundation, review dependencies and follow the Owner's business order in D155 before resuming Supplier contract questions one at a time.
+4. Preserve the real Owner, Auth accounts and volumes. No database reset, repeated Owner setup, real password/recovery-code change or old-code/data/credential copying. Use rollback fixtures or a clearly isolated validation database. Do not run a second scheduler from the worktree against the original database.
+5. No subagents unless Owner requests them. No paid resources, Production deployment or external messages without applicable authorization. Fast mode is optional and has not been changed by this work.
+6. Record actual pass/fail/blocked evidence per exact source candidate. Do not claim perfect security, complete ERP or full recovery based on source/UI/build-only evidence.
 
-D137 adds Owner-only per-account additional permissions with audited self-approval, separately from Role templates; see docs/INDIVIDUAL-PERMISSIONS.md. The Owner has created one real Admin account.
+D136 fixes the six ERP roles separately from manual Company Position. D137 preserves Owner-managed per-account permissions independently of role templates. One real Owner and one real Admin already exist; their data is preserved.
 
-D136 separates manual Company Position from six fixed ERP Roles and their configurable permission templates. See docs/ERP-ROLES.md for verification.
+The existing live local slice covers accounts, permission templates/individual grants, approvals, audit, notifications, local encrypted backups, ERP login/session revocation and Owner emergency recovery fencing. Important identity/device/handover/reconciliation gaps remain. Workspace/settings/usage still include sample behavior. Read STATE.md and OPEN_ITEMS.md for the evidence boundary.
 
-Six screens now use live local database data: accounts, permissions, approvals, audit, notifications and local backups. Login, private profile photos, position snapshots, individual permission request decisions, failed ERP-login locking and emergency Owner recovery are connected. Workspace/settings/usage remain sample review. Backup capture, daily 18:00 Yangon scheduling/catch-up while the local server runs, interrupted-worker reconciliation, scheduled-only retention and isolated restore verification are live locally; see docs/LOCAL-BACKUPS.md. The actual Owner password and recovery code were not changed during development.
+D141–D143 preserve the approved new Google identities and prior split-key offsite integrity proof. Use docs/OFFSITE-BACKUP-SETUP.md for account/destination binding and pending no-profile restore/remote retention/Telegram gates. Main account re-verification was deferred; do not repeat consent from a stale browser URL. Never request secrets in chat.
 
-Resume from STATE.md and OPEN_ITEMS.md. No live business module entry yet. Device-limit/third-device approval, full account editing and administrator password changes, handover, complete session/retention/recovery operations, live restore, offsite backup, real email/usage and Production are still pending. Production is fail-closed and requires separate approval. Existing M1 browser tests cover the old sample UI and are not real Auth acceptance tests.
-
-D141: use new Google identities for backup integration and new Supabase/GitHub/Vercel identities/resources for future Production. The selected backup Google account is erp.evershine@gmail.com; Gmail connector identity and Google Cloud sign-in are verified. Project peerless-sensor-508107-e0 is EVERSHINE ERP Backup. Owner accepted the policy. Desktop client and protected local setup utility are ready; real Drive consent is pending because the connected browser inventory has no Chrome. See latest setup progress. See docs/OFFSITE-BACKUP-SETUP.md. Do not use old connected accounts by default.
+Supplier contract decisions are preserved in docs/SUPPLIER-CONTRACT.md, including one onboarding approval and Deposit <= Sub Total. None of that constitutes implemented business behavior.

@@ -73,7 +73,7 @@ export function LiveBackups({
     <>
       <PageHeading
         title="Backup & Restore"
-        subtitle="Local encrypted backups with a separate restore check."
+        subtitle="Local encrypted backups with verified two-account Drive delivery."
         action={
           <button onClick={openRetention} disabled={reviewing}>
             {reviewing ? "Loading…" : "Retention review"}
@@ -116,8 +116,9 @@ export function LiveBackups({
           </p>
         )}
         <p className="muted">
-          Restore checks use a separate database. Live restore and Google Drive
-          / Telegram delivery are not enabled yet.
+          Restore checks use a separate database. Drive delivery uses two
+          independent key shares; live restore and Telegram delivery remain
+          pending.
         </p>
       </section>
       <div className="table-panel live-scroll">

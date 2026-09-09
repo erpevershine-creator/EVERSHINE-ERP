@@ -9,6 +9,7 @@ import {
   checkConnection,
   driveScope,
   backupGoogleAccount,
+  recoveryGoogleAccount,
 } from "../scripts/google-drive-oauth.mjs";
 import { secretCodec } from "../scripts/google-secret-store.mjs";
 const client = {
@@ -54,6 +55,13 @@ test("authorization uses fresh S256 PKCE and only app-file access with exact loo
   assert.equal(u.searchParams.get("redirect_uri"), "http://127.0.0.1:54399/");
   assert.equal(u.searchParams.get("login_hint"), backupGoogleAccount);
   assert.ok(!a.url.includes(client.client_secret));
+});
+test("recovery authorization is account-bound and uses a separate purpose", () => {
+  const a = makeAuthorization(client, 54399, "recovery"),
+    u = new URL(a.url);
+  assert.equal(a.purpose, "recovery");
+  assert.equal(u.searchParams.get("login_hint"), recoveryGoogleAccount);
+  assert.notEqual(recoveryGoogleAccount, backupGoogleAccount);
 });
 test("callback rejects forged host, wrong state, duplicate values and denial", () => {
   const a = makeAuthorization(client, 54399),
@@ -173,6 +181,27 @@ test("refresh verification rejects changed identity and revoked grants without r
     })),
     /^Error: GOOGLE_RECONNECT_REQUIRED$/,
   );
+});
+test("recovery refresh verification binds the separate recovery identity", async () => {
+  const c = {
+    ...client,
+    email: recoveryGoogleAccount,
+    scope: driveScope,
+    permissionId: "recovery-user",
+    refresh_token: "fixture-recovery-refresh",
+  };
+  const identity = await checkConnection(client, c, async (url) =>
+    url.includes("/token")
+      ? response({ access_token: "recovery-access" })
+      : response({
+          user: {
+            emailAddress: recoveryGoogleAccount,
+            permissionId: "recovery-user",
+          },
+        }),
+    "recovery",
+  );
+  assert.equal(identity.email, recoveryGoogleAccount);
 });
 test(
   "Windows protection roundtrips disposable tokens and rejects damaged ciphertext",
