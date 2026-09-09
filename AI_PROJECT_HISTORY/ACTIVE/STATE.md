@@ -50,3 +50,6 @@ See OPEN_ITEMS.md. Business modules, live restore, retention/offsite backups, re
 - Validation: 156/156 transaction-only pgTAP tests, 9 Node tests (including real Windows lock contention/loss), typecheck/lint/build passed. Security advisors: no issues; DB lint only preexisting create_position unused parameter warnings. Actual capture c2283c9d-95b1-46a6-a9b3-4a47f08cace3 verified 54 tables and 2 Storage files. Browser shows verified and active scheduler heartbeat on 2026-09-09. No forced live failure or real user permission change.
 - Future deadline/catch-up cases were tested with rollback fixtures; the real daily deadline has not yet occurred since enablement. Existing verified manual capture correctly satisfied the current due slot. No time manipulation or fake verified record was used in the live database.
 - Remaining: retention pruning, offsite key custody, Google Drive/Telegram, full live restore/maintenance/retry flow and broader identity/device work. Local DPAPI/profile dependency remains.
+
+## Backup folder layout — 2026-09-09
+Owner requested date-only names. Local archives now use .runtime/backups/DD-MM-YYYY/<backup UUID>, based on creation time in Asia/Yangon. Five existing archives moved under the exclusive worker lock; all file checksums preserved. UUID identity and database records are unchanged.

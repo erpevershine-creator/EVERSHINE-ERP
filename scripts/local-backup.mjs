@@ -1,3 +1,4 @@
+import { backupRelativePath } from "./backup-folder.mjs";
 import { acquireBackupLock } from "./backup-lock.mjs";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
@@ -211,12 +212,11 @@ async function main() {
       if (!tick.job) return;
       id = validBackupId(tick.job);
     }
-    folder = path.join(root, ".runtime/backups", id);
     clone = "evershine-restorecheck-" + id;
     const claimed = JSON.parse(
       (
         await query(
-          `update public.local_backup_runs set status='running',stage='Preparing' where id='${id}' and status='queued' returning jsonb_build_object('id',id);`,
+          `update public.local_backup_runs set status='running',stage='Preparing' where id='${id}' and status='queued' returning jsonb_build_object('id',id,'createdAt',created_at);`,
         )
       )
         .toString()
@@ -224,6 +224,11 @@ async function main() {
     );
     if (!claimed) throw Error("JOB_NOT_QUEUED");
     ownedJob = true;
+    folder = path.join(
+      root,
+      ".runtime/backups",
+      backupRelativePath(id, claimed.createdAt),
+    );
     await query(`select private.assert_local_backup_authority('${id}');`);
     await fsp.mkdir(folder, { recursive: true });
     key = Buffer.from(
