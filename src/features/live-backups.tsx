@@ -2,11 +2,17 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeading, Modal, Badge } from "@/components/ui";
-import { createLocalBackup } from "@/app/backups/actions";
+import {
+  createLocalBackup,
+  reviewBackupRetention,
+} from "@/app/backups/actions";
 import type { Result } from "@/app/live/actions";
 export type BackupRun = {
   origin: "manual" | "scheduled";
   scheduled_for: string | null;
+  archive_state: string;
+  pruned_at: string | null;
+  prune_error_code: string | null;
   id: string;
   reason: string;
   status: string;
@@ -35,6 +41,22 @@ export function LiveBackups({
   canCreate: boolean;
 }) {
   const router = useRouter();
+  const [retention, setRetention] = useState<Awaited<
+    ReturnType<typeof reviewBackupRetention>
+  > | null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  async function openRetention() {
+    setReviewing(true);
+    setReviewError("");
+    try {
+      setRetention(await reviewBackupRetention());
+    } catch {
+      setReviewError("Retention review could not be loaded. Please retry.");
+    } finally {
+      setReviewing(false);
+    }
+  }
   const [selected, setSelected] = useState<string | null>(null);
   const [state, action, pending] = useActionState(createLocalBackup, {
     status: "idle",
@@ -52,7 +74,13 @@ export function LiveBackups({
       <PageHeading
         title="Backup & Restore"
         subtitle="Local encrypted backups with a separate restore check."
+        action={
+          <button onClick={openRetention} disabled={reviewing}>
+            {reviewing ? "Loading…" : "Retention review"}
+          </button>
+        }
       />
+      {reviewError && <p role="alert">{reviewError}</p>}
       <section className="panel">
         <p className="muted">
           Daily · 18:00 Myanmar time ·{" "}
@@ -108,7 +136,13 @@ export function LiveBackups({
               <tr key={r.id}>
                 <td>{time(r.created_at)}</td>
                 <td>
-                  <Badge>{r.status}</Badge>
+                  <Badge>
+                    {r.archive_state === "pruned"
+                      ? "Pruned"
+                      : r.archive_state === "pruning"
+                        ? "Removing"
+                        : r.status}
+                  </Badge>
                 </td>
                 <td>{r.stage}</td>
                 <td>
@@ -125,10 +159,58 @@ export function LiveBackups({
         </table>
         {!runs.length && <p>No local backups yet.</p>}
       </div>
+      {retention && (
+        <Modal title="Backup retention" wide onClose={() => setRetention(null)}>
+          <p>
+            Scheduled backups: 7 daily · 3 completed months · 1 completed year.
+            Manual backups are kept.
+          </p>
+          <p>
+            {retention.keep} kept · {retention.candidates} outside retention ·{" "}
+            {retention.removed} removed
+          </p>
+          <p className="muted">
+            Removal runs after a newer verified backup passes its archive
+            integrity check. History remains.
+          </p>
+          <div className="live-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Started · Myanmar time</th>
+                  <th>Source</th>
+                  <th>Retention</th>
+                </tr>
+              </thead>
+              <tbody>
+                {retention.rows.map((r) => (
+                  <tr key={r.id}>
+                    <td>{time(r.created_at)}</td>
+                    <td>{r.origin}</td>
+                    <td>{r.reasons.join(" · ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {retention.total > retention.rows.length && (
+            <p>
+              Showing latest {retention.rows.length} of {retention.total}{" "}
+              backups. Totals include all records.
+            </p>
+          )}
+        </Modal>
+      )}
       {detail && (
         <Modal title="Backup details" onClose={() => setSelected(null)}>
           <p>{detail.reason}</p>
-          <p>{detail.stage}</p>
+          <p>
+            {detail.archive_state === "pruned"
+              ? "Archive removed by retention; history retained."
+              : detail.archive_state === "pruning"
+                ? "Archive removal in progress; unavailable for restore."
+                : detail.stage}
+          </p>
           <dl>
             <dt>Backup ID</dt>
             <dd>{detail.id}</dd>
@@ -150,12 +232,17 @@ export function LiveBackups({
           {detail.error_code && (
             <p role="alert">Error reference: {detail.error_code}</p>
           )}
-          {detail.status === "verified" && (
-            <p>
-              Database record checksums and stored file checksums matched after
-              an isolated restore.
-            </p>
+          {detail.prune_error_code && (
+            <p role="alert">Retention check: {detail.prune_error_code}</p>
           )}
+          {detail.pruned_at && <p>Removed: {time(detail.pruned_at)}</p>}
+          {detail.status === "verified" &&
+            detail.archive_state === "present" && (
+              <p>
+                Database record checksums and stored file checksums matched
+                after an isolated restore.
+              </p>
+            )}
         </Modal>
       )}
     </>

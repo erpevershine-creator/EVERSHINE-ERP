@@ -32,7 +32,7 @@ See docs/ERP-ROLES.md for current D136 verification and runtime evidence. The fo
 - Real Owner password change and an end-to-end Auth+Storage employee creation were deliberately not exercised against the Owner's account. Database RPC/security tests and UI inspection are not a claim of full real-account acceptance. M1 Playwright tests target the previous sample flow and must be adapted for live scenarios.
 
 ## Remaining
-See OPEN_ITEMS.md. Business modules, live restore, retention/offsite backups, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; the local scheduler now runs alongside npm run dev (see D139 below).
+See OPEN_ITEMS.md. Business modules, live restore, offsite backups, real email/quota integrations and Production remain unimplemented/unaccepted. Backup requirements D120–D134 are preserved in DECISIONS.md; the local scheduler now runs alongside npm run dev (see D139 below).
 
 ## Local backup continuation — 2026-09-08 (D138)
 - /backups now uses real local_backup_runs records. Owner or scoped Admin requests capture with a reason; the trusted local worker rechecks the requester's active session/page/action before reading data. No client can write a verified status.
@@ -53,3 +53,12 @@ See OPEN_ITEMS.md. Business modules, live restore, retention/offsite backups, re
 
 ## Backup folder layout — 2026-09-09
 Owner requested date-only names. Local archives now use .runtime/backups/DD-MM-YYYY/<backup UUID>, based on creation time in Asia/Yangon. Five existing archives moved under the exclusive worker lock; all file checksums preserved. UUID identity and database records are unchanged.
+
+## Scheduled archive retention — 2026-09-09 (D140)
+- Manual backups remain retained, including failed manual captures. Existing history is never deleted by archive retention. /backups → Retention review shows kept/outside-retention/removed counts and per-archive reasons.
+- Scheduled verified archives retain the latest snapshot for each of the 7 most recent available Yangon dates, the 3 most recent available completed months and the most recent available completed year. Overlapping tiers share one archive. Sparse history uses the last actual snapshot of an available period, never an invented month/year-end capture; incomplete periods do not qualify for monthly/yearly tiers. This preserves available history conservatively.
+- Pruning starts only after a new verified capture, under the same exclusive worker lock. The newer replacement's signed manifest, all five encrypted artifacts, authentication tags, hashes and lengths are rechecked before removal. Only the validated date/UUID archive directory is removed. Manual, failed/unverified, invalid-date and pending replacement-dependency archives are protected.
+- Durable pruning state and replacement identity commit before file removal. Interrupted removal remains unavailable for restore until a later tick rechecks the replacement and reconciles it; retry backoff is 30 minutes. At most 20 targets are handled per pass. If a replacement is missing/corrupt, removal stops and records a safe error code; operator reconciliation UI remains future work. Metadata/audit remain, and empty date parent folders may remain.
+- Validation: 16 Node tests, 160 rollback-only pgTAP assertions, typecheck, lint and optimized build passed. DB lint has only the preexisting unused create_position parameter warnings. File tests cover corrupted replacement protection, manual preservation, unexpected-file rejection and interruption after removal but before database finalization. No real expired scheduled archive was deleted: all six live archives are manual.
+- Actual manual run 827f945e-ceba-4234-b7ac-0f8a746b915e passed the isolated restore check on 2026-09-09 and was written under 09-09-2026. Browser showed Verified. Existing five archives remain. Real account credentials and grants were not changed.
+- Remaining: offsite key custody, Google Drive/Telegram connection, full live restore/maintenance/retry, device controls and account editing. Current local DPAPI archives still depend on this Windows profile/key; this is not yet computer-loss disaster recovery.

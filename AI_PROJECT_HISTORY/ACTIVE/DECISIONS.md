@@ -177,6 +177,8 @@ Source: explicit Owner replies in current task, summarized through 2026-09-06. O
 
 | D139 | Owner continued the foundation backup task after D138. Implement the previously confirmed D124–D126 daily 18:00 Asia/Yangon schedule and availability catch-up with safe interrupted-worker reconciliation. The local development server supervises the scheduler; no Windows login password, user session impersonation, paid service or external delivery is introduced. Catch-up captures current data for the latest due slot, not fabricated past-day snapshots. |
 
+| D140 | Owner explicitly confirmed that manually requested backups remain retained. Apply D129 automatic retention only to verified scheduled archives: 7 daily, 3 completed-month and 1 completed-year representatives. Preserve manual/failed archives, metadata and audit. Verify a newer replacement before removing any scheduled archive. Date-only Yangon folders remain DD-MM-YYYY with separate UUID identities. |
+
 ## Proposed phase sequence, not individually confirmed
 Phase sequence: foundation (Login, accounts, permissions, audit, approval, settings, backup) → Supplier/Product → Purchase/receipt → promotions/customer agreements → Orders/delivery → invoices/consignment surveys → returns/exchanges/damage → finance/statements → dashboards/reports → release validation. Detailed rules, entities, screens and accounting behavior still require confirmation.
 

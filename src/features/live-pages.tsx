@@ -19,7 +19,7 @@ export async function LivePage({ section }: { section: string }) {
     const { data, error } = await db
       .from("local_backup_runs")
       .select(
-        "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code,origin,scheduled_for",
+        "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code,origin,scheduled_for,archive_state,pruned_at,prune_error_code",
       )
       .order("created_at", { ascending: false })
       .limit(50);

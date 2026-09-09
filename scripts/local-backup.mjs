@@ -1,3 +1,4 @@
+import { maintainBackupRetention } from "./prune-backups.mjs";
 import { backupRelativePath } from "./backup-folder.mjs";
 import { acquireBackupLock } from "./backup-lock.mjs";
 import fs from "node:fs";
@@ -184,12 +185,36 @@ async function main() {
     ownedJob = false,
     key,
     stage = "Preparing";
+  const getKey = async () => {
+    if (key) return key;
+    key = Buffer.from(
+      (
+        await command(
+          [
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            path.join(root, "scripts/backup-key.ps1"),
+          ],
+          undefined,
+          "powershell.exe",
+        )
+      )
+        .toString()
+        .trim(),
+      "base64",
+    );
+    if (key.length !== 32) throw Error("KEY_UNAVAILABLE");
+
+    return key;
+  };
   const update = async (status, extra = "") =>
     query(
       `update public.local_backup_runs set status='${status}',stage='${stage}'${extra} where id='${id}' and status='running';`,
     );
   try {
     if (process.argv[2] === "tick") {
+      await maintainBackupRetention({ root, query, getKey }).catch(() => {});
       const tick = JSON.parse(
         (await query("select private.prepare_local_backup_tick();"))
           .toString()
@@ -231,24 +256,7 @@ async function main() {
     );
     await query(`select private.assert_local_backup_authority('${id}');`);
     await fsp.mkdir(folder, { recursive: true });
-    key = Buffer.from(
-      (
-        await command(
-          [
-            "-NoProfile",
-            "-NonInteractive",
-            "-File",
-            path.join(root, "scripts/backup-key.ps1"),
-          ],
-          undefined,
-          "powershell.exe",
-        )
-      )
-        .toString()
-        .trim(),
-      "base64",
-    );
-    if (key.length !== 32) throw Error("KEY_UNAVAILABLE");
+    await getKey();
     const image = (await command(["inspect", "--format", "{{.Image}}", DB]))
       .toString()
       .trim();
@@ -503,6 +511,14 @@ async function main() {
     await query(
       `begin; update public.local_backup_runs set status='verified',stage='${stage}',finished_at=now(),archive_bytes=${bytes},table_count=${tables.length},storage_files=${manifest.storageFiles},manifest_sha256='${digest}' where id='${id}' and status='running'; insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,coalesce(p.employee_name,'Local backup scheduler'),'Local backup restore verified','local_backup',b.id::text,b.reason,jsonb_build_object('backup_id',b.id,'tables',b.table_count,'storage_files',b.storage_files,'manifest_sha256',b.manifest_sha256) from public.local_backup_runs b left join public.profiles p on p.id=b.requester_id where b.id='${id}' and b.status='verified'; commit;`,
     );
+    await maintainBackupRetention({
+      root,
+      query,
+      getKey,
+      replacementId: id,
+    }).catch(() => {
+      console.error("RETENTION_CHECK_FAILED");
+    });
     console.log(
       JSON.stringify({
         id,

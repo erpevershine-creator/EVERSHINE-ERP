@@ -1,4 +1,8 @@
 "use server";
+import {
+  planBackupRetention,
+  type RetentionBackup,
+} from "@/lib/backup-retention";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { headers } from "next/headers";
@@ -79,4 +83,36 @@ export async function createLocalBackup(
     status: "success",
     message: "Backup started. Verification progress appears below.",
   };
+}
+
+export async function reviewBackupRetention() {
+  const access = await requireAccess("backups");
+  if (!["owner", "admin"].includes(access.role))
+    throw Error("Backup review is outside your permissions.");
+  const db = await createClient();
+  const rows: RetentionBackup[] = [];
+  // Read every page for the calculation; never silently plan from the 50-row screen list.
+  for (let offset = 0; offset < 10000; offset += 1000) {
+    const { data, error } = await db
+      .from("local_backup_runs")
+      .select("id,origin,status,created_at,archive_state,prune_replacement_id")
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(offset, offset + 999);
+    if (error) throw Error("Retention review could not be loaded.");
+    rows.push(...data);
+    if (data.length < 1000) {
+      const plan = planBackupRetention(rows);
+      return {
+        total: plan.length,
+        keep: plan.filter((r) => r.decision === "keep").length,
+        candidates: plan.filter((r) => r.decision === "candidate").length,
+        removed: plan.filter((r) => r.decision === "removed").length,
+        rows: plan.slice(0, 200),
+      };
+    }
+  }
+  throw Error(
+    "Backup history requires a larger review; no partial plan is shown.",
+  );
 }
