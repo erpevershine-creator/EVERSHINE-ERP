@@ -7,6 +7,10 @@ insert into auth.users(id,email,role,aud,email_confirmed_at) select owner_id,'in
 insert into public.profiles(id,employee_name,position_id,department,erp_role,username,contact,avatar_path)
 select owner_id,'Individual Test Owner',(select id from public.positions where erp_role_code='owner'),'Test','owner','individual.owner.test@gmail.com','test',owner_id||'/photo.png' from ip;
 insert into auth.sessions(id,user_id,created_at,updated_at) select owner_session,owner_id,now(),now() from ip;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,staff_session,admin_session]) from ip) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',owner_session)::text,true) from ip;
 -- No dependency on permissions the real Owner assigned to these role templates.
 update public.positions set version=1 where erp_role_code='sales';
@@ -21,6 +25,10 @@ select public.provision_employee(staff,'sales','Individual Staff','Sales Manager
 select public.provision_employee(peer,'sales','Individual Peer','Sales Staff','Test','individual.peer.test@gmail.com','test',peer||'/photo.png') from ip;
 select public.provision_employee(admin_id,'admin','Individual Admin','Office Manager','Test','individual.admin.test@gmail.com','test',admin_id||'/photo.png') from ip;
 insert into auth.sessions(id,user_id,created_at,updated_at) select staff_session,staff,now(),now() from ip union all select admin_session,admin_id,now(),now() from ip;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,staff_session,admin_session]) from ip) on conflict(id) do nothing;
 update ip set old_template=private.template_access((select id from public.positions where erp_role_code='sales'));
 select ok(not has_function_privilege('anon','public.approve_individual_permissions(uuid,integer,jsonb,jsonb,text)','execute'),'anonymous cannot grant individual permissions');
 select ok(not has_function_privilege('authenticated','private.permission_snapshot(uuid,jsonb,jsonb)','execute'),'internal snapshot helper is not a client API');

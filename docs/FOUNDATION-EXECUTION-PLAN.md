@@ -14,8 +14,8 @@ This is a native Git worktree created for this task, not a new Codex task. The o
 
 | Gate | Work and acceptance evidence | Status |
 | --- | --- | --- |
-| F0 Baseline | Exact source checkpoint, pending-file preservation, migration/hash manifest, dependency lock, fresh typecheck/lint/unit/build/DB results, roles/RLS/RPC/audit/backup evidence and Owner checklist | IN PROGRESS |
-| F1 Identity/security | Account/profile/password administration, provider-operation fencing/reconciliation, login throttling, two-device and third-device approval, seven-day idle reapproval, expiry/reminders; real bypass/role/concurrency probes on isolated fixtures | OPEN |
+| F0 Baseline | Exact source checkpoint, pending-file preservation, migration/hash manifest, dependency lock, fresh typecheck/lint/unit/build/DB results, roles/RLS/RPC/audit/backup evidence and Owner checklist | IN PROGRESS — starting checkpoint and fresh 189-assertion evidence recorded |
+| F1 Identity/security | Account/profile/password administration, provider-operation fencing/reconciliation, login throttling, two-device and third-device approval, seven-day idle reapproval, expiry/reminders; real bypass/role/concurrency probes on isolated fixtures | IN PROGRESS — session admission/replay/global and per-identifier throttles now covered; remaining controls open |
 | F2 Permissions/approval/handover | Delegated Admin scope, individual overrides/denies, reject/re-draft/expiry, exact approvals and handover/temporary responsibilities without changing original actors | OPEN |
 | F3 Foundation operation | Server pagination/search/filter/sort, governed exports, audit/notification consistency, settings and truthful usage monitoring; remove or clearly gate remaining sample-only behavior | OPEN |
 | F4 Backup/DR | Existing local capture/schedule/retention, durable offsite retries/retention, independent-profile recovery, restore maintenance/failure/manual retry, destination-bound external delivery and recovery verification | OPEN |

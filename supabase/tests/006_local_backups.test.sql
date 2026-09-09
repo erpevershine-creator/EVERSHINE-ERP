@@ -9,10 +9,18 @@ insert into auth.users(id,email,role,aud,email_confirmed_at) select owner_id,'ba
 insert into public.profiles(id,employee_name,position_id,department,erp_role,username,contact,avatar_path)
 select owner_id,'Backup Test Owner',(select id from public.positions where erp_role_code='owner'),'Test','owner','backup.owner.test@gmail.com','test',owner_id||'/photo.png' from bt;
 insert into auth.sessions(id,user_id,created_at,updated_at) select owner_session,owner_id,now(),now() from bt;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,admin_session]) from bt) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',owner_session)::text,true) from bt;
 insert into auth.users(id,email,role,aud,email_confirmed_at,raw_app_meta_data) select admin_id,'backup.admin.test@gmail.com','authenticated','authenticated',now(),jsonb_build_object('provisioned_by',owner_id) from bt;
 select public.provision_employee(admin_id,'admin','Backup Admin','Office Manager','Test','backup.admin.test@gmail.com','test',admin_id||'/photo.png') from bt;
 insert into auth.sessions(id,user_id,created_at,updated_at) select admin_session,admin_id,now(),now() from bt;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,admin_session]) from bt) on conflict(id) do nothing;
 update public.profiles set page_access='{}',action_access='{}',individual_pages='{}',individual_actions='{}' where id=(select admin_id from bt);
 select ok(not has_function_privilege('anon','public.request_local_backup(text)','execute'),'anonymous backup denied');
 select ok(not has_function_privilege('authenticated','private.assert_local_backup_authority(uuid)','execute'),'worker check is not a client API');

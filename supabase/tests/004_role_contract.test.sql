@@ -14,6 +14,10 @@ insert into auth.users(id,email,role,aud,email_confirmed_at) select owner_id,'ro
 insert into public.profiles(id,employee_name,company_position,position_id,department,erp_role,username,contact,avatar_path)
 select owner_id,'Role Test Owner','Managing Director',(select id from public.positions where erp_role_code='owner'),'Test','owner','roles.owner.test@gmail.com','test',owner_id||'/photo.png' from rf;
 insert into auth.sessions(id,user_id,created_at,updated_at) select session_id,owner_id,now(),now() from rf;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[session_id,admin_session]) from rf) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',session_id)::text,true) from rf;
 insert into auth.users(id,email,role,aud,email_confirmed_at,raw_app_meta_data)
 select sales_id,'roles.sales.test@gmail.com','authenticated','authenticated',now(),jsonb_build_object('provisioned_by',owner_id) from rf
@@ -37,6 +41,10 @@ update public.position_page_permissions set can_view=false where position_id=(se
 delete from public.position_action_permissions where position_id=(select id from public.positions where erp_role_code='sales');
 update public.profiles set page_access='{}',action_access='{}' where id=(select sales_id from rf);
 insert into auth.sessions(id,user_id,created_at,updated_at) select admin_session,admin_id,now(),now() from rf;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[session_id,admin_session]) from rf) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',admin_id,'role','authenticated','session_id',admin_session)::text,true) from rf;
 select throws_ok($$select public.draft_permission_change((select id from public.positions where erp_role_code='sales'),1,'{"accounts":true}','{"Account Management":["create"]}',array[sales_id],'Attempt outside scope') from rf$$,
  'P0001','Requested access exceeds your authority','approved Admin cannot delegate authority they do not hold');

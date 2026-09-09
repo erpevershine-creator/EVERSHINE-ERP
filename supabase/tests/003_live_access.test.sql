@@ -9,6 +9,10 @@ select owner_id,'live.owner.test@gmail.com','authenticated','authenticated',now(
 insert into public.profiles(id,employee_name,position_id,department,erp_role,username,contact,avatar_path)
 select owner_id,'Test Owner',(select id from public.positions where code='owner'),'Test','owner','live.owner.test@gmail.com','test',owner_id||'/photo.png' from fixture;
 insert into auth.sessions(id,user_id,created_at,updated_at) select owner_session,owner_id,now(),now() from fixture;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,staff_session,admin_session]) from fixture) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',owner_session)::text,true) from fixture;
 select ok(private.is_owner(),'verified active Owner session has authority');
 select ok(not has_function_privilege('anon','public.my_access()','execute'),'anonymous access context denied');
@@ -31,6 +35,10 @@ select public.provision_employee(staff2,'sales','Test Staff 2','Senior Sales Rep
 select public.provision_employee(admin_id,'admin','Test Admin','Account Administrator','Test','live.admin.test@gmail.com','test',admin_id||'/photo.png') from fixture;
 select ok((select page_access->>'dashboard'='true' from public.profiles where id=(select staff1 from fixture)),'new account receives position snapshot');
 insert into auth.sessions(id,user_id,created_at,updated_at) select staff_session,staff1,now(),now() from fixture union all select admin_session,admin_id,now(),now() from fixture;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,staff_session,admin_session]) from fixture) on conflict(id) do nothing;
 update fixture set request_id=public.draft_permission_change(position_id,1,'{"dashboard":true,"settings":true}','{"Workspace":["view"]}',array[staff1],'Test selected account change');
 select is((select status from public.approval_requests where id=(select request_id from fixture)),'draft','change starts as draft');
 insert into public.user_page_overrides(profile_id,page_id,can_view,reason,approved_request_id)
@@ -87,6 +95,10 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role',
 select ok(not private.is_active_user(),'old Owner session stays revoked even with refreshed JWT iat');
 update fixture set owner_session=gen_random_uuid();
 insert into auth.sessions(id,user_id,created_at,updated_at) select owner_session,owner_id,clock_timestamp(),clock_timestamp() from fixture;
+-- Explicit trusted admission for this rollback fixture; raw provider sessions alone grant no ERP access.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at)
+select s.id,s.user_id,extensions.digest(s.id::text,'sha256'),'Test admitted session',s.created_at,s.created_at
+from auth.sessions s where s.id in (select unnest(array[owner_session,staff_session,admin_session]) from fixture) on conflict(id) do nothing;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',owner_session)::text,true) from fixture;
 select ok(private.is_owner(),'fresh Owner sign-in works after recovery');
 select ok(not exists(select 1 from public.audit_events where after_data ?| array['password','code','recovery_hash']),'audit contains no recovery or password secrets');

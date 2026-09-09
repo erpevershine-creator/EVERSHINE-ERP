@@ -1,5 +1,12 @@
 # Current implementation and evidence
 
+## Foundation execution — 2026-09-10 (D155)
+
+- A native worktree at `C:/Users/DELL/Desktop/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910` isolates the implementation branch `codex/foundation-gates-20260910`. Starting source checkpoint `a0d3072` and its SHA-256 manifest are in `docs/FOUNDATION-BASELINE-20260910.*`; the original checkout, Owner data and credentials remain separate.
+- Fresh candidate evidence: `npm ci` passed; typecheck, lint, 28/28 Node tests and optimized build passed; local rollback database tests pass 189/189 assertions; schema-only isolated validation also passes 189/189; DB lint has only the two pre-existing unused `create_position` parameter warnings.
+- F1 admission hardening is now implemented in `20260910010000_login_admission.sql`: `private.is_active_user()` requires a matching active ERP-admitted `device_sessions` row, login reservations enforce global/per-identifier limits before provider authentication, completion is single-use and identity/session-bound, service failures do not increment password failures, and raw/replayed/stale/unknown sessions are covered by 29 negative/positive pgTAP assertions. Existing session history is retained; no reset was run.
+- F1 remains open overall: two-device/third-device approval, idle reapproval, full account/password administration, provider-operation reconciliation, expiry reminders and other controls are not yet accepted. Supplier questions remain paused under D155.
+
 Updated 2026-09-09. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains. The Owner subsequently created one real employee Admin; browser inspection confirms one Owner and one Admin. Codex did not create or change that employee account during D137 verification. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
 
 ## Runtime
