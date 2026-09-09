@@ -68,11 +68,19 @@ export async function login(
     p_outcome: "success",
     p_session: typeof sessionId === "string" ? sessionId : null,
   });
-  if (attempt.error || attempt.data !== true) {
+  if (attempt.error || !["admitted", "pending"].includes(attempt.data)) {
     await supabase.auth.signOut({ scope: "local" });
     return {
       status: "error",
       message: "Sign-in could not be recorded. Please retry.",
+    };
+  }
+  if (attempt.data === "pending") {
+    await supabase.auth.signOut({ scope: "local" });
+    return {
+      status: "error",
+      message:
+        "A third-device sign-in approval is pending. An authorized approver must decide it within 24 hours.",
     };
   }
   const { data: access, error: accessError } = await supabase.rpc("my_access");

@@ -193,8 +193,13 @@ export async function decideRequest(form: FormData): Promise<Result> {
   await requireAccess("approvals");
   const db = await createClient();
   const submit = value(form, "decision") === "submit";
+  const requestType = value(form, "requestType");
   const { error } = await db.rpc(
-    submit ? "submit_permission_change" : "decide_permission_change",
+    submit
+      ? "submit_permission_change"
+      : requestType === "device_login"
+        ? "decide_device_login"
+        : "decide_permission_change",
     submit
       ? { p_request: Number(value(form, "id")) }
       : {

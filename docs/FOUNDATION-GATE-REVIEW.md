@@ -18,11 +18,11 @@ The starting source manifest is [FOUNDATION-BASELINE-20260910.json](FOUNDATION-B
 | Gate | Required evidence | Current result |
 | --- | --- | --- |
 | Source baseline | Exact candidate source/migrations/lockfile hashes and rollback reference | PARTIAL: checkpoint a0d3072 and manifest recorded; remediation is not yet committed |
-| Identity/security | Account/password editing, delegated scope, pagination, handover, two-device/third-device/idle controls, throttling, interrupted recovery reconciliation | PARTIAL: new session admission/replay/throttle negative tests pass; remaining controls are open |
+| Identity/security | Account/password editing, delegated scope, pagination, handover, two-device/third-device/idle controls, throttling, interrupted recovery reconciliation | PARTIAL: session admission, replay/throttle and two-device/third-device approval negative tests pass; remaining controls are open |
 | Database enforcement | Migration application evidence, RLS/ACL bypass tests, server/RPC authority, stale/replay/concurrency and audit verification | Historical local evidence exists; full candidate validation pending |
 | Local backups | Encrypted capture, 18:00 Yangon/catch-up, retention, preserved manual archives, isolated restore evidence | Existing local evidence in LOCAL-BACKUPS.md; not full application disaster recovery |
 | Offsite/DR | No-source-profile retrieval/restore, remote retry/retention, live restore maintenance/failure/retry, Telegram delivery | OPEN: one authenticated Main/Recovery split-key integrity proof only |
-| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 28/28 Node tests, optimized build, 189/189 rollback pgTAP assertions and isolated schema-only 189/189 checks pass; DB lint has only two pre-existing unused-parameter warnings |
+| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 28/28 Node tests, optimized build, 209/209 rollback pgTAP assertions and isolated schema-only 209/209 checks pass; DB lint has only two pre-existing unused-parameter warnings |
 | Owner acceptance | Review known limits and record explicit baseline acceptance | PENDING: the Owner authorized the work, not a completed freeze |
 | Business entry | Accepted foundation/DR gates plus module contract and vertical-slice acceptance | CLOSED pending above gates |
 

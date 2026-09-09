@@ -93,7 +93,7 @@ export async function LivePage({ section }: { section: string }) {
         .select(
           "id,request_type,requester_id,target_id,reason,status,current_data,proposed_data,decision_reason",
         )
-        .in("request_type", ["position_permissions", "individual_permissions"])
+        .in("request_type", ["position_permissions", "individual_permissions", "device_login"])
         .order("id", { ascending: false })
         .limit(200),
       db.from("pages").select("id,label").order("display_order"),

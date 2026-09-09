@@ -659,12 +659,18 @@ export function LiveApprovals({
       />
       {selected && (
         <Modal
-          title={`Permission request ${selected.id}`}
+          title={`${selected.request_type === "device_login" ? "Device sign-in request" : "Permission request"} ${selected.id}`}
           onClose={() => setId(null)}
           wide
         >
           <Badge>{selected.status}</Badge>
           <p>{selected.reason}</p>
+          {selected.request_type === "device_login" && (
+            <p>
+              A third device is waiting for approval. Approval replaces the
+              oldest active device session and preserves its audit history.
+            </p>
+          )}
           <div className="account-form-grid">
             <section>
               <h3>
@@ -739,16 +745,26 @@ export function LiveApprovals({
             selected.requester_id === access.id && (
               <ActionForm run={decideRequest} label="Submit for approval">
                 <input type="hidden" name="id" value={selected.id} />
+                <input type="hidden" name="requestType" value={selected.request_type} />
                 <input type="hidden" name="decision" value="submit" />
               </ActionForm>
             )}
           {complete &&
             selected.status === "pending" &&
-            can(access, "Positions & Permissions", "approve") &&
+            can(
+              access,
+              selected.request_type === "device_login"
+                ? "Account Management"
+                : "Positions & Permissions",
+              selected.request_type === "device_login"
+                ? "approve_device"
+                : "approve",
+            ) &&
             (selected.requester_id !== access.id ||
               access.role === "owner") && (
               <ActionForm run={decideRequest} label="Record decision">
                 <input type="hidden" name="id" value={selected.id} />
+                <input type="hidden" name="requestType" value={selected.request_type} />
                 <label>
                   Decision
                   <select name="decision">
