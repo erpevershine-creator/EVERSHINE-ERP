@@ -6,6 +6,7 @@ import { Badge, Modal, PageHeading } from "@/components/ui";
 import {
   createAccount,
   accountStatus,
+  changeAccountPassword,
   savePermissionDraft,
   decideRequest,
   getAffectedAccounts,
@@ -213,6 +214,24 @@ export function LiveAccounts({
             {selected.department} · {selected.contact}
           </p>
           <Badge>{selected.status}</Badge>
+          {(selected.id !== access.id || access.role === "owner") &&
+            can(access, "Account Management", "change_password") && (
+              <ActionForm run={changeAccountPassword} label="Change password">
+                <input name="id" type="hidden" value={selected.id} />
+                <label>
+                  New ERP password
+                  <input name="password" type="password" minLength={8} maxLength={128} required autoComplete="new-password" />
+                </label>
+                <label>
+                  Confirm password
+                  <input name="confirmPassword" type="password" minLength={8} maxLength={128} required autoComplete="new-password" />
+                </label>
+                <label>
+                  Reason
+                  <textarea name="reason" required maxLength={1000} />
+                </label>
+              </ActionForm>
+            )}
           {selected.erp_role !== "owner" &&
             selected.id !== access.id &&
             ["owner", "admin"].includes(access.role) && (

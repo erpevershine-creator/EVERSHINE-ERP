@@ -164,6 +164,47 @@ export async function accountStatus(form: FormData): Promise<Result> {
     message: "Account updated. Previous sessions are no longer authorized.",
   };
 }
+
+export async function changeAccountPassword(form: FormData): Promise<Result> {
+  const access = await requireAccess("accounts");
+  if (!allows(access, "Account Management", "change_password"))
+    return failure("Password changes are outside your permissions.");
+  const target = value(form, "id");
+  const password = String(form.get("password") ?? "");
+  const confirm = String(form.get("confirmPassword") ?? "");
+  const reason = value(form, "reason");
+  if (!target || !validatePassword(password) || password.length > 128 || password !== confirm)
+    return failure("Passwords must match and contain 8–128 characters, one uppercase letter and one number.");
+  if (!reason) return failure("Reason is required.");
+  const db = await createClient();
+  const prepared = await db.rpc("prepare_password_change", {
+    p_target: target,
+    p_reason: reason,
+  });
+  if (prepared.error || !prepared.data?.operation || !prepared.data?.target)
+    return failure("Password change was rejected. Check account authority and current status.");
+  const operation = prepared.data.operation as string;
+  const admin = createAdminClient();
+  let definitiveFailure = false;
+  try {
+    const update = await admin.auth.admin.updateUserById(prepared.data.target as string, { password });
+    if (update.error) {
+      if (!update.error.status || update.error.status >= 500)
+        return failure("Auth could not confirm the password change. The account remains fenced for administrator reconciliation.");
+      definitiveFailure = true;
+    }
+  } catch {
+    return failure("Password change was interrupted. The account remains fenced for administrator reconciliation.");
+  }
+  const finished = await admin.rpc("finish_password_change", {
+    p_operation: operation,
+    p_success: !definitiveFailure,
+  });
+  if (finished.error) return failure("Password change completion could not be confirmed; administrator reconciliation is required.");
+  if (definitiveFailure) return failure("Auth rejected the password change. The account remains fenced.");
+  refresh();
+  return { status: "success", message: "Password changed. All previous sessions were logged out." };
+}
 export async function savePermissionDraft(form: FormData): Promise<Result> {
   await requireAccess("permissions");
   const db = await createClient();
