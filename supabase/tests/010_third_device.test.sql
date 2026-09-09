@@ -38,7 +38,7 @@ select is(public.complete_login_attempt(t1,'success',t3),'pending','a further th
 select is((select count(*) from public.device_sessions where profile_id=owner_id and status='active'),2::bigint,'replacement login never exceeds two active devices') from td;
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s3)::text,true) from td;
 select throws_ok($$select public.decide_device_login(request_id,true,'Replay') from td$$,'P0001','Request is not pending','approved request cannot be replayed');
-select ok(exists(select 1 from public.audit_events where action='Third-device sign-in approved' and approval_request_id=(select request_id from td)),'approval is audited');
+select ok(exists(select 1 from public.audit_events where action='Device sign-in approved' and approval_request_id=(select request_id from td)),'approval is audited');
 select ok(exists(select 1 from public.notifications where approval_request_id=(select request_id from td)),'requester is notified');
 select * from finish();
 rollback;
