@@ -65,3 +65,11 @@ Owner requested date-only names. Local archives now use .runtime/backups/DD-MM-Y
 
 ## New account boundary — 2026-09-09 (D141)
 Recorded new-account-only backup/Production intent and prepared docs/OFFSITE-BACKUP-SETUP.md. The new Google account is erp.evershine@gmail.com. The Google sign-in page shows that address; authentication is not yet verified. No runtime change, cloud account creation, credential entry, upload, key export or Production deployment occurred. Offsite recovery remains unimplemented; local DPAPI dependence remains.
+
+## Google setup progress — 2026-09-09
+- Gmail connector profile independently returned erp.evershine@gmail.com, display name EVERSHINE ERP. No inbox content was read and no email was sent. Connector access is not the ERP's unattended OAuth credential.
+- Google Cloud sign-in is active. Enabling Drive API selected/created My First Project (project peerless-sensor-508107-e0, number 822638054713) and navigated to its Drive API metrics page. Renamed the project to EVERSHINE ERP Backup; readback showed the new name. IAM principal list and OAuth support-email picker showed erp.evershine@gmail.com. No IAM grant was edited.
+- Prepared unsaved Google Auth Platform form: application EVERSHINE ERP Backup; support/contact erp.evershine@gmail.com; External audience (personal Gmail cannot select Internal). No OAuth client, refresh token or application Drive access exists yet.
+- Paused at Finish before checking “I agree to the Google API Services: User Data Policy.” and before Continue/Create. Browser interaction policy requires action-time confirmation for accepting a binding provider agreement. The user can review https://developers.google.com/terms/api-services-user-data-policy and confirm. Do not treat this pending approval as granted.
+- Current setup URL: https://console.cloud.google.com/auth/overview/create?authuser=0&project=peerless-sensor-508107-e0 . Unsaved form may need re-entry if the tab closes. Existing project must be reused; do not create duplicates or enable free trials/billing.
+- No paid plan, billing activation, archive upload, key export, Telegram configuration or Production deployment occurred. System-key custody, OAuth callback/client implementation and offsite restore proof remain pending.
