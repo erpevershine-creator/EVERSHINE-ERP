@@ -1,5 +1,5 @@
 begin;
-select plan(20);
+select plan(23);
 update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
 delete from private.login_attempts;
 create temporary table td(owner_id uuid default gen_random_uuid(),s1 uuid default gen_random_uuid(),s2 uuid default gen_random_uuid(),s3 uuid default gen_random_uuid(),t1 uuid,t2 uuid,t3 uuid,request_id bigint);
@@ -18,6 +18,9 @@ select ok((select status='pending' and deadline_at is not null from public.appro
 update td set request_id=(select id from public.approval_requests where request_type='device_login' and requester_id=owner_id and status='pending'),t3=public.reserve_login_attempt('device.owner.test@gmail.com');
 select is(public.complete_login_attempt(t3,'success',s3),'pending','same third device request is idempotent') from td;
 select ok(not exists(select 1 from public.device_sessions where id=(select s3 from td)),'pending provider session has no ERP admission');
+select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s3)::text,true) from td;
+select is(public.my_login_approval_status(),'pending','pending provider session can poll approval without ERP data access');
+select ok(not private.is_active_user(),'pending provider session remains blocked from ERP data');
 select ok(not has_function_privilege('anon','public.decide_device_login(bigint,boolean,text)','execute'),'anonymous cannot decide device approval');
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s1)::text,true) from td;
 select throws_ok($$select public.decide_device_login(request_id,true,'') from td$$,'P0001','Decision reason required','approval reason is mandatory');
@@ -26,6 +29,8 @@ select is((select status from public.approval_requests where id=(select request_
 select is((select count(*) from public.device_sessions where profile_id=(select owner_id from td) and status='active'),2::bigint,'approval keeps the two-device limit');
 select ok((select status='logged_out' and ended_reason='Approved third-device replacement' from public.device_sessions where id=(select s1 from td)),'oldest active session is logged out');
 select ok((select status='active' from public.device_sessions where id=(select s3 from td)),'approved third device is admitted');
+select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s3)::text,true) from td;
+select is(public.my_login_approval_status(),'admitted','same pending session observes approval without a new login');
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s3)::text,true) from td;
 select ok(private.is_active_user(),'approved third-device session can access ERP');
 select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s1)::text,true) from td;

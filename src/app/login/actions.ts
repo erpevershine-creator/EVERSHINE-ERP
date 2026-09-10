@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export type LoginState = {
-  status: "idle" | "error" | "success";
+  status: "idle" | "error" | "pending" | "success";
   message: string;
 };
 
@@ -76,11 +76,10 @@ export async function login(
     };
   }
   if (attempt.data === "pending") {
-    await supabase.auth.signOut({ scope: "local" });
     return {
-      status: "error",
+      status: "pending",
       message:
-        "A third-device sign-in approval is pending. An authorized approver must decide it within 24 hours.",
+        "Sign-in approval is pending. This session stays protected while an authorized approver reviews it.",
     };
   }
   const { data: access, error: accessError } = await supabase.rpc("my_access");
@@ -94,6 +93,15 @@ export async function login(
   }
 
   return { status: "success", message: "Signed in." };
+}
+
+export async function checkLoginApproval(): Promise<LoginState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("my_login_approval_status");
+  if (error || !data) return { status: "pending", message: "Approval status is temporarily unavailable." };
+  if (data === "admitted") return { status: "success", message: "Sign-in approved." };
+  if (data === "rejected" || data === "signed_out") return { status: "error", message: "Sign-in approval was rejected or expired. Please sign in again." };
+  return { status: "pending", message: "Sign-in approval is pending." };
 }
 
 export async function logout() {

@@ -26,7 +26,7 @@ after its own provider receipt. There is no timer-based automatic unlock.
 ## Validation
 
 - Typecheck, application lint, 33 Node tests and optimized build passed.
-- Isolated database: 254 assertions across 13 suites passed.
+- Isolated database: 257 assertions across 13 suites passed.
 - Actual Auth container: eight workflows passed, including concurrent duplicate
   updates (exactly one commit), receipt generation, replay rejection, new-password
   login, direct self-change rollback, superseded recovery rejection, Owner
