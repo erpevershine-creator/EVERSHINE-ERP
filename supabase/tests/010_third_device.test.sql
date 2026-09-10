@@ -1,5 +1,5 @@
 begin;
-select plan(23);
+select plan(26);
 update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
 delete from private.login_attempts;
 create temporary table td(owner_id uuid default gen_random_uuid(),s1 uuid default gen_random_uuid(),s2 uuid default gen_random_uuid(),s3 uuid default gen_random_uuid(),t1 uuid,t2 uuid,t3 uuid,request_id bigint);
@@ -45,5 +45,12 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role',
 select throws_ok($$select public.decide_device_login(request_id,true,'Replay') from td$$,'P0001','Request is not pending','approved request cannot be replayed');
 select ok(exists(select 1 from public.audit_events where action='Device sign-in approved' and approval_request_id=(select request_id from td)),'approval is audited');
 select ok(exists(select 1 from public.notifications where approval_request_id=(select request_id from td)),'requester is notified');
+update td set request_id=(select id from public.approval_requests where request_type='device_login' and requester_id=owner_id and status='pending' order by id desc limit 1);
+update public.approval_requests set deadline_at=clock_timestamp()-interval '1 second' where id=(select request_id from td);
+select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s3)::text,true) from td;
+select public.decide_device_login(request_id,true,'Late approval') from td;
+select is((select status from public.approval_requests where id=(select request_id from td)),'expired','expired request is durably recorded');
+select throws_ok($$select public.decide_device_login(request_id,true,'Replay expired') from td$$,'P0001','Request is not pending','expired request cannot be replayed');
+select ok(exists(select 1 from public.audit_events where action='Device sign-in expired' and approval_request_id=(select request_id from td)),'expiry is audited');
 select * from finish();
 rollback;

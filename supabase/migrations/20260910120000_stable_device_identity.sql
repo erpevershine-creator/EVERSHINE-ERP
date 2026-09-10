@@ -67,7 +67,12 @@ begin
  if r.requester_id=auth.uid() and not private.is_owner() then raise exception 'Only Owner may self-approve'; end if;
  select * into p from public.profiles where id=r.requester_id for update;
  if not found or p.status<>'active' or p.recovery_pending or p.password_change_pending then raise exception 'Account is unavailable'; end if;
- if r.deadline_at<=clock_timestamp() then update public.approval_requests set status='expired',version=version+1 where id=r.id; return; end if;
+ if r.deadline_at<=clock_timestamp() then
+   update public.approval_requests set status='expired',decided_at=clock_timestamp(),decision_reason='Approval window expired',version=version+1 where id=r.id;
+   insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,before_data,after_data,approval_request_id)
+     values(auth.uid(),(select employee_name from public.profiles where id=auth.uid()),'Device sign-in expired','approval_request',r.id::text,'Approval window expired',r.current_data,r.proposed_data,r.id);
+   return;
+ end if;
  sid:=(r.proposed_data->>'sessionId')::uuid; label:=coalesce(r.proposed_data->>'deviceLabel','ERP sign-in'); started:=(r.proposed_data->>'startedAt')::timestamptz; fingerprint:=decode(r.proposed_data->>'deviceFingerprint','hex');
  if not exists(select 1 from auth.sessions where id=sid and user_id=p.id) then raise exception 'Provider session is unavailable'; end if;
  if p_approve then

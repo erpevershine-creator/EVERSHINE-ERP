@@ -82,14 +82,14 @@ export async function login(
     };
   }
   if (attempt.data === "pending") {
-    cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
+    cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
     return {
       status: "pending",
       message:
         "Sign-in approval is pending. This session stays protected while an authorized approver reviews it.",
     };
   }
-  cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
+  cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
   const { data: access, error: accessError } = await supabase.rpc("my_access");
   if (accessError || !access) {
     await supabase.auth.signOut({ scope: "local" });
