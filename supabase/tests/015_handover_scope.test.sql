@@ -1,5 +1,5 @@
 begin;
-select plan(11);
+select plan(16);
 update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
 create temporary table ho(owner_id uuid default gen_random_uuid(),admin_id uuid default gen_random_uuid(),s1 uuid default gen_random_uuid(),s2 uuid default gen_random_uuid(),s3 uuid default gen_random_uuid(),s4 uuid default gen_random_uuid(),sa uuid default gen_random_uuid(),t1 uuid,t2 uuid,t3 uuid,hid bigint,hid2 bigint,request_id bigint,request2 bigint);
 insert into ho default values;
@@ -49,6 +49,17 @@ update ho set hid2=public.create_handover(admin_id,clock_timestamp(),clock_times
 select set_config('request.jwt.claims',jsonb_build_object('sub',admin_id,'role','authenticated','session_id',sa)::text,true) from ho;
 select public.decide_handover(hid2,true,'Admin approved permission handover') from ho;
 select is((select status from public.handover_requests where id=(select hid2 from ho)),'approved','permission handover approval is recorded');
+select ok(private.handover_can_act(request2,'Positions & Permissions','approve'),'active successor has selected temporary authority') from ho;
+update public.device_sessions set status='logged_out',ended_at=clock_timestamp(),ended_reason='Test revocation' where id=(select sa from ho);
+select throws_ok($$select public.decide_permission_change(request2,true,'Revoked successor') from ho$$,'42501','Permission denied','handover cannot revive a revoked successor session');
+update public.device_sessions set status='active',ended_at=null,ended_reason=null where id=(select sa from ho);
+update public.profiles set recovery_pending=true where id=(select owner_id from ho);
+select throws_ok($$select public.decide_permission_change(request2,true,'Fenced source') from ho$$,'42501','Permission denied','source recovery fence suspends delegated authority');
+update public.profiles set recovery_pending=false where id=(select owner_id from ho);
+update public.handover_requests set ends_at=clock_timestamp()-interval '1 second',starts_at=clock_timestamp()-interval '1 hour' where id=(select hid2 from ho);
+select throws_ok($$select public.decide_permission_change(request2,true,'Expired handover') from ho$$,'42501','Permission denied','expired assignment cannot authorize a decision');
+update public.handover_requests set ends_at=clock_timestamp()+interval '1 hour' where id=(select hid2 from ho);
+select ok(not private.handover_can_act(request_id,'Positions & Permissions','approve'),'assignment cannot authorize another request or module') from ho;
 select public.decide_permission_change(request2,true,'Temporary permission approval handover') from ho;
 select is((select status from public.approval_requests where id=(select request2 from ho)),'approved','successor can approve selected permission request');
 select * from finish();

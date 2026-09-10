@@ -1,6 +1,6 @@
 {
   "kind": "schema-only-isolated-foundation-check",
-  "startedAt": "2026-09-10T03:06:44.936Z",
+  "startedAt": "2026-09-10T06:23:35.890Z",
   "sourceFiles": {
     "scripts/foundation-db-check.mjs": "8f73679861bf6743f6c542f0889e468ff3f5e06d822bac07b9f5e82243f3b4f1",
     "scripts/foundation-auth-check.mjs": "cc14a2a647a713776a36a76273b723065979477b3fd6867a520d5e0f44ad7c23",
@@ -28,8 +28,10 @@
     "supabase/migrations/20260910100000_pending_device_session.sql": "1bf139d08e988083bcf6e20446dd35658adab99da8dd4dc31d17932a4c644800",
     "supabase/migrations/20260910110000_device_heartbeat.sql": "f3e85689e29360ea1fb50a9722d2fdd0898946db00be2afab7ca1efe75695c9b",
     "supabase/migrations/20260910120000_stable_device_identity.sql": "f985c953d546f2539a2842605d5f9431ad3482b71d14364cb290eb270c362649",
-    "supabase/migrations/20260910130000_scoped_handover.sql": "c97f02413ddc35a0e643b8a213b9feb13bfbc486811751051094698787b2da9e",
+    "supabase/migrations/20260910130000_scoped_handover.sql": "c493efae8b797dacf0131d9a0db44e10517ac3154a037ace45ac86ddb0feb3ff",
     "supabase/migrations/20260910140000_permission_handover_scope.sql": "31d6443de6560ca993c186c5de2f9ae4c7376bdadfd06b744e7ce72ee86f0f60",
+    "supabase/migrations/20260910150000_db_lint_cleanup.sql": "309df6113af9e6da98299c11609cc8c25d2f02977a21320096ec999c7de27281",
+    "supabase/migrations/20260910160000_handover_session_fence.sql": "e7adb9bc444c5d9907b65d897c1adb58d0e6104398e262fb0a5d1ee8f311fb7b",
     "supabase/tests/001_foundation_rls.test.sql": "1aaeb4610c675b3aa1adb57890039f3d2674c4970917ba2946373fa4f475a416",
     "supabase/tests/002_owner_provisioning.test.sql": "ee878d50395c95575d93f4c36096c5f05c76e27ffda6720e7866670a487103fb",
     "supabase/tests/003_live_access.test.sql": "f7fc72b21120b7de4e4a4a5a6bef721cdad0ba50070eb3809b5895997c53c970",
@@ -44,7 +46,7 @@
     "supabase/tests/012_password_administration.test.sql": "532df5237248f3107fde46494b09e0883b21a7699dec75585c9dad23af96eac7",
     "supabase/tests/013_password_provider_receipts.test.sql": "3dfb397f7097218b5153cee6045249a9d45ad565df1e5308a86adede96e7c0bb",
     "supabase/tests/014_device_heartbeat.test.sql": "901221fab7ea92a78a9c1fefa01c1154bb5f85332c27b74ffc9dbba03787b177",
-    "supabase/tests/015_handover_scope.test.sql": "fee533aea770badf2fcbc731ae9056d1a2f8b0b7a2b05e555d3dd668b2a88683"
+    "supabase/tests/015_handover_scope.test.sql": "16368361b1a854c77b0ab4321df488f9f80ec4b72f11c976d9ee3e888752c3ff"
   },
   "migrations": [
     "20260910080000_password_access_fence.sql",
@@ -53,7 +55,9 @@
     "20260910110000_device_heartbeat.sql",
     "20260910120000_stable_device_identity.sql",
     "20260910130000_scoped_handover.sql",
-    "20260910140000_permission_handover_scope.sql"
+    "20260910140000_permission_handover_scope.sql",
+    "20260910150000_db_lint_cleanup.sql",
+    "20260910160000_handover_session_fence.sql"
   ],
   "tests": [
     {
@@ -128,7 +132,7 @@
     },
     {
       "file": "015_handover_scope.test.sql",
-      "assertions": 11,
+      "assertions": 16,
       "status": "pass"
     }
   ],
@@ -153,5 +157,5 @@
     "syntheticAccountsOnly": true
   },
   "status": "pass",
-  "finishedAt": "2026-09-10T03:07:13.492Z"
+  "finishedAt": "2026-09-10T06:24:08.007Z"
 }

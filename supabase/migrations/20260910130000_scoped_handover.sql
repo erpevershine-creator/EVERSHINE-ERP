@@ -51,6 +51,7 @@ create function public.create_handover(p_successor uuid,p_starts timestamptz,p_e
 language plpgsql security definer set search_path='' as $$
 declare h bigint; x bigint; source public.profiles; successor public.profiles;
 begin
+ perform private.require_admin('Account Management','handover');
  select * into source from public.profiles where id=auth.uid() for update;
  select * into successor from public.profiles where id=p_successor for update;
  if not found or source.status<>'active' or successor.status<>'active' or successor.erp_role not in ('admin','owner') then raise exception 'Handover account unavailable'; end if;
@@ -70,7 +71,8 @@ create function public.decide_handover(p_handover bigint,p_approve boolean,p_rea
 language plpgsql security definer set search_path='' as $$
 declare h public.handover_requests; source public.profiles; successor public.profiles;
 begin
- if not(exists(select 1 from public.profiles p join auth.sessions s on s.user_id=p.id join public.device_sessions d on d.id=s.id and d.status='active' where p.id=auth.uid() and p.erp_role='owner' and p.status='active' and s.id::text=auth.jwt()->>'session_id' and s.created_at>=p.sessions_valid_after) or private.has_action('Account Management','approve_handover')) then raise exception 'Permission denied' using errcode='42501'; end if;
+ perform private.require_admin('Account Management','approve_handover');
+ if p_approve is null then raise exception 'Decision required'; end if;
  if p_reason is null or length(btrim(p_reason)) not between 1 and 1000 then raise exception 'Decision reason required'; end if;
  select * into h from public.handover_requests where id=p_handover for update;
  if not found or h.status<>'pending' then raise exception 'Handover is not pending'; end if;
@@ -86,7 +88,7 @@ end; $$;
 create function public.revoke_handover(p_handover bigint,p_reason text) returns void
 language plpgsql security definer set search_path='' as $$
 begin
- if not(private.is_owner() or private.has_action('Account Management','handover')) then raise exception 'Permission denied'; end if;
+ perform private.require_admin('Account Management','handover');
  if p_reason is null or length(btrim(p_reason)) not between 1 and 1000 then raise exception 'Reason required'; end if;
  update public.handover_requests set status='revoked',decided_by=auth.uid(),decided_at=clock_timestamp(),decision_reason=btrim(p_reason),version=version+1 where id=p_handover and status='approved';
  if not found then raise exception 'Handover is not active'; end if;
