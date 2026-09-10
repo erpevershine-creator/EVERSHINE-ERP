@@ -243,7 +243,7 @@ export async function LivePage({
       db
         .from("approval_requests")
         .select(
-          "id,request_type,requester_id,target_id,reason,status,current_data,proposed_data,decision_reason",
+          "id,request_type,requester_id,target_id,reason,status,current_data,proposed_data,decision_reason,source_request_id,return_reason,version",
           { count: "exact" },
         )
         .in("request_type", ["position_permissions", "individual_permissions", "device_login"])
@@ -258,12 +258,20 @@ export async function LivePage({
     });
     if (capabilities.error) throw new Error("Approval authority could not be verified.");
     const decisionIds = new Set(
-      (capabilities.data as { request_id: number; can_decide: boolean }[])
+      (capabilities.data as { request_id: number; can_decide: boolean; can_copy: boolean }[])
         .filter((row) => row.can_decide).map((row) => row.request_id),
+    );
+    const copyIds = new Set(
+      (capabilities.data as { request_id: number; can_decide: boolean; can_copy: boolean }[])
+        .filter((row) => row.can_copy).map((row) => row.request_id),
     );
     return (
       <LiveApprovals
-        requests={rs.data.map((request) => ({ ...request, can_decide: decisionIds.has(request.id) }))}
+        requests={rs.data.map((request) => ({
+          ...request,
+          can_decide: decisionIds.has(request.id),
+          can_copy: copyIds.has(request.id),
+        }))}
         pages={ps.data}
         access={access}
         serverPagination={pagination(section, page, rs.count ?? rs.data.length)}

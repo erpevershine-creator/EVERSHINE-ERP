@@ -8,6 +8,8 @@ import {
   accountStatus,
   changeAccountPassword,
   savePermissionDraft,
+  revisePermissionDraft,
+  copyExpiredPermissionRequest,
   decideRequest,
   getAffectedAccounts,
   type Result,
@@ -50,10 +52,14 @@ export type ActionPermission = {
 };
 export type Request = {
   can_decide?: boolean;
+  can_copy?: boolean;
   id: number;
+  version: number;
   requester_id: string;
   request_type: string;
   target_id: string;
+  source_request_id: number | null;
+  return_reason: string | null;
   reason: string;
   status: string;
   current_data: {
@@ -632,6 +638,99 @@ function PermissionSummary({
     </>
   );
 }
+function ReturnedPermissionDraft({
+  request,
+  pages,
+  affected,
+}: {
+  request: Request;
+  pages: Page[];
+  affected: Affected[];
+}) {
+  const [views, setViews] = useState<Record<string, boolean>>(
+    request.proposed_data.pages ?? {},
+  );
+  const [actions, setActions] = useState<Record<string, string[]>>(
+    request.proposed_data.actions ?? {},
+  );
+  return (
+    <ActionForm run={revisePermissionDraft} label="Save revised Draft">
+      <input type="hidden" name="id" value={request.id} />
+      <input type="hidden" name="version" value={request.version} />
+      <input type="hidden" name="pages" value={JSON.stringify(views)} />
+      <input type="hidden" name="actions" value={JSON.stringify(actions)} />
+      <fieldset>
+        <legend>Edit returned permission Draft</legend>
+        <div className="live-check-grid">
+          {pages.map((page) => (
+            <label key={page.id}>
+              <input
+                type="checkbox"
+                checked={views[page.id] ?? false}
+                onChange={(event) =>
+                  setViews({ ...views, [page.id]: event.target.checked })
+                }
+              />
+              {permissionLabel(page.label)}
+            </label>
+          ))}
+        </div>
+        <details>
+          <summary>Action permissions</summary>
+          {pages.map((page) => (
+            <fieldset key={page.id}>
+              <legend>{permissionLabel(page.label)}</legend>
+              <div className="live-check-grid">
+                {actionChoices.map((action) => (
+                  <label key={action}>
+                    <input
+                      type="checkbox"
+                      checked={actions[page.label]?.includes(action) ?? false}
+                      onChange={(event) =>
+                        setActions({
+                          ...actions,
+                          [page.label]: event.target.checked
+                            ? [...(actions[page.label] ?? []), action]
+                            : (actions[page.label] ?? []).filter(
+                                (value) => value !== action,
+                              ),
+                        })
+                      }
+                    />
+                    {action.replaceAll("_", " ")}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+        </details>
+        <fieldset>
+          <legend>Accounts retained in this revision</legend>
+          {affected.length ? (
+            affected.map((account) => (
+              <label key={account.profile_id}>
+                <input
+                  name="accounts"
+                  type="checkbox"
+                  value={account.profile_id}
+                  defaultChecked
+                />{" "}
+                {account.account_name} · version {account.expected_profile_version}
+              </label>
+            ))
+          ) : (
+            <p className="muted">This Draft changes the ERP Role template only.</p>
+          )}
+          <small>Clear an account to leave its current permissions unchanged.</small>
+        </fieldset>
+        <label>
+          Revised reason
+          <textarea name="reason" required maxLength={1000} defaultValue={request.reason} />
+        </label>
+      </fieldset>
+    </ActionForm>
+  );
+}
 export function LiveApprovals({
   requests,
   pages,
@@ -694,6 +793,12 @@ export function LiveApprovals({
         >
           <Badge>{selected.status}</Badge>
           <p>{selected.reason}</p>
+          {selected.source_request_id && (
+            <p>
+              Linked to request #{selected.source_request_id}
+              {selected.return_reason ? ` · ${selected.return_reason}` : ""}
+            </p>
+          )}
           {selected.request_type === "device_login" && (
             <p>
               A third device is waiting for approval. Approval replaces the
@@ -770,12 +875,34 @@ export function LiveApprovals({
             <p>Template only; existing accounts stay unchanged.</p>
           )}
           {complete &&
+            selected.request_type === "position_permissions" &&
+            selected.status === "draft" &&
+            selected.requester_id === access.id && (
+              <ReturnedPermissionDraft
+                request={selected}
+                pages={pages}
+                affected={affected.filter((a) => a.request_id === selected.id)}
+              />
+            )}
+          {complete &&
             selected.status === "draft" &&
             selected.requester_id === access.id && (
               <ActionForm run={decideRequest} label="Submit for approval">
                 <input type="hidden" name="id" value={selected.id} />
                 <input type="hidden" name="requestType" value={selected.request_type} />
                 <input type="hidden" name="decision" value="submit" />
+              </ActionForm>
+            )}
+          {complete &&
+            selected.request_type === "position_permissions" &&
+            selected.status === "expired" &&
+            selected.can_copy === true && (
+              <ActionForm run={copyExpiredPermissionRequest} label="Create linked Draft">
+                <input type="hidden" name="id" value={selected.id} />
+                <label>
+                  New reason
+                  <textarea name="reason" required maxLength={1000} />
+                </label>
               </ActionForm>
             )}
           {complete &&

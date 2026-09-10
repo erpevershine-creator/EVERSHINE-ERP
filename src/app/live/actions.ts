@@ -226,6 +226,41 @@ export async function savePermissionDraft(form: FormData): Promise<Result> {
     message: "Draft saved. Review it in Approval Center, then submit.",
   };
 }
+export async function revisePermissionDraft(form: FormData): Promise<Result> {
+  await requireAccess("approvals");
+  const db = await createClient();
+  try {
+    const { error } = await db.rpc("revise_permission_draft", {
+      p_request: Number(value(form, "id")),
+      p_expected: Number(value(form, "version")),
+      p_pages: JSON.parse(value(form, "pages")),
+      p_actions: JSON.parse(value(form, "actions")),
+      p_accounts: form.getAll("accounts"),
+      p_reason: value(form, "reason"),
+    });
+    if (error)
+      return failure(
+        "Draft was not saved. Reload it and check the selected access, accounts and reason.",
+      );
+  } catch {
+    return failure("Invalid permission Draft.");
+  }
+  refresh();
+  return { status: "success", message: "Draft revised. Review it, then submit for approval." };
+}
+
+export async function copyExpiredPermissionRequest(form: FormData): Promise<Result> {
+  await requireAccess("approvals");
+  const db = await createClient();
+  const { error } = await db.rpc("copy_expired_permission_request", {
+    p_source: Number(value(form, "id")),
+    p_reason: value(form, "reason"),
+  });
+  if (error)
+    return failure("Expired request was not copied. Check authority, scope and reason.");
+  refresh();
+  return { status: "success", message: "A linked Draft was created for review." };
+}
 export async function decideRequest(form: FormData): Promise<Result> {
   await requireAccess("approvals");
   const db = await createClient();

@@ -24,7 +24,7 @@ The starting source manifest is [FOUNDATION-BASELINE-20260910.json](FOUNDATION-B
 | Database enforcement | Migration application evidence, RLS/ACL bypass tests, server/RPC authority, stale/replay/concurrency and audit verification | Historical local evidence exists; full candidate validation pending |
 | Local backups | Encrypted capture, 18:00 Yangon/catch-up, retention, preserved manual archives, isolated restore evidence | Existing local evidence in LOCAL-BACKUPS.md; not full application disaster recovery |
 | Offsite/DR | No-source-profile retrieval/restore, remote retry/retention, live restore maintenance/failure/retry, Telegram delivery | OPEN: one authenticated Main/Recovery split-key integrity proof only |
-| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 33/33 Node tests, optimized build, and 324/324 isolated SQL assertions plus eight Auth workflows pass; DB lint has only two pre-existing unused-parameter warnings |
+| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 33/33 Node tests, optimized build, and 348/348 isolated SQL assertions plus eight Auth workflows pass; DB lint has only two pre-existing unused-parameter warnings |
 | Owner acceptance | Review known limits and record explicit baseline acceptance | PENDING: the Owner authorized the work, not a completed freeze |
 | Business entry | Accepted foundation/DR gates plus module contract and vertical-slice acceptance | CLOSED pending above gates |
 
