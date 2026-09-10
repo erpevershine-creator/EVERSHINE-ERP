@@ -16,7 +16,7 @@ Use an isolated new Docker/Supabase local project after screen acceptance; never
 
 Build a server data access layer with fresh user/session checks for every request and mutation. Database RLS must enforce actual per-action/record/warehouse authority; a role label or hidden button is insufficient. Do not rely on editable user_metadata for authorization. Mutations and audit records must be transactional; use concurrency/version guards and idempotency for approvals/posting. Session invalidation must be checked against active server state. API errors should be concise, with private diagnostic detail in controlled logs.
 
-Implement and test Owner provisioning/recovery, account lock/expiry, delegated administration, device approval, durable history, permission snapshots, handover, backup/restore and notification jobs against confirmed decisions. M1 does not enforce these against Supabase Auth. Password-expiry reminders now have an idempotent local worker; durable Production scheduling and the real 3-hour approval-deadline reminders remain pending.
+Implement and test Owner provisioning/recovery, account lock/expiry, delegated administration, device approval, durable history, permission snapshots, handover, backup/restore and notification jobs against confirmed decisions. M1 does not enforce these against Supabase Auth. Password-expiry and three-hour approval-deadline reminders now have idempotent local workers; durable Production scheduling and monitoring remain pending.
 
 Approved company names and warehouse labels are fixed reference values in M1. `Asia/Yangon` is a preview display default matching this workspace, not a newly approved ERP timezone/currency policy.
 

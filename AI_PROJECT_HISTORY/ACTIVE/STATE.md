@@ -1,5 +1,17 @@
 # Current implementation and evidence
 
+## Approval deadline jobs — latest continuation
+
+Candidate 20260910190000 implements D105/D106 with service-only three-hour
+reminders, current-authority recipient calculation, durable delivery evidence
+and automatic system-audited expiry. Device and permission decision RPCs now
+enforce deadline expiry synchronously if the worker is late. Fresh validation
+passes 324 SQL assertions, 33 Node tests, eight isolated Auth workflows,
+typecheck, lint and optimized build. See
+docs/FOUNDATION-APPROVAL-DEADLINES.md. The worker is local-only; Production
+scheduling/monitoring, rejected/expired request revision flows and remaining
+F1-F6 work stay open. No candidate migration was applied to Owner data.
+
 ## Password-expiry reminders — latest continuation
 
 Candidate 20260910180000 implements D49/D50 as a service-only, Yangon-day
@@ -73,7 +85,7 @@ Updated 2026-09-09. Milestone 2.2 live local identity/permissions slice is imple
 - Accounts: database-backed list, private authenticated photo endpoint, required photo/name/manual Company Position/department/ERP Role/Gmail username/password/confirmation/contact creation form. Owner or authorized Admin only; only Owner appoints Admins. Auth creation and photo upload precede transactional profile/snapshot/audit provisioning. Compensation checks for committed profile before cleanup.
 - Admin actions: scoped disable, reenable and unlock with reason; Owner cannot be changed there. Previous sessions are revoked using server/database checks. Employee general profile/password editing and handover are not implemented.
 - ERP Roles & Permissions (D136): fixed Owner/Admin/Sales/Delivery/Finance/Inventory catalogue. Manual Company Position is descriptive; the selected ERP Role derives the permission template, enforced by a composite database foreign key. New Sales/Delivery/Finance/Inventory templates start with no page/action access until configured and approved. Configure additional page/action permissions on a role, select exact affected accounts, save Draft, Submit, then individually Approve/Reject. Only Owner self-approves. RPCs check current authority, versions and scope; stale requests cannot apply. Each account keeps its own page/action snapshot. Excluded accounts and existing individual page overrides are preserved.
-- Approval Center fetches the complete affected-account snapshot per opened request before showing decision controls. Snapshot includes account name/version and before/after page/action access. Lists currently show latest 200 requests; account list has an initial 500-row cap. Full server list paging and rejected-request re-drafting/revision remain follow-up work.
+- Approval Center fetches the complete affected-account snapshot per opened request before showing decision controls. Snapshot includes account name/version and before/after page/action access. Approval/account history pages now use bounded server pages, while search/sort still apply only within each loaded page and the permission account selector remains capped at 500. Governed full-result export and rejected/expired request re-drafting/revision remain follow-up work.
 - Audit and recipient-scoped notifications use real data and Myanmar time. Notification read state persists through RLS. No Gmail/Telegram messages are sent. Audit is append-only.
 - Sidebar and direct routes use logged-in database access, with server actions/RPCs enforcing authority separately. Removed synthetic actor selector from the live shell. Remaining sample review screens are explicitly labelled.
 - ERP sign-in records session history and counts five invalid password attempts before locking. Service failures do not count. Six-month expiry blocks access. Manual account unlock requires authorized Owner/Admin. The counter is on the ERP login path; direct provider-auth attempts and full throttling/security coverage require further hardening before Production.

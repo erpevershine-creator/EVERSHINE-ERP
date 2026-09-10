@@ -157,6 +157,7 @@ export async function LivePage({
               ["Password operations", "Provider receipt and completion fence enforced"],
               ["Approval handover", "Request-scoped for device and permission-template approvals"],
               ["Password expiry reminders", "Daily Yangon reminder ledger; local worker checks while the app is running"],
+              ["Approval deadlines", "Three-hour reminder ledger and automatic expiry; local worker checks while the app is running"],
             ]}
           />
         </section>

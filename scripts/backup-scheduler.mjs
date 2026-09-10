@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 const workers = [
   [fileURLToPath(new URL("./local-backup.mjs", import.meta.url)), "tick"],
   [fileURLToPath(new URL("./password-expiry-reminders.mjs", import.meta.url))],
+  [fileURLToPath(new URL("./approval-deadline-jobs.mjs", import.meta.url))],
 ];
 let stopped = false,
   timer;
