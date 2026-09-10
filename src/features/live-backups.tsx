@@ -35,10 +35,14 @@ export function LiveBackups({
   runs,
   canCreate,
   schedule,
+  page,
+  total,
 }: {
   schedule: { enabled: boolean; last_checked_at: string | null } | null;
   runs: BackupRun[];
   canCreate: boolean;
+  page: number;
+  total: number;
 }) {
   const router = useRouter();
   const [retention, setRetention] = useState<Awaited<
@@ -160,6 +164,15 @@ export function LiveBackups({
         </table>
         {!runs.length && <p>No local backups yet.</p>}
       </div>
+      {total > 50 && (
+        <nav className="table-footer" aria-label="Backup pages">
+          <span>{page} / {Math.ceil(total / 50)} · {total} total</span>
+          <div>
+            {page > 1 ? <a href={`/backups?page=${page - 1}`} aria-label="Previous page">‹</a> : <button disabled aria-label="Previous page">‹</button>}
+            {page < Math.ceil(total / 50) ? <a href={`/backups?page=${page + 1}`} aria-label="Next page">›</a> : <button disabled aria-label="Next page">›</button>}
+          </div>
+        </nav>
+      )}
       {retention && (
         <Modal title="Backup retention" wide onClose={() => setRetention(null)}>
           <p>

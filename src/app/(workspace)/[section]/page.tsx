@@ -38,10 +38,13 @@ export async function generateMetadata({
 }
 export default async function Section({
   params,
+  searchParams,
 }: {
   params: Promise<{ section: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { section } = await params;
+  const query = await searchParams;
   if (!Object.hasOwn(pages, section)) notFound();
   const access = await requireAccess();
   if (!access.pages[section])
@@ -58,10 +61,12 @@ export default async function Section({
       "approvals",
       "audit",
       "notifications",
-      "backups",
-    ].includes(section)
+    "backups",
+    "settings",
+    "usage",
+  ].includes(section)
   )
-    return <LivePage section={section} />;
+    return <LivePage section={section} searchParams={query} />;
   const Component = pages[section as keyof typeof pages];
   return <Component />;
 }

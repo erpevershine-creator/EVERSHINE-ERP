@@ -8,12 +8,20 @@ import {
   ChevronRight,
   ArrowDownUp,
 } from "lucide-react";
+import Link from "next/link";
 import { csvCell } from "@/lib/policy";
 export type Column<T> = {
   key: string;
   label: string;
   value: (row: T) => string;
   render?: (row: T) => ReactNode;
+};
+export type ServerPagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  previousHref?: string;
+  nextHref?: string;
 };
 export function DataTable<T extends { id: string }>({
   rows,
@@ -25,6 +33,7 @@ export function DataTable<T extends { id: string }>({
   sample = true,
   initialSort,
   onOpen,
+  serverPagination,
 }: {
   rows: T[];
   columns: Column<T>[];
@@ -35,6 +44,7 @@ export function DataTable<T extends { id: string }>({
   sample?: boolean;
   initialSort?: string;
   onOpen?: (row: T) => void;
+  serverPagination?: ServerPagination;
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(initialSort ?? columns[0].key);
@@ -55,9 +65,14 @@ export function DataTable<T extends { id: string }>({
         .localeCompare(sortColumn.value(b), undefined, { numeric: true }) *
       (descending ? -1 : 1),
   );
-  const pageCount = Math.max(1, Math.ceil(ordered.length / 10));
+  const pageSize = serverPagination?.pageSize ?? 10;
+  const pageCount = serverPagination
+    ? Math.max(1, Math.ceil(serverPagination.total / pageSize))
+    : Math.max(1, Math.ceil(ordered.length / pageSize));
   const currentPage = Math.min(page, pageCount - 1);
-  const slice = ordered.slice(currentPage * 10, (currentPage + 1) * 10);
+  const slice = serverPagination
+    ? ordered
+    : ordered.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   function exportCsv() {
     const text =
       "\uFEFF" +
@@ -144,7 +159,7 @@ export function DataTable<T extends { id: string }>({
         </details>
         {exportAllowed ? (
           <button onClick={exportCsv}>
-            <Download size={15} /> Export CSV
+            <Download size={15} /> {serverPagination ? "Export page CSV" : "Export CSV"}
           </button>
         ) : null}
         {actions}
@@ -218,27 +233,63 @@ export function DataTable<T extends { id: string }>({
       </div>
       <div className="table-footer">
         <span>
-          {ordered.length ? currentPage * 10 + 1 : 0}–
-          {Math.min((currentPage + 1) * 10, ordered.length)} of {ordered.length}
+          {serverPagination
+            ? serverPagination.total
+              ? (serverPagination.page - 1) * pageSize + 1
+              : 0
+            : ordered.length
+              ? currentPage * pageSize + 1
+              : 0}
+          –
+          {serverPagination
+            ? Math.min(
+                serverPagination.page * pageSize,
+                serverPagination.total,
+              )
+            : Math.min((currentPage + 1) * pageSize, ordered.length)} of {serverPagination?.total ?? ordered.length}
         </span>
         <div>
-          <button
-            aria-label="Previous page"
-            disabled={!currentPage}
-            onClick={() => setPage(currentPage - 1)}
-          >
-            <ChevronLeft size={15} />
-          </button>
+          {serverPagination ? (
+            serverPagination.previousHref ? (
+              <Link href={serverPagination.previousHref} aria-label="Previous page">
+                <ChevronLeft size={15} />
+              </Link>
+            ) : (
+              <button aria-label="Previous page" disabled>
+                <ChevronLeft size={15} />
+              </button>
+            )
+          ) : (
+            <button
+              aria-label="Previous page"
+              disabled={!currentPage}
+              onClick={() => setPage(currentPage - 1)}
+            >
+              <ChevronLeft size={15} />
+            </button>
+          )}
           <span>
-            {currentPage + 1} / {pageCount}
+            {serverPagination?.page ?? currentPage + 1} / {pageCount}
           </span>
-          <button
-            aria-label="Next page"
-            disabled={currentPage + 1 >= pageCount}
-            onClick={() => setPage(currentPage + 1)}
-          >
-            <ChevronRight size={15} />
-          </button>
+          {serverPagination ? (
+            serverPagination.nextHref ? (
+              <Link href={serverPagination.nextHref} aria-label="Next page">
+                <ChevronRight size={15} />
+              </Link>
+            ) : (
+              <button aria-label="Next page" disabled>
+                <ChevronRight size={15} />
+              </button>
+            )
+          ) : (
+            <button
+              aria-label="Next page"
+              disabled={currentPage + 1 >= pageCount}
+              onClick={() => setPage(currentPage + 1)}
+            >
+              <ChevronRight size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>

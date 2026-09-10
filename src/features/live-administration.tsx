@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Private authenticated photos must bypass the shared image optimizer. */
 "use client";
 import { useActionState, useState, type ReactNode } from "react";
-import { DataTable } from "@/components/table";
+import { DataTable, type ServerPagination } from "@/components/table";
 import { Badge, Modal, PageHeading } from "@/components/ui";
 import {
   createAccount,
@@ -123,10 +123,12 @@ export function LiveAccounts({
   profiles,
   positions,
   access,
+  serverPagination,
 }: {
   profiles: Profile[];
   positions: Position[];
   access: Access;
+  serverPagination?: ServerPagination;
 }) {
   const [create, setCreate] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -152,6 +154,7 @@ export function LiveAccounts({
         sample={false}
         exportAllowed={can(access, "Account Management", "export")}
         onOpen={(p) => setSelectedId(p.id)}
+        serverPagination={serverPagination}
         columns={[
           {
             key: "employee",
@@ -394,6 +397,7 @@ export function LivePermissions({
   pagePermissions,
   actionPermissions,
   access,
+  serverPagination,
 }: {
   positions: Position[];
   profiles: Profile[];
@@ -401,6 +405,7 @@ export function LivePermissions({
   pagePermissions: PagePermission[];
   actionPermissions: ActionPermission[];
   access: Access;
+  serverPagination?: ServerPagination;
 }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const selected = positions.find((p) => p.id === selectedId);
@@ -420,6 +425,7 @@ export function LivePermissions({
         exportAllowed={can(access, "Positions & Permissions", "export")}
         rows={positions.map((p) => ({ ...p, id: String(p.id) }))}
         onOpen={(row) => setSelectedId(Number(row.id))}
+        serverPagination={serverPagination}
         columns={[
           {
             key: "name",
@@ -629,10 +635,12 @@ export function LiveApprovals({
   requests,
   pages,
   access,
+  serverPagination,
 }: {
   requests: Request[];
   pages: Page[];
   access: Access;
+  serverPagination?: ServerPagination;
 }) {
   const [id, setId] = useState<number | null>(null);
   const selected = requests.find((r) => r.id === id);
@@ -665,6 +673,7 @@ export function LiveApprovals({
         onOpen={(r) => {
           void openRequest(Number(r.id));
         }}
+        serverPagination={serverPagination}
         columns={[
           { key: "id", label: "Request", value: (r) => `PERM-${r.id}` },
           { key: "reason", label: "Reason", value: (r) => r.reason },
