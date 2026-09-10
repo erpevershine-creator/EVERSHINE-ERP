@@ -1,7 +1,7 @@
 begin;
-select plan(8);
+select plan(11);
 update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
-create temporary table ho(owner_id uuid default gen_random_uuid(),admin_id uuid default gen_random_uuid(),s1 uuid default gen_random_uuid(),s2 uuid default gen_random_uuid(),s3 uuid default gen_random_uuid(),s4 uuid default gen_random_uuid(),sa uuid default gen_random_uuid(),t1 uuid,t2 uuid,t3 uuid,hid bigint,request_id bigint);
+create temporary table ho(owner_id uuid default gen_random_uuid(),admin_id uuid default gen_random_uuid(),s1 uuid default gen_random_uuid(),s2 uuid default gen_random_uuid(),s3 uuid default gen_random_uuid(),s4 uuid default gen_random_uuid(),sa uuid default gen_random_uuid(),t1 uuid,t2 uuid,t3 uuid,hid bigint,hid2 bigint,request_id bigint,request2 bigint);
 insert into ho default values;
 insert into auth.users(id,email,role,aud,email_confirmed_at) select owner_id,'handover.owner.test@gmail.com','authenticated','authenticated',now() from ho union all select admin_id,'handover.admin.test@gmail.com','authenticated','authenticated',now() from ho;
 insert into public.profiles(id,employee_name,company_position,position_id,department,erp_role,username,contact,avatar_path)
@@ -35,5 +35,21 @@ select ok((select status='active' from public.device_sessions where id=(select s
 select throws_ok($$select public.decide_device_login(request_id,true,'Replay') from ho$$,'P0001','Request is not pending','selected approval cannot replay');
 select public.revoke_handover(hid,'Owner returned') from ho;
 select is((select status from public.handover_requests where id=(select hid from ho)),'revoked','handover is explicitly revocable');
+
+-- The same request-scoped handover boundary must cover permission-template
+-- approvals. The successor has no Positions & Permissions approval action.
+select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s2)::text,true) from ho;
+update public.profiles set status='active',recovery_pending=false,password_expires_at=clock_timestamp()+interval '1 year',sessions_valid_after='-infinity',action_access=jsonb_build_object('*',jsonb_build_array('*')),page_access=(select jsonb_object_agg(id,true) from public.pages) where id=(select owner_id from ho);
+select public.draft_permission_change((select position_id from public.profiles where id=(select admin_id from ho)),(select version from public.positions where id=(select position_id from public.profiles where id=(select admin_id from ho))),'{}'::jsonb,'{}'::jsonb,array[(select admin_id from ho)],'Permission handover fixture') from ho;
+update ho set request2=(select id from public.approval_requests where requester_id=(select owner_id from ho) and request_type='position_permissions' and status='draft' order by id desc limit 1);
+select public.submit_permission_change(request2) from ho;
+select ok((select status='pending' from public.approval_requests where id=(select request2 from ho)),'permission request is pending for handover');
+select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role','authenticated','session_id',s2)::text,true) from ho;
+update ho set hid2=public.create_handover(admin_id,clock_timestamp(),clock_timestamp()+interval '1 hour',array[request2],'Owner temporarily unavailable for permission approval');
+select set_config('request.jwt.claims',jsonb_build_object('sub',admin_id,'role','authenticated','session_id',sa)::text,true) from ho;
+select public.decide_handover(hid2,true,'Admin approved permission handover') from ho;
+select is((select status from public.handover_requests where id=(select hid2 from ho)),'approved','permission handover approval is recorded');
+select public.decide_permission_change(request2,true,'Temporary permission approval handover') from ho;
+select is((select status from public.approval_requests where id=(select request2 from ho)),'approved','successor can approve selected permission request');
 select * from finish();
 rollback;

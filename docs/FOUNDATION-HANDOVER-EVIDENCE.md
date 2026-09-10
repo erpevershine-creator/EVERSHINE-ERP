@@ -11,12 +11,15 @@ The source's authority remains the upper bound; no permanent permission or role
 is changed. Handover decisions require a reason, and an approved handover can be
 revoked explicitly. Expiry/rejection/revocation cannot be replayed as approval.
 
-The isolated handover suite passes eight assertions: selected-item binding,
-approval history, successor action on the selected device request, replay denial
-and explicit revocation. The full isolated run passes 275 SQL assertions across
-15 suites and eight Auth workflows. Typecheck/lint/build evidence from the same
-worktree remains green. See `docs/evidence/handover-20260910.json`.
+The isolated handover suite passes eleven assertions: selected-item binding,
+approval history, successor action on the selected device and permission-template
+requests, replay denial and explicit revocation. The full isolated run passes
+278 SQL assertions across 15 suites and eight Auth workflows. Typecheck/lint/build
+evidence from the same worktree remains green. See the refreshed
+`docs/evidence/foundation-db-check.json`.
 
-This is a candidate migration and remains unapplied to Owner data. Permission
-template handover for non-device approval types still needs the same request-level
-authority adapter before F2 can be closed completely.
+This is a candidate migration and remains unapplied to Owner data. Individual
+permission grants remain an intentionally Owner-only atomic operation; they are
+recorded with an approved request and cannot be delegated to an Admin. Pending
+device and permission-template approvals now use the request-level authority
+adapter.
