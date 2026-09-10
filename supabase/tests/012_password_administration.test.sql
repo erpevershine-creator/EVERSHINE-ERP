@@ -1,5 +1,5 @@
 begin;
-select plan(12);
+select plan(20);
 update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
 create temporary table pw(owner_id uuid default gen_random_uuid(),staff_id uuid default gen_random_uuid(),owner_session uuid default gen_random_uuid(),staff_session uuid default gen_random_uuid(),operation uuid);
 insert into pw default values;
@@ -11,11 +11,24 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',owner_id,'role',
 select ok(not has_function_privilege('anon','public.prepare_password_change(uuid,text)','execute'),'anonymous cannot prepare a password change');
 select throws_ok($$select public.prepare_password_change(staff_id,'') from pw$$,'P0001','Reason required','password-change reason is mandatory');
 update pw set operation=(public.prepare_password_change(staff_id,'Owner reset after account review')->>'operation')::uuid;
-select ok((select status='running' from private.password_change_operations where id=(select operation from pw)),'provider operation is fenced before Auth update');
+select ok((select status='running' from private.password_change_operations where id=(select operation from pw)),'provider operation is recorded before Auth update');
+select ok((select password_change_pending from public.profiles where id=(select staff_id from pw)),'durable password fence is set before provider update');
 select ok((select status='logged_out' and ended_reason='Password change' from public.device_sessions where id=(select staff_session from pw)),'target sessions are revoked before provider update');
 select ok(not exists(select 1 from public.audit_events where after_data ? 'password' or before_data ? 'password'),'audit does not contain plaintext password data');
 select set_config('request.jwt.claims','{"role":"service_role"}',true);
+create temporary table fresh_password_login(ticket uuid,session_id uuid default gen_random_uuid());
+insert into fresh_password_login(ticket) select public.reserve_login_attempt('password.staff.test@gmail.com');
+insert into auth.sessions(id,user_id,created_at,updated_at) select f.session_id,p.staff_id,clock_timestamp(),clock_timestamp() from fresh_password_login f cross join pw p;
+select is((select public.complete_login_attempt(ticket,'success',session_id) from fresh_password_login),'rejected','fresh old-password provider login cannot bypass running password fence');
+-- Simulate a stale/concurrent admission writer: the RLS predicate must also fence it.
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at) select f.session_id,p.staff_id,extensions.digest(f.session_id::text,'sha256'),'Concurrent fixture',clock_timestamp(),clock_timestamp() from fresh_password_login f cross join pw p;
+select set_config('request.jwt.claims',jsonb_build_object('sub',p.staff_id,'role','authenticated','session_id',f.session_id)::text,true) from pw p cross join fresh_password_login f;
+select ok(not private.is_active_user(),'matching fresh device/session cannot bypass password fence in RLS');
+select set_config('request.jwt.claims','{"role":"service_role"}',true);
 select public.finish_password_change(operation,true) from pw;
+select is((select status from public.device_sessions where id=(select session_id from fresh_password_login)),'logged_out','completion revokes a concurrent admitted session before clearing access');
+select ok((select not password_change_pending from public.profiles where id=(select staff_id from pw)),'successful server completion clears fence');
+select is((select count(*)::integer from public.audit_events where action='Password change completed' and actor_id=(select owner_id from pw)),1,'service completion retains original authorized actor in audit');
 select is((select status from private.password_change_operations where id=(select operation from pw)),'completed','successful provider operation completes');
 select ok((select password_expires_at>now()+interval '5 months' from public.profiles where id=(select staff_id from pw)),'successful change renews six-month expiry');
 select set_config('request.jwt.claims',jsonb_build_object('sub',staff_id,'role','authenticated','session_id',staff_session)::text,true) from pw;
@@ -26,6 +39,11 @@ select ok((select target_id=(select owner_id from pw) from private.password_chan
 select set_config('request.jwt.claims','{"role":"service_role"}',true);
 select public.finish_password_change(operation,false) from pw;
 select is((select status from private.password_change_operations where id=(select operation from pw)),'failed','definitive provider failure is durable');
+select ok((select password_change_pending from public.profiles where id=(select owner_id from pw)),'failed provider operation remains fenced for reconciliation');
+truncate fresh_password_login;
+insert into fresh_password_login(ticket) select public.reserve_login_attempt('password.owner.test@gmail.com');
+insert into auth.sessions(id,user_id,created_at,updated_at) select f.session_id,p.owner_id,clock_timestamp(),clock_timestamp() from fresh_password_login f cross join pw p;
+select is((select public.complete_login_attempt(ticket,'success',session_id) from fresh_password_login),'rejected','fresh login remains blocked after provider failure');
 select throws_ok($$select public.finish_password_change(operation,true) from pw$$,'P0001','Password operation unavailable','finished operation cannot be replayed');
 select ok(not has_function_privilege('authenticated','public.finish_password_change(uuid,boolean)','execute'),'clients cannot forge provider completion');
 select * from finish();

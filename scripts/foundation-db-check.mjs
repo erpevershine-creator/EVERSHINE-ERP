@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 // Read the existing schema/reference catalogue only. Never copy account data,
 // provider secrets, Storage objects or backup archives into the validation DB.
@@ -26,8 +26,19 @@ async function run(args, input) {
 }
 const sqlArgs = (name) => ["exec", "-i", name, "psql", "-X", "-qAt", "-U", "supabase_admin", "-d", "postgres", "-v", "ON_ERROR_STOP=1", ...(name === clone ? ["-h", "/tmp"] : [])];
 let created = false;
-const report = { kind: "schema-only-isolated-foundation-check", migrations: [], tests: [], noNetwork: true, noLiveMounts: true, noAccountDataCopied: true };
+const candidateSql = new Map();
+const report = { kind: "schema-only-isolated-foundation-check", startedAt: new Date().toISOString(), sourceFiles: {}, migrations: [], tests: [], noNetwork: true, noLiveMounts: true, noAccountDataCopied: true };
 try {
+  // Include exact candidate hashes: HEAD alone omits uncommitted fixes, and
+  // the source database may already contain some migration versions.
+  for (const directory of ["supabase/migrations", "supabase/tests"]) {
+    for (const file of (await readdir(path.join(root, directory))).filter(file => file.endsWith(".sql")).sort()) {
+      const relative = `${directory}/${file}`;
+      const bytes = await readFile(path.join(root, relative));
+      report.sourceFiles[relative] = createHash("sha256").update(bytes).digest("hex");
+      candidateSql.set(relative, bytes.toString("utf8"));
+    }
+  }
   const image = (await run(["inspect", "--format", "{{.Image}}", source])).trim();
   if (!/^sha256:[a-f0-9]{64}$/.test(image)) throw Error("Invalid source image identity");
   report.image = image;
@@ -56,13 +67,13 @@ try {
       values('profile-photos','profile-photos',false,2097152,array['image/jpeg','image/png','image/webp']);
     create extension if not exists pgtap with schema extensions;
   `);
-  for (const file of (await readdir(path.join(root, "supabase/migrations"))).sort()) {
+  for (const file of [...candidateSql.keys()].filter(file => file.startsWith("supabase/migrations/")).map(file => file.split("/").at(-1)).sort()) {
     if (!file.endsWith(".sql") || applied.has(file.split("_")[0])) continue;
-    await run(sqlArgs(clone), `begin;\n${await readFile(path.join(root, "supabase/migrations", file), "utf8")}\ncommit;`);
+    await run(sqlArgs(clone), `begin;\n${candidateSql.get(`supabase/migrations/${file}`)}\ncommit;`);
     report.migrations.push(file);
   }
-  for (const file of (await readdir(path.join(root, "supabase/tests"))).filter(file => file.endsWith(".test.sql")).sort()) {
-    const output = await run(sqlArgs(clone), await readFile(path.join(root, "supabase/tests", file), "utf8"));
+  for (const file of [...candidateSql.keys()].filter(file => file.startsWith("supabase/tests/") && file.endsWith(".test.sql")).map(file => file.split("/").at(-1)).sort()) {
+    const output = await run(sqlArgs(clone), candidateSql.get(`supabase/tests/${file}`));
     const planned = Number(output.match(/^1\.\.(\d+)\s*$/m)?.[1]);
     const passed = (output.match(/^ok \d+\b/gm) ?? []).length;
     if (!planned || passed !== planned || /^not ok|^# Looks like/m.test(output)) throw Error(`${file}: ${output}`);

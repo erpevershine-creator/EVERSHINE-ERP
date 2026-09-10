@@ -1,5 +1,12 @@
 # Current implementation and evidence
 
+## Current correction — failure-path review (2026-09-10)
+
+Earlier passing fixture counts below are historical evidence, not acceptance of the password/device workflows. A fresh old-password provider login was not blocked by a running password operation, and pending device login signs out the provider session needed by approval. Foundation F1 remains OPEN. See docs/FOUNDATION-FAILURE-PATH-REVIEW.md for the ordered corrections and integration risks.
+
+The worktree now contains candidate migration 20260910080000_password_access_fence.sql and eight additional password regression assertions. Fresh isolated schema-only validation passes 240/240 assertions, including 20 password assertions. Typecheck, lint, 28/28 Node tests and optimized build passed. It has NOT been applied to the Owner database. Provider reconciliation and device end-to-end acceptance remain outstanding. No real password or Owner data was changed in this continuation.
+
+
 ## Foundation execution — 2026-09-10 (D155)
 
 - A native worktree at `C:/Users/DELL/Desktop/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910` isolates the implementation branch `codex/foundation-gates-20260910`. Starting source checkpoint `a0d3072` and its SHA-256 manifest are in `docs/FOUNDATION-BASELINE-20260910.*`; the original checkout, Owner data and credentials remain separate.

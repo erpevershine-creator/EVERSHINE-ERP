@@ -2,6 +2,8 @@
 
 Updated 2026-09-10. Status: OPEN — baseline checkpoint exists; Owner acceptance is still pending.
 
+Failure-path correction: see [current review](FOUNDATION-FAILURE-PATH-REVIEW.md). Prior fixture results do not establish operational password fencing or a usable pending-device approval flow. Those gates remain OPEN.
+
 ## Source identity
 
 - Project: C:/Users/DELL/Desktop/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910
