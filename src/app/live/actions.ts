@@ -1,4 +1,5 @@
 "use server";
+import { completeGovernedPasswordChange } from "@/lib/governed-password";
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -185,23 +186,18 @@ export async function changeAccountPassword(form: FormData): Promise<Result> {
     return failure("Password change was rejected. Check account authority and current status.");
   const operation = prepared.data.operation as string;
   const admin = createAdminClient();
-  let definitiveFailure = false;
-  try {
-    const update = await admin.auth.admin.updateUserById(prepared.data.target as string, { password });
-    if (update.error) {
-      if (!update.error.status || update.error.status >= 500)
-        return failure("Auth could not confirm the password change. The account remains fenced for administrator reconciliation.");
-      definitiveFailure = true;
-    }
-  } catch {
-    return failure("Password change was interrupted. The account remains fenced for administrator reconciliation.");
-  }
-  const finished = await admin.rpc("finish_password_change", {
-    p_operation: operation,
-    p_success: !definitiveFailure,
+  const outcome = await completeGovernedPasswordChange({
+    update: () => admin.auth.admin.updateUserById(prepared.data.target as string, {
+      password,
+      app_metadata: { erp_password_operation: operation },
+    }),
+    receipt: async () => admin.rpc("password_provider_applied", { p_operation: operation }),
+    finish: async success => admin.rpc("finish_password_change", { p_operation: operation, p_success: success }),
   });
-  if (finished.error) return failure("Password change completion could not be confirmed; administrator reconciliation is required.");
-  if (definitiveFailure) return failure("Auth rejected the password change. The account remains fenced.");
+  if (outcome !== "completed")
+    return failure(outcome === "failed"
+      ? "Auth rejected the password change. Access remains closed; an authorized administrator can retry."
+      : "Completion is not confirmed. Access remains closed; retry through this governed form. Owner can use emergency recovery.");
   refresh();
   return { status: "success", message: "Password changed. All previous sessions were logged out." };
 }

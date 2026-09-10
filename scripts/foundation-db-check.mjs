@@ -4,6 +4,7 @@ import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash, randomUUID } from "node:crypto";
+import { checkIsolatedAuth } from "./foundation-auth-check.mjs";
 
 // Read the existing schema/reference catalogue only. Never copy account data,
 // provider secrets, Storage objects or backup archives into the validation DB.
@@ -26,9 +27,13 @@ async function run(args, input) {
 }
 const sqlArgs = (name) => ["exec", "-i", name, "psql", "-X", "-qAt", "-U", "supabase_admin", "-d", "postgres", "-v", "ON_ERROR_STOP=1", ...(name === clone ? ["-h", "/tmp"] : [])];
 let created = false;
+const extraContainers = [];
 const candidateSql = new Map();
 const report = { kind: "schema-only-isolated-foundation-check", startedAt: new Date().toISOString(), sourceFiles: {}, migrations: [], tests: [], noNetwork: true, noLiveMounts: true, noAccountDataCopied: true };
 try {
+  for (const file of ["scripts/foundation-db-check.mjs", "scripts/foundation-auth-check.mjs"]) {
+    report.sourceFiles[file] = createHash("sha256").update(await readFile(path.join(root, file))).digest("hex");
+  }
   // Include exact candidate hashes: HEAD alone omits uncommitted fixes, and
   // the source database may already contain some migration versions.
   for (const directory of ["supabase/migrations", "supabase/tests"]) {
@@ -45,8 +50,8 @@ try {
   const applied = new Set((await run(sqlArgs(source), "select version from supabase_migrations.schema_migrations order by version;")).trim().split(/\r?\n/));
   const roles = await run(["exec", source, "pg_dumpall", "-U", "supabase_admin", "--roles-only", "--no-role-passwords"]);
   const schema = await run(["exec", source, "pg_dump", "-U", "supabase_admin", "-d", "postgres", "--schema-only"]);
-  const catalogue = await run(["exec", source, "pg_dump", "-U", "supabase_admin", "-d", "postgres", "--data-only", "-t", "public.pages", "-t", "public.positions", "-t", "public.position_page_permissions", "-t", "public.position_action_permissions"]);
-  await run(["run", "-d", "--name", clone, "--label", `${label}=${clone}`, "--network", "none", "--user", "postgres", "--entrypoint", "sh", image, "-c", "initdb -D /tmp/erp-pg -U supabase_admin -A trust >/tmp/erp-init.log && exec postgres -D /tmp/erp-pg -c listen_addresses= -c unix_socket_directories=/tmp"]);
+  const catalogue = await run(["exec", source, "pg_dump", "-U", "supabase_admin", "-d", "postgres", "--data-only", "-t", "public.pages", "-t", "public.positions", "-t", "public.position_page_permissions", "-t", "public.position_action_permissions", "-t", "auth.schema_migrations"]);
+  await run(["run", "-d", "--name", clone, "--label", `${label}=${clone}`, "--network", "none", "--user", "postgres", "--entrypoint", "sh", image, "-c", "initdb -D /tmp/erp-pg -U supabase_admin -A trust >/tmp/erp-init.log && exec postgres -D /tmp/erp-pg -c listen_addresses=127.0.0.1 -c unix_socket_directories=/tmp"]);
   created = true;
   let ready = false;
   for (let i = 0; i < 60; i++) {
@@ -80,12 +85,21 @@ try {
     report.tests.push({ file, assertions: passed, status: "pass" });
     console.log(`${file}: ${passed}/${planned} passed`);
   }
+  if (process.argv.includes("--auth")) {
+    report.auth = await checkIsolatedAuth({ run, clone, sql: input => run(sqlArgs(clone), input), label, register: name => extraContainers.push(name) });
+    console.log(`Isolated Auth: ${report.auth.checks.length} workflows passed`);
+  }
   report.status = "pass";
 } catch (error) {
   report.status = "fail";
   console.error(error.message);
   process.exitCode = 1;
 } finally {
+  for (const name of extraContainers.reverse()) {
+    const owned = (await run(["inspect", "--format", `{{index .Config.Labels "${label}"}}`, name])).trim();
+    if (owned !== name) throw Error("Auth cleanup refused: container identity mismatch");
+    await run(["rm", "-f", "-v", name]);
+  }
   if (created) {
     const owned = (await run(["inspect", "--format", `{{index .Config.Labels "${label}"}}`, clone])).trim();
     if (owned !== clone) throw Error("Cleanup refused: container identity mismatch");

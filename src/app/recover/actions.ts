@@ -1,4 +1,5 @@
 "use server";
+import { completeGovernedPasswordChange } from "@/lib/governed-password";
 import { createHash } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -37,45 +38,20 @@ export async function recoverOwner(
       message: "Recovery service is unavailable. Please retry.",
     };
   if (op.error) return { status: "error", message: op.error };
-  // A process interruption leaves the durable operation running and access fenced.
-  // Never automatically clear this fence on a timer or on an ambiguous response.
-  let definitiveFailure = false;
-  try {
-    const update = await admin.auth.admin.updateUserById(op.owner, {
+  const outcome = await completeGovernedPasswordChange({
+    update: () => admin.auth.admin.updateUserById(op.owner, {
       password,
-    });
-    if (update.error) {
-      if (!update.error.status || update.error.status >= 500)
-        return {
-          status: "error",
-          message:
-            "Auth could not confirm the password update. Recovery stays locked for local administrator reconciliation.",
-        };
-      definitiveFailure = true;
-    }
-  } catch {
-    return {
-      status: "error",
-      message:
-        "Recovery was interrupted. Account access stays closed until the local operation is reconciled.",
-    };
-  }
-  const finish = await admin.rpc("finish_owner_recovery", {
-    p_operation: op.operation,
-    p_success: !definitiveFailure,
+      app_metadata: { erp_password_operation: op.operation },
+    }),
+    receipt: async () => admin.rpc("password_provider_applied", { p_operation: op.operation }),
+    finish: async success => admin.rpc("finish_owner_recovery", { p_operation: op.operation, p_success: success }),
   });
-  if (finish.error)
-    return {
-      status: "error",
-      message:
-        "Recovery completion could not be confirmed. Try signing in; if access is still unavailable, request local administrator review.",
-    };
-  if (definitiveFailure)
-    return {
-      status: "error",
-      message:
-        "Auth rejected the password change. Account access stays closed; retry with the recovery code and a valid new password.",
-    };
+  if (outcome !== "completed") return {
+    status: "error",
+    message: outcome === "failed"
+      ? "Auth rejected the password change. Retry with the recovery code and a valid password; access stays closed."
+      : "Recovery completion is not confirmed. Retry here with your recovery code; access remains closed and older attempts cannot overwrite the retry.",
+  };
   const db = await createClient();
   await db.auth.signOut({ scope: "local" });
   return {

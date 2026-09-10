@@ -25,6 +25,10 @@ insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_
 select set_config('request.jwt.claims',jsonb_build_object('sub',p.staff_id,'role','authenticated','session_id',f.session_id)::text,true) from pw p cross join fresh_password_login f;
 select ok(not private.is_active_user(),'matching fresh device/session cannot bypass password fence in RLS');
 select set_config('request.jwt.claims','{"role":"service_role"}',true);
+-- Simulate the provider's transaction boundary on synthetic Auth rows only.
+update auth.users set encrypted_password='synthetic-password-verifier',raw_app_meta_data=jsonb_build_object('erp_password_operation',(select operation from pw)) where id=(select staff_id from pw);
+set constraints all immediate;
+set constraints all deferred;
 select public.finish_password_change(operation,true) from pw;
 select is((select status from public.device_sessions where id=(select session_id from fresh_password_login)),'logged_out','completion revokes a concurrent admitted session before clearing access');
 select ok((select not password_change_pending from public.profiles where id=(select staff_id from pw)),'successful server completion clears fence');

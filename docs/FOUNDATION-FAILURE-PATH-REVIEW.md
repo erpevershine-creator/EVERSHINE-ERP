@@ -35,6 +35,11 @@ No factory reset, database volume removal or real account update was performed.
 
 ## Required next checks, in order
 
+Password/recovery update: [current provider evidence](FOUNDATION-PASSWORD-RECOVERY-EVIDENCE.md)
+now proves receipt-backed completion, safe retry, direct password API rejection
+and eight real Auth workflows in isolation. The original issue description below
+is retained as review history; its browser/runtime acceptance remains pending.
+
 1. Password/recovery provider proof and reconciliation: completion currently trusts
    the server outcome. Interrupted calls need verified provider evidence and safe
    retry handling, including late responses. Owner self-change failure must have
