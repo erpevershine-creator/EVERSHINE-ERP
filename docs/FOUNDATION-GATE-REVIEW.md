@@ -19,12 +19,12 @@ The starting source manifest is [FOUNDATION-BASELINE-20260910.json](FOUNDATION-B
 
 | Gate | Required evidence | Current result |
 | --- | --- | --- |
-| Source baseline | Exact candidate source/migrations/lockfile hashes and rollback reference | PARTIAL: checkpoint a0d3072 and manifest recorded; remediation is not yet committed |
-| Identity/security | Account/password editing, delegated scope, pagination, handover, two-device/third-device/idle controls, throttling, interrupted recovery reconciliation | PARTIAL: password authority/fencing, provider receipts, session admission, replay/throttle, two-device/third-device approval, seven-day idle reapproval, recovery reconciliation and scoped handover pass candidate tests; profile editing and expiry reminders remain open |
+| Source baseline | Exact candidate source/migrations/lockfile hashes and rollback reference | PARTIAL: checkpoint a0d3072 and manifest recorded; subsequent candidate commits and fresh evidence are retained on the worktree branch, while final Owner freeze is pending |
+| Identity/security | Account/password editing, delegated scope, pagination, handover, two-device/third-device/idle controls, throttling, interrupted recovery reconciliation | PARTIAL: password authority/fencing, provider receipts, session admission, replay/throttle, two-device/third-device approval, seven-day idle reapproval, recovery reconciliation, scoped handover and local expiry reminders pass candidate tests; general profile editing remains open |
 | Database enforcement | Migration application evidence, RLS/ACL bypass tests, server/RPC authority, stale/replay/concurrency and audit verification | Historical local evidence exists; full candidate validation pending |
 | Local backups | Encrypted capture, 18:00 Yangon/catch-up, retention, preserved manual archives, isolated restore evidence | Existing local evidence in LOCAL-BACKUPS.md; not full application disaster recovery |
 | Offsite/DR | No-source-profile retrieval/restore, remote retry/retention, live restore maintenance/failure/retry, Telegram delivery | OPEN: one authenticated Main/Recovery split-key integrity proof only |
-| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 33/33 Node tests, optimized build, and 278/278 isolated SQL assertions plus eight Auth workflows pass; DB lint has only two pre-existing unused-parameter warnings |
+| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 33/33 Node tests, optimized build, and 304/304 isolated SQL assertions plus eight Auth workflows pass; DB lint has only two pre-existing unused-parameter warnings |
 | Owner acceptance | Review known limits and record explicit baseline acceptance | PENDING: the Owner authorized the work, not a completed freeze |
 | Business entry | Accepted foundation/DR gates plus module contract and vertical-slice acceptance | CLOSED pending above gates |
 
@@ -36,4 +36,4 @@ The current totals are evidence for this worktree candidate. They do not close t
 - Fast Mode was not changed; it is optional and is not treated as a foundation control.
 - Documentation and source changes remain separate from Owner acceptance, live restore, data reset, Production deployment and paid resources.
 
-Next execution work: review and commit the admission remediation, then continue F1 controls (device limits, idle reapproval, password administration and recovery reconciliation) with isolated negative tests. Supplier questions stay paused under D155.
+Next execution work: complete governed profile editing, then close remaining F2/F3 controls with isolated negative tests. Supplier questions stay paused under D155.

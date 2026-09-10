@@ -156,7 +156,7 @@ export async function LivePage({
               ["Session admission", "Enforced by server-side device admission"],
               ["Password operations", "Provider receipt and completion fence enforced"],
               ["Approval handover", "Request-scoped for device and permission-template approvals"],
-              ["Password expiry reminders", "Not scheduled; expiry blocks access until governed change or recovery"],
+              ["Password expiry reminders", "Daily Yangon reminder ledger; local worker checks while the app is running"],
             ]}
           />
         </section>

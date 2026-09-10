@@ -33,7 +33,7 @@ const scheduler =
       )
     : null;
 scheduler?.on("error", () =>
-  console.error("Local backup scheduler unavailable"),
+  console.error("Local foundation scheduler unavailable"),
 );
 scheduler?.stdin.on("error", () => {});
 const stopScheduler = () => scheduler?.stdin.end();

@@ -1,5 +1,19 @@
 # Current implementation and evidence
 
+## Password-expiry reminders — latest continuation
+
+Candidate 20260910180000 implements D49/D50 as a service-only, Yangon-day
+reminder batch with durable per-target/recipient/expiry/day evidence. Owner sees
+every eligible reminder; an Admin sees only non-privileged targets for which the
+Admin has both password-change authority and the complete delegated permission
+scope. Same-day and concurrent retries cannot duplicate delivery. The local
+worker refuses non-local Supabase URLs and runs under the existing supervised
+development scheduler. Fresh validation passes 304 SQL assertions, 33 Node
+tests, eight isolated Auth workflows, typecheck, lint and optimized build. See
+docs/FOUNDATION-PASSWORD-EXPIRY-REMINDERS.md. Production scheduling, profile
+editing and the remaining F2-F6 gates are still open. No candidate migration was
+applied to Owner data.
+
 ## Temporary handover visibility — latest continuation
 
 Candidate 20260910170000 connects parent-request/affected-account RLS visibility
@@ -46,7 +60,7 @@ The worktree now contains candidate migration 20260910080000_password_access_fen
 - F1 device admission now also enforces two active devices. A third provider session creates a pending `device_login` approval with a one-day deadline; Owner or an Account Management approver can approve with a required reason, which logs out the oldest active session, admits the new session, preserves audit/notification history and keeps the two-device limit. Rejection, replay, stale sessions, anonymous decision and missing reasons are covered by 20 additional pgTAP assertions. The local candidate has applied migrations through `20260910040000_restore_login_audit.sql`.
 - F1 idle reapproval now uses the existing `requires_login_approval` profile fence: active device sessions idle for seven days are logged out with a reason, the next login creates a pending one-day device approval, approval clears the fence and admits the new session. Eleven rollback assertions cover the idle path. The Approval Center RLS policy separately recognizes `approve_device` for Admin visibility. The local candidate has applied migrations through `20260910060000_device_approval_visibility.sql`.
 - F1 password administration now uses `private.password_change_operations`: Owner or delegated Account Management authority prepares a reasoned, session-revoking server/provider operation; plaintext never enters database/audit; success renews the six-month expiry and definitive/ambiguous failures remain fenced for reconciliation. Owner-only Owner-password and no employee self-change rules are enforced. Twelve rollback assertions cover authority, replay, audit secrecy, expiry and failure. The local candidate has applied migrations through `20260910070000_password_administration.sql`.
-- F1 remains open overall: two-device/third-device approval, idle reapproval, full account/password administration, provider-operation reconciliation, expiry reminders and other controls are not yet accepted. Supplier questions remain paused under D155.
+- F1 remains open overall: candidate admission/device/password/reconciliation/reminder controls pass isolated validation, while general profile editing and final browser/Owner acceptance remain open. Supplier questions remain paused under D155.
 
 Updated 2026-09-09. Milestone 2.2 live local identity/permissions slice is implemented. One real active Owner remains. The Owner subsequently created one real employee Admin; browser inspection confirms one Owner and one Admin. Codex did not create or change that employee account during D137 verification. The older chronological state is archived at AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md.
 

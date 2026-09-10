@@ -55,6 +55,7 @@ checkout/RPC compatibility remains a separate integration gate. Migrations
 `20260910080000` and `20260910090000` remain unapplied to Owner data.
 
 Password administration is only the password portion of D24. Identifier editing,
-full delegated scope review, expiry reminders, device identity/pending approval,
-handover and the remaining F2–F6 gates still require their own evidence. This
-document is not Foundation acceptance or a claim of complete ERP security.
+full delegated scope review, handover and the remaining F2–F6 gates still require
+their own evidence. Expiry reminders are now covered separately in
+`FOUNDATION-PASSWORD-EXPIRY-REMINDERS.md`. This document is not Foundation
+acceptance or a claim of complete ERP security.
