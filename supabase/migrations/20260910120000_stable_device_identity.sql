@@ -60,7 +60,7 @@ create or replace function public.decide_device_login(p_request bigint,p_approve
 language plpgsql security definer set search_path='' as $$
 declare r public.approval_requests; p public.profiles; sid uuid; started timestamptz; label text; old public.device_sessions; fingerprint bytea;
 begin
- perform private.require_admin('Account Management','approve_device');
+ perform private.require_request_authority('Account Management','approve_device',p_request);
  if p_approve is null or p_reason is null or length(btrim(p_reason)) not between 1 and 1000 then raise exception 'Decision reason required'; end if;
  select * into r from public.approval_requests where id=p_request for update;
  if not found or r.request_type<>'device_login' or r.status<>'pending' then raise exception 'Request is not pending'; end if;
