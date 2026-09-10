@@ -1,0 +1,21 @@
+begin;
+select plan(7);
+update public.profiles set status='inactive',disabled_at=null where erp_role='owner';
+create temporary table hb(uid uuid default gen_random_uuid(),sid uuid default gen_random_uuid());
+insert into hb default values;
+insert into auth.users(id,email,role,aud,email_confirmed_at) select uid,'heartbeat.owner.test@gmail.com','authenticated','authenticated',now() from hb;
+insert into public.profiles(id,employee_name,position_id,department,erp_role,username,contact,avatar_path)
+select uid,'Heartbeat Owner',(select id from public.positions where erp_role_code='owner'),'Test','owner','heartbeat.owner.test@gmail.com','test',uid||'/photo.png' from hb;
+insert into auth.sessions(id,user_id,created_at,updated_at) select sid,uid,clock_timestamp(),clock_timestamp() from hb;
+insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at) select sid,uid,extensions.digest(sid::text,'sha256'),'Heartbeat device',clock_timestamp(),clock_timestamp() from hb;
+select set_config('request.jwt.claims',jsonb_build_object('sub',uid,'role','authenticated','session_id',sid)::text,true) from hb;
+select is(public.touch_my_device(),'active','active device heartbeat is accepted');
+select ok((select last_seen_at>clock_timestamp()-interval '1 minute' from public.device_sessions where id=(select sid from hb)),'heartbeat updates last-seen time');
+update public.device_sessions set last_seen_at=clock_timestamp()-interval '8 days' where id=(select sid from hb);
+select is(public.touch_my_device(),'idle_reapproval','seven-day idle device is closed');
+select is((select status from public.device_sessions where id=(select sid from hb)),'logged_out','idle device is durably logged out');
+select ok((select requires_login_approval from public.profiles where id=(select uid from hb)),'idle device sets reapproval fence');
+select ok(not private.is_active_user(),'idle device loses ERP access immediately');
+select ok(exists(select 1 from public.audit_events where action='Device idle reapproval required' and entity_id=(select sid::text from hb)),'idle closure is audited');
+select * from finish();
+rollback;

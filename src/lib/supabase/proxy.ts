@@ -27,5 +27,6 @@ export async function updateSupabaseSession(request: NextRequest) {
 
   // Validating claims also refreshes an expiring session cookie when needed.
   const { data } = await supabase.auth.getClaims();
+  if (data?.claims?.sub) await supabase.rpc("touch_my_device");
   return { response, userId: data?.claims?.sub ?? null };
 }

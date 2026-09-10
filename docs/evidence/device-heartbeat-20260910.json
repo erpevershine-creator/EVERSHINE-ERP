@@ -1,0 +1,145 @@
+{
+  "kind": "schema-only-isolated-foundation-check",
+  "startedAt": "2026-09-10T02:09:28.857Z",
+  "sourceFiles": {
+    "scripts/foundation-db-check.mjs": "8f73679861bf6743f6c542f0889e468ff3f5e06d822bac07b9f5e82243f3b4f1",
+    "scripts/foundation-auth-check.mjs": "cc14a2a647a713776a36a76273b723065979477b3fd6867a520d5e0f44ad7c23",
+    "supabase/migrations/20260907020914_foundation_identity_access.sql": "142b6f0b08d0454ac8d980b2e7553581add696ef8f2bcb21e573934861ce5ff7",
+    "supabase/migrations/20260907143000_initial_owner_provisioning.sql": "d4dba311b77a119a4001fb6d57f790c8f737f4a4044bdf21f65b4ab582b50795",
+    "supabase/migrations/20260907175923_live_account_permissions_recovery.sql": "228999d9f3d8a0e606d3722444e4b1e4eaa6c8c5b691721f23ce35c05404950c",
+    "supabase/migrations/20260907182018_live_access_hardening.sql": "7c8e52b931d89771f5da1a75f6949eb5b569d5b3ca27d3a73196c1f97cd22b9e",
+    "supabase/migrations/20260908011724_permission_action_alias_fix.sql": "7ab5155d36fbc3b74a972413f9910e66c02d6759c3d373390f69c6b6747682a1",
+    "supabase/migrations/20260908012427_explicit_session_revocation.sql": "6d2ebdf4d20abdfc89b1ab8dd8f769b594fbd881f53be6b87aafdc8ec127c41c",
+    "supabase/migrations/20260908025914_company_positions_erp_roles.sql": "86f1d0da8146f857e1213f91e06f182c44a611c7848b700dca4fa8df9b1f7f29",
+    "supabase/migrations/20260908052249_owner_individual_permissions.sql": "ff1ad99cd3bacc996ec9def8ad57a7e990a831a39d6f2c30c32fa33ec6b63ce9",
+    "supabase/migrations/20260908113048_local_verified_backups.sql": "2d77aa06dfa10be4e714b1e08aecc1855dac28413b6e409edb1f3e6825557ead",
+    "supabase/migrations/20260908114400_backup_worker_authority.sql": "31d8cd44bc0c985651899823670c38563ae00ad75141ce42e59a7f310951dd9e",
+    "supabase/migrations/20260908151454_scheduled_local_backups.sql": "045141d1e41e9bdef930cee10d1d15f102b7a215c2cd3755830155a2c747d326",
+    "supabase/migrations/20260909013759_backup_retention_tracking.sql": "f3a2bc6f1f32abbf31ee5d73103555b9700481795884ef71864412947382cfd4",
+    "supabase/migrations/20260910010000_login_admission.sql": "5fb9195f8a14c4823fa6af31bce7d9623a4449cb0e1cc45f778ca0d7f61ff0f0",
+    "supabase/migrations/20260910020000_third_device_approval.sql": "4670e621610718bb424ee3be5c329858daccd310edf8f4d40a275c7c85f2fbee",
+    "supabase/migrations/20260910030000_fix_device_pending_status.sql": "fd5004415b50c4acb731665848749e5642a42a86e3029784e8ed73a50b5020dc",
+    "supabase/migrations/20260910040000_restore_login_audit.sql": "72ea24c065b952b04e406614c91b66e870f95dd8d75baadd9e93d6c9db7f7390",
+    "supabase/migrations/20260910050000_idle_login_reapproval.sql": "aed0a406df2bed8f47d6cc805d826f91c984bb48b628a233d813a9a299dc0eb4",
+    "supabase/migrations/20260910060000_device_approval_visibility.sql": "991ee22d862555c856a62ec510053a65bc60a80c9fd9953a2e7f4abbc6a54084",
+    "supabase/migrations/20260910070000_password_administration.sql": "b66aeeb5e04112242c7bb565a133a86d10d574840f5c5bf241e2e78455a653f3",
+    "supabase/migrations/20260910080000_password_access_fence.sql": "70bab8065e2646c4dc23c20fc5fd9c5460fbf1ea173ed7812c8a35ae1e6b1a62",
+    "supabase/migrations/20260910090000_password_provider_receipts.sql": "4c87cca9c03020a09b02157f4d027003225a57e627d83ad2a19ebc75dca342de",
+    "supabase/migrations/20260910100000_pending_device_session.sql": "1bf139d08e988083bcf6e20446dd35658adab99da8dd4dc31d17932a4c644800",
+    "supabase/migrations/20260910110000_device_heartbeat.sql": "f3e85689e29360ea1fb50a9722d2fdd0898946db00be2afab7ca1efe75695c9b",
+    "supabase/tests/001_foundation_rls.test.sql": "1aaeb4610c675b3aa1adb57890039f3d2674c4970917ba2946373fa4f475a416",
+    "supabase/tests/002_owner_provisioning.test.sql": "ee878d50395c95575d93f4c36096c5f05c76e27ffda6720e7866670a487103fb",
+    "supabase/tests/003_live_access.test.sql": "f7fc72b21120b7de4e4a4a5a6bef721cdad0ba50070eb3809b5895997c53c970",
+    "supabase/tests/004_role_contract.test.sql": "844bd8fd1063c5d688aab6dd52704eee5453c3ffca7c5d4554e50548e0c6aeb0",
+    "supabase/tests/005_individual_permissions.test.sql": "5c89e9dcf7a37453053d270771789f6b9e7e0fd35fae4b27a22087b5f5eccf2d",
+    "supabase/tests/006_local_backups.test.sql": "a9fd3cade83a1aa0c7be8d8eb2ff0c330bd9efb322de9c4e0df99be16379ac73",
+    "supabase/tests/007_backup_schedule.test.sql": "336d1379b0ee0432caa9b03e2465db0bb2e9bb5395824207fe354fb9b16b4bcf",
+    "supabase/tests/008_retention_tracking.test.sql": "3641705f30d2e5068fb6ab3c7bc1f0b5b6c157339ab18e487b569048bd46292c",
+    "supabase/tests/009_login_admission.test.sql": "c308bb655786d445e456877371e55fb9bd0b17518ff9c774ed3222c952551419",
+    "supabase/tests/010_third_device.test.sql": "9e81a3186ced86826d8f4ab50c6e9b8218c4b7cee1ce1bbafb7541a407c6d55a",
+    "supabase/tests/011_idle_reapproval.test.sql": "003f5ec6752efb864f57bf1dc4e0e28f28961cef74aa1c6c2cd006cb03381c8a",
+    "supabase/tests/012_password_administration.test.sql": "532df5237248f3107fde46494b09e0883b21a7699dec75585c9dad23af96eac7",
+    "supabase/tests/013_password_provider_receipts.test.sql": "3dfb397f7097218b5153cee6045249a9d45ad565df1e5308a86adede96e7c0bb",
+    "supabase/tests/014_device_heartbeat.test.sql": "901221fab7ea92a78a9c1fefa01c1154bb5f85332c27b74ffc9dbba03787b177"
+  },
+  "migrations": [
+    "20260910080000_password_access_fence.sql",
+    "20260910090000_password_provider_receipts.sql",
+    "20260910100000_pending_device_session.sql",
+    "20260910110000_device_heartbeat.sql"
+  ],
+  "tests": [
+    {
+      "file": "001_foundation_rls.test.sql",
+      "assertions": 34,
+      "status": "pass"
+    },
+    {
+      "file": "002_owner_provisioning.test.sql",
+      "assertions": 13,
+      "status": "pass"
+    },
+    {
+      "file": "003_live_access.test.sql",
+      "assertions": 35,
+      "status": "pass"
+    },
+    {
+      "file": "004_role_contract.test.sql",
+      "assertions": 14,
+      "status": "pass"
+    },
+    {
+      "file": "005_individual_permissions.test.sql",
+      "assertions": 24,
+      "status": "pass"
+    },
+    {
+      "file": "006_local_backups.test.sql",
+      "assertions": 17,
+      "status": "pass"
+    },
+    {
+      "file": "007_backup_schedule.test.sql",
+      "assertions": 19,
+      "status": "pass"
+    },
+    {
+      "file": "008_retention_tracking.test.sql",
+      "assertions": 4,
+      "status": "pass"
+    },
+    {
+      "file": "009_login_admission.test.sql",
+      "assertions": 29,
+      "status": "pass"
+    },
+    {
+      "file": "010_third_device.test.sql",
+      "assertions": 23,
+      "status": "pass"
+    },
+    {
+      "file": "011_idle_reapproval.test.sql",
+      "assertions": 11,
+      "status": "pass"
+    },
+    {
+      "file": "012_password_administration.test.sql",
+      "assertions": 20,
+      "status": "pass"
+    },
+    {
+      "file": "013_password_provider_receipts.test.sql",
+      "assertions": 14,
+      "status": "pass"
+    },
+    {
+      "file": "014_device_heartbeat.test.sql",
+      "assertions": 7,
+      "status": "pass"
+    }
+  ],
+  "noNetwork": true,
+  "noLiveMounts": true,
+  "noAccountDataCopied": true,
+  "image": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+  "auth": {
+    "image": "sha256:c0c25187a6b835e65a6f6e6c6b39d090e832d40e6de5186f2c038e0411944232",
+    "checks": [
+      "Concurrent duplicate provider updates commit exactly once",
+      "Auth password and metadata transaction produces receipt",
+      "Replayed provider operation cannot overwrite password",
+      "New password authenticates through real provider",
+      "Direct user password update is rejected and rolls back",
+      "Verified recovery retry fences late earlier provider response",
+      "Owner recovery clears both fences and intended password works",
+      "Confirmed password reuse policy works with new receipt"
+    ],
+    "status": "pass",
+    "noHostPorts": true,
+    "syntheticAccountsOnly": true
+  },
+  "status": "pass",
+  "finishedAt": "2026-09-10T02:10:01.508Z"
+}
