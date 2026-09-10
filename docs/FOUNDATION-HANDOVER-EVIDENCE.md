@@ -38,3 +38,18 @@ D09 permanent successor transfer and source inactivation are not implemented.
 Delegated appointment scope, successor RLS visibility and UI integration still
 need completion, alongside reject/re-draft lifecycle coverage. The temporary
 assignment implementation must not be presented as complete D09-D13 acceptance.
+
+## Request visibility and decision capability candidate
+
+Candidate 20260910170000 shares the active request visibility predicate between
+the approval list and affected-account details. Temporary successors can inspect
+only selected pending requests; expired or revoked authority removes access.
+Handover tables also require an active session for direct authenticated reads.
+A bounded capability RPC drives the decision form; actual decision RPCs still
+recheck authority. This does not grant permanent module actions or page access.
+
+Fresh isolated run: 290 SQL assertions across 15 suites, including 23 handover
+assertions, and eight Auth workflows passed. The new cases use authenticated RLS
+reads for request/details, revoked-session denial, expired-assignment denial and
+decision capabilities. Browser interaction is not yet verified. Permanent
+successor transfer and delegated appointment scope remain open.

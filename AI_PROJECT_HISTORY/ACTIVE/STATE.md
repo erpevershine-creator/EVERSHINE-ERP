@@ -1,5 +1,14 @@
 # Current implementation and evidence
 
+## Temporary handover visibility — latest continuation
+
+Candidate 20260910170000 connects parent-request/affected-account RLS visibility
+and adds bounded per-request decision capabilities for the approval UI. Direct
+handover table reads require an admitted active session. Fresh isolated tests
+pass 290 SQL assertions and eight Auth workflows. Browser acceptance, permanent
+successor transfer and delegated appointment scope remain open; no candidate
+migration was applied to the Owner database.
+
 ## Handover security re-review — latest candidate
 
 F2 remains OPEN. Earlier PASS language was premature: D09 permanent successor

@@ -49,6 +49,7 @@ export type ActionPermission = {
   allowed: boolean;
 };
 export type Request = {
+  can_decide?: boolean;
   id: number;
   requester_id: string;
   request_type: string;
@@ -779,15 +780,7 @@ export function LiveApprovals({
             )}
           {complete &&
             selected.status === "pending" &&
-            can(
-              access,
-              selected.request_type === "device_login"
-                ? "Account Management"
-                : "Positions & Permissions",
-              selected.request_type === "device_login"
-                ? "approve_device"
-                : "approve",
-            ) &&
+            selected.can_decide === true &&
             (selected.requester_id !== access.id ||
               access.role === "owner") && (
               <ActionForm run={decideRequest} label="Record decision">

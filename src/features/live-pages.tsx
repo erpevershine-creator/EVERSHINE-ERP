@@ -252,9 +252,17 @@ export async function LivePage({
     ]);
     if (rs.error || ps.error)
       throw new Error("Approval requests could not be loaded.");
+    const capabilities = await db.rpc("request_decision_capabilities", {
+      p_requests: rs.data.map((request) => request.id),
+    });
+    if (capabilities.error) throw new Error("Approval authority could not be verified.");
+    const decisionIds = new Set(
+      (capabilities.data as { request_id: number; can_decide: boolean }[])
+        .filter((row) => row.can_decide).map((row) => row.request_id),
+    );
     return (
       <LiveApprovals
-        requests={rs.data}
+        requests={rs.data.map((request) => ({ ...request, can_decide: decisionIds.has(request.id) }))}
         pages={ps.data}
         access={access}
         serverPagination={pagination(section, page, rs.count ?? rs.data.length)}
