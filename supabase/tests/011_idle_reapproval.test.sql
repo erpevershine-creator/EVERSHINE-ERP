@@ -23,7 +23,7 @@ select public.decide_device_login(request_id,true,'Reapprove after seven-day idl
 select is((select status from public.approval_requests where id=(select request_id from ir)),'approved','idle approval is recorded');
 select ok((select not requires_login_approval from public.profiles where id=owner_id),'approval clears login fence') from ir;
 select ok((select status='active' from public.device_sessions where id=ir.new_session),'approved session is admitted') from ir;
-select is((select count(*) from public.device_sessions where profile_id=owner_id and status='active'),1::bigint,'idle replacement stays within two-device limit') from ir;
+select is((select count(*) from public.device_sessions where profile_id=owner_id and status='active'),2::bigint,'idle replacement preserves a healthy device and stays within two-device limit') from ir;
 select ok(exists(select 1 from public.audit_events where action='Device sign-in approved' and approval_request_id=(select request_id from ir)),'idle decision is audited');
 select ok(exists(select 1 from public.notifications where approval_request_id=(select request_id from ir)),'idle requester is notified');
 select * from finish();

@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { randomBytes } from "node:crypto";
 
 export type LoginState = {
   status: "idle" | "error" | "pending" | "success";
@@ -38,6 +40,9 @@ export async function login(
         : "Too many login attempts. Please try again later.",
     };
   const supabase = await createClient();
+  const cookieStore = await cookies();
+  let deviceToken = cookieStore.get("erp_device_token")?.value;
+  if (!deviceToken) deviceToken = randomBytes(32).toString("base64url");
   const { data, error } = await supabase.auth.signInWithPassword({
     email: username,
     password,
@@ -67,6 +72,7 @@ export async function login(
     p_ticket: reservation.data,
     p_outcome: "success",
     p_session: typeof sessionId === "string" ? sessionId : null,
+    p_device_token: deviceToken,
   });
   if (attempt.error || !["admitted", "pending"].includes(attempt.data)) {
     await supabase.auth.signOut({ scope: "local" });
@@ -76,12 +82,14 @@ export async function login(
     };
   }
   if (attempt.data === "pending") {
+    cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
     return {
       status: "pending",
       message:
         "Sign-in approval is pending. This session stays protected while an authorized approver reviews it.",
     };
   }
+  cookieStore.set("erp_device_token", deviceToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
   const { data: access, error: accessError } = await supabase.rpc("my_access");
   if (accessError || !access) {
     await supabase.auth.signOut({ scope: "local" });
