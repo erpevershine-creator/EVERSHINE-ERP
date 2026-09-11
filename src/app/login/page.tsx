@@ -10,13 +10,50 @@ export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
   const admin = createAdminClient();
-  const { data: owner, error: ownerError } = await admin
-    .from("profiles")
-    .select("id")
-    .eq("erp_role", "owner")
-    .neq("status", "inactive")
-    .maybeSingle();
-  if (ownerError) throw new Error("Owner setup status could not be verified.");
+  let owner = null;
+  let ownerError: { message: string } | null = null;
+
+  try {
+    const res = await admin
+      .from("profiles")
+      .select("id")
+      .eq("erp_role", "owner")
+      .neq("status", "inactive")
+      .maybeSingle();
+    owner = res.data;
+    if (res.error) {
+      ownerError = { message: res.error.message };
+    }
+  } catch (err: unknown) {
+    ownerError = {
+      message: err instanceof Error ? err.message : "Database connection unavailable",
+    };
+  }
+
+  if (ownerError) {
+    return (
+      <main className="login-layout">
+        <div className="login-brand">
+          <span className="brand-mark">E</span>
+          <div>
+            EVERSHINE<span>Enterprise resource planning</span>
+          </div>
+        </div>
+        <section className="login-card" style={{ textAlign: "center", gap: "1rem" }}>
+          <LockKeyhole size={28} className="muted" />
+          <h1>Connecting to Database</h1>
+          <p className="muted">Local Supabase database is starting or not responding.</p>
+          <div className="error-banner" style={{ textAlign: "left", fontSize: "0.85rem" }}>
+            {ownerError.message}
+          </div>
+          <a href="/login" className="btn primary" style={{ alignSelf: "center", textDecoration: "none" }}>
+            Retry Connection
+          </a>
+        </section>
+      </main>
+    );
+  }
+
   if (!owner) redirect("/setup/owner");
 
   const access = await getAccess();
