@@ -31,6 +31,7 @@ const modules: Module[] = [
   "Account Management",
   "Positions & Permissions",
   "Settings",
+  "Supplier Onboarding",
 ];
 export function Approvals() {
   const { state, actor } = useReview();

@@ -6,6 +6,7 @@ import { Approvals } from "@/features/approvals";
 import { Accounts, Permissions } from "@/features/administration";
 import { Audit, Notifications } from "@/features/history-notifications";
 import { Settings, Backups, Usage } from "@/features/settings";
+import { Suppliers } from "@/features/suppliers";
 const pages = {
   dashboard: Dashboard,
   approvals: Approvals,
@@ -16,6 +17,7 @@ const pages = {
   settings: Settings,
   backups: Backups,
   usage: Usage,
+  suppliers: Suppliers,
 };
 const titles: Record<string, string> = {
   dashboard: "Workspace",
@@ -27,6 +29,7 @@ const titles: Record<string, string> = {
   settings: "Settings",
   backups: "Backup & Restore",
   usage: "Usage Monitor",
+  suppliers: "Suppliers & Commercials",
 };
 export async function generateMetadata({
   params,

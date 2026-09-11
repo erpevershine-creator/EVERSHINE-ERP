@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Truck,
 } from "lucide-react";
 import { ThemeControl } from "./theme";
 import { logout } from "@/app/login/actions";
@@ -25,6 +26,12 @@ export const navigation = [
     path: "dashboard",
     label: "Workspace",
     icon: LayoutDashboard,
+    group: "WORKSPACE",
+  },
+  {
+    path: "suppliers",
+    label: "Suppliers & Commercials",
+    icon: Truck,
     group: "WORKSPACE",
   },
   {

@@ -25,7 +25,8 @@ export type PreviewRole = "Owner" | "Admin" | "Employee";
 export type Module =
   | "Account Management"
   | "Positions & Permissions"
-  | "Settings";
+  | "Settings"
+  | "Supplier Onboarding";
 export type PreviewActor = {
   id: string;
   name: string;
@@ -38,7 +39,7 @@ export const actors: PreviewActor[] = [
     id: "owner",
     name: "Owner (sample)",
     role: "Owner",
-    approvals: ["Account Management", "Positions & Permissions", "Settings"],
+    approvals: ["Account Management", "Positions & Permissions", "Settings", "Supplier Onboarding"],
   },
   {
     id: "admin",
