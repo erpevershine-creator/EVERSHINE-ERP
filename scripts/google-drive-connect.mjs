@@ -9,7 +9,7 @@ import {
   validateCallback,
   exchangeCode,
   checkConnection,
-  backupGoogleAccount,
+  googleTarget,
 } from "./google-drive-oauth.mjs";
 import { readGoogleSecret, writeGoogleSecret } from "./google-secret-store.mjs";
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -43,10 +43,14 @@ async function main() {
     return;
   }
   const client = await readGoogleSecret("client");
+  const purpose = process.argv[3] ?? "backup";
+  const target = googleTarget(purpose);
   if (mode === "status") {
     const identity = await checkConnection(
       client,
-      await readGoogleSecret("connection"),
+      await readGoogleSecret(target.secret),
+      fetch,
+      purpose,
     );
     console.log(JSON.stringify({ connected: true, email: identity.email }));
     return;
@@ -54,7 +58,7 @@ async function main() {
   if (mode !== "connect") throw Error("USE_IMPORT_CONNECT_OR_STATUS");
   const authorizationFile = path.join(
     root,
-    ".runtime/google-drive-authorization.json",
+    ".runtime/" + target.authorizationFile,
   );
   const server = http.createServer();
   let authorization,
@@ -64,7 +68,7 @@ async function main() {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
-  authorization = makeAuthorization(client, server.address().port);
+  authorization = makeAuthorization(client, server.address().port, purpose);
   try {
     const completion = new Promise((resolve, reject) => {
       timer = setTimeout(
@@ -99,9 +103,9 @@ async function main() {
         clearTimeout(timer); // A valid callback arrived within the authorization window.
         try {
           const connection = await exchangeCode(client, authorization, code);
-          await writeGoogleSecret("connection", connection);
+          await writeGoogleSecret(target.secret, connection);
           res.end(
-            "Google Drive account connected for EVERSHINE ERP. Backup uploads are not enabled yet. You may close this tab.",
+            `Google Drive ${purpose} account connected for EVERSHINE ERP. No backup or key uploads are enabled yet. You may close this tab.`,
             () => resolve(connection.email),
           );
         } catch (e) {
@@ -118,12 +122,12 @@ async function main() {
       authorizationFile,
       JSON.stringify({
         url: authorization.url,
-        email: backupGoogleAccount,
+        email: target.email,
         expires_at: new Date(Date.now() + 5 * 60000).toISOString(),
       }),
     );
     console.log(
-      "Google authorization ready. Open .runtime/google-drive-authorization.json URL in the system browser. Expires in five minutes.",
+      `Google ${purpose} authorization ready. Open .runtime/${target.authorizationFile} URL in the system browser. Expires in five minutes.`,
     );
     console.log(JSON.stringify({ connected: true, email: await completion }));
   } finally {

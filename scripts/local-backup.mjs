@@ -1,4 +1,5 @@
 import { maintainBackupRetention } from "./prune-backups.mjs";
+import { publish as publishOffsite } from "./offsite-backup.mjs";
 import { backupRelativePath } from "./backup-folder.mjs";
 import { acquireBackupLock } from "./backup-lock.mjs";
 import fs from "node:fs";
@@ -511,6 +512,21 @@ async function main() {
     await query(
       `begin; update public.local_backup_runs set status='verified',stage='${stage}',finished_at=now(),archive_bytes=${bytes},table_count=${tables.length},storage_files=${manifest.storageFiles},manifest_sha256='${digest}' where id='${id}' and status='running'; insert into public.audit_events(actor_id,actor_name,action,entity_type,entity_id,reason,after_data) select p.id,coalesce(p.employee_name,'Local backup scheduler'),'Local backup restore verified','local_backup',b.id::text,b.reason,jsonb_build_object('backup_id',b.id,'tables',b.table_count,'storage_files',b.storage_files,'manifest_sha256',b.manifest_sha256) from public.local_backup_runs b left join public.profiles p on p.id=b.requester_id where b.id='${id}' and b.status='verified'; commit;`,
     );
+    let offsite = "pending";
+    try {
+      await publishOffsite(id);
+      offsite = "verified";
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          id,
+          status: "offsite-pending",
+          code: /^[A-Z_]+$/.test(error.message)
+            ? error.message
+            : "OFFSITE_BACKUP_FAILED",
+        }),
+      );
+    }
     await maintainBackupRetention({
       root,
       query,
@@ -526,6 +542,7 @@ async function main() {
         tables: tables.length,
         storageFiles: manifest.storageFiles,
         bytes,
+        offsite,
       }),
     );
   } catch (e) {

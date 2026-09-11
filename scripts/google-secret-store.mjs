@@ -47,7 +47,16 @@ export async function secretCodec(operation, input) {
   });
 }
 function filename(name) {
-  if (!["client", "connection"].includes(name) || !process.env.LOCALAPPDATA)
+  if (
+    ![
+      "client",
+      "connection",
+      "recovery-connection",
+      "destination",
+      "recovery-destination",
+    ].includes(name) ||
+    !process.env.LOCALAPPDATA
+  )
     throw Error("GOOGLE_SECRET_STORE_FAILED");
   return path.join(
     process.env.LOCALAPPDATA,
