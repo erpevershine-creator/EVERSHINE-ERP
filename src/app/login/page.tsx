@@ -46,9 +46,9 @@ export default async function LoginPage() {
           <div className="error-banner" style={{ textAlign: "left", fontSize: "0.85rem" }}>
             {ownerError.message}
           </div>
-          <a href="/login" className="btn primary" style={{ alignSelf: "center", textDecoration: "none" }}>
+          <Link href="/login" className="btn primary" style={{ alignSelf: "center", textDecoration: "none" }}>
             Retry Connection
-          </a>
+          </Link>
         </section>
       </main>
     );

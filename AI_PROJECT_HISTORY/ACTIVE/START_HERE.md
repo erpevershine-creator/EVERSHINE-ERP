@@ -16,3 +16,9 @@ The existing live local slice covers accounts, permission templates/individual g
 D141–D143 preserve the approved new Google identities and prior split-key offsite integrity proof. Use docs/OFFSITE-BACKUP-SETUP.md for account/destination binding and pending no-profile restore/remote retention/Telegram gates. Main account re-verification was deferred; do not repeat consent from a stale browser URL. Never request secrets in chat.
 
 Supplier contract decisions are preserved in docs/SUPPLIER-CONTRACT.md, including one onboarding approval and Deposit <= Sub Total. None of that constitutes implemented business behavior.
+
+## F0 Owner acceptance — 2026-09-14
+Owner explicitly accepted the presented F0 baseline review package with “လက်ခံအတည်ပြုပါတယ်။”. F0-20260914 is COMPLETE / OWNER ACCEPTED. See docs/FOUNDATION-F0-ACCEPTANCE-20260914.md. This accepts F0 only; F1–F6 and Production remain unaccepted. The frozen manifest remains unchanged; these acceptance documentation edits postdate its capture. No runtime or database changes accompany this record.
+
+## Supplier execution authorization — 2026-09-14
+Owner requested the Supplier completion audit, confirmed no-adjustment packages and explicitly instructed completion of Supplier before Product. That newer instruction authorizes local Supplier implementation despite the earlier Supplier pause. See D156 and docs/SUPPLIER-COMPLETION-AUDIT-20260914.md. Foundation acceptance remains separate.

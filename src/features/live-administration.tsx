@@ -13,6 +13,7 @@ import {
 } from "@/app/live/actions";
 import { erpRoles, roleLabel, permissionLabel } from "@/lib/erp-roles";
 import { IndividualPermissions } from "./individual-permissions";
+import { SupplierApproval } from "./supplier-approval";
 import type { Access } from "@/lib/access";
 
 export type Profile = {
@@ -448,6 +449,8 @@ export function LivePermissions({
   );
 }
 const actionChoices = [
+  "submit",
+  "import",
   "view",
   "create",
   "edit",
@@ -625,6 +628,7 @@ export function LiveApprovals({
   const complete = Boolean(snapshot?.rows);
   async function openRequest(requestId: number) {
     setId(requestId);
+    if(requests.find(r=>r.id===requestId)?.request_type==="supplier_package") return;
     try {
       const rows = await getAffectedAccounts(requestId);
       setSnapshots((previous) => ({ ...previous, [requestId]: { rows } }));
@@ -647,7 +651,7 @@ export function LiveApprovals({
           void openRequest(Number(r.id));
         }}
         columns={[
-          { key: "id", label: "Request", value: (r) => `PERM-${r.id}` },
+          { key: "id", label: "Request", value: (r) => `${r.request_type==="supplier_package" ? "SUP" : "PERM"}-${r.id}` },
           { key: "reason", label: "Reason", value: (r) => r.reason },
           {
             key: "status",
@@ -657,7 +661,8 @@ export function LiveApprovals({
           },
         ]}
       />
-      {selected && (
+      {selected?.request_type==="supplier_package" && <SupplierApproval request={selected} access={access} onClose={()=>setId(null)}/>}
+      {selected && selected.request_type!=="supplier_package" && (
         <Modal
           title={`Permission request ${selected.id}`}
           onClose={() => setId(null)}

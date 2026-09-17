@@ -93,3 +93,9 @@ These are design references, not authority to copy code, data, credentials, lega
 ## Delivery gates
 
 The Owner requested foundation baseline freeze, identity/security closure and backup/DR acceptance before live business entry. Track these independently from Supplier requirements. Existing local/offsite integrity proof does not close full recovery acceptance. Preserve Owner data. No Supplier schema, UI or runtime validation was implemented by this documentation update.
+
+## 2026-09-14 — No-adjustment agreement confirmed
+Owner confirms zero Financial Titles and zero formula steps are a complete no-adjustment agreement/formula: Total = Sub Total. Deposit remains an actual per-Purchase amount after Sub Total, bounded by Sub Total. CNY — Chinese Yuan and INR — Indian Rupee are requested alongside existing currencies. Supplier completion is explicitly authorized locally; outstanding business decisions remain to be resolved one at a time.
+
+## 2026-09-14 — City code correction and execution authority
+Latest Owner instruction supersedes country-based numbering: use City numbering, Yangon = SUP-YGN-00001. City is the sequence and duplicate-name scope. Keep Country as structured address data. No existing generated code may be edited/reused. Whole Supplier + Agreement + Formula packages are submitted and reviewed together; current Active package remains effective until a new package is approved. Owner requests isolated SQL/concurrency and browser workflow evidence before completion.

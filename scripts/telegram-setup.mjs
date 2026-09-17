@@ -1,0 +1,3 @@
+import readline from 'node:readline'; import {writeTelegramToken,readTelegramToken} from './telegram-secret-store.mjs';
+const rl=readline.createInterface({input:process.stdin,output:process.stdout}); const ask=q=>new Promise(r=>rl.question(q,r));
+const token=(await ask('Paste Telegram bot token locally (not sent to chat): ')).trim(); rl.close(); await writeTelegramToken(token); const t=await readTelegramToken(); const res=await fetch(`https://api.telegram.org/bot${t}/getMe`); const j=await res.json(); if(!j.ok)throw new Error('Telegram getMe failed'); console.log(`Stored protected token for @${j.result.username}`);

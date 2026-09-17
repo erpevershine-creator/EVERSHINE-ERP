@@ -87,6 +87,7 @@ export function Shell({
   const [collapsed, setCollapsed] = useState(false);
   const canView = (page: string) => Boolean(allowedPages[page]);
   const live = [
+    "suppliers",
     "accounts",
     "permissions",
     "approvals",

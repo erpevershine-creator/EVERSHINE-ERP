@@ -1,3 +1,107 @@
+.version-row > strong {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* Supplier Module Custom ERP Styling */
+.supplier-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.supplier-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.supplier-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.supplier-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+.supplier-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+.supplier-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+@media (max-width: 768px) {
+  .supplier-grid-2,
+  .supplier-grid-3,
+  .supplier-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+.supplier-item-card {
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sample-calc-box {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.sample-calc-result-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .sidebar,
+  .topbar,
+  .page-heading button,
+  .table-toolbar,
+  .table-footer,
+  dialog,
+  .row-action,
+  th:last-child,
+  td:last-child {
+    display: none !important;
+  }
+  .table-panel,
+  .table-scroll {
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+  }
+  table {
+    width: 100%;
+  }
+  @page {
+    margin: 12mm;
+  }
+}
 :root {
   color-scheme: light;
   --bg: #f5f6f8;
@@ -2103,4 +2207,75 @@ tbody tr:hover {
   gap: 16px;
   padding: 16px;
   border-bottom: 1px solid var(--border);
+}
+
+/* Shared create/edit supplier dialog. Keep scrolling within the fields. */
+.modal:has(.supplier-form) {
+  width: 960px;
+  overflow: hidden;
+}
+.modal:has(.supplier-form) .modal-body { padding: 0; }
+.supplier-form {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 116px);
+}
+.supplier-form-content {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.supplier-form-intro {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.supplier-form .supplier-section {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 6px;
+}
+.supplier-form .supplier-section-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+.supplier-form [class*="supplier-grid-"] > div { min-width: 0; }
+.supplier-form [class*="supplier-grid-"] input,
+.supplier-form [class*="supplier-grid-"] select {
+  width: 100%;
+  min-height: 38px;
+  font-size: 13px;
+}
+.supplier-form label { margin-bottom: 6px; line-height: 1.6; }
+.supplier-profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.supplier-profile-grid > div:first-child { grid-column: 1 / -1; }
+.supplier-address-line { grid-column: span 2; }
+.supplier-form-actions {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+.supplier-form-actions > button:first-child { margin-right: auto; }
+.supplier-reason { padding: 10px 22px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.supplier-reason textarea { min-height: 48px; max-height: 96px; }
+.supplier-form .sample-calc-result-grid strong { overflow-wrap: anywhere; }
+@media (max-width: 768px) {
+  .supplier-form-content { padding: 14px; }
+  .supplier-form .supplier-section { padding: 14px; }
+  .supplier-form .supplier-profile-grid { grid-template-columns: 1fr; }
+  .supplier-address-line { grid-column: auto; }
+  .supplier-form .sample-calc-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .supplier-form-actions { padding: 12px 14px; }
+  .supplier-form-actions > button { flex: 1 1 auto; }
 }

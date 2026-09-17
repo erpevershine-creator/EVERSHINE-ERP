@@ -1,0 +1,6 @@
+import fs from 'node:fs/promises'; import path from 'node:path'; import {spawn} from 'node:child_process'; import {fileURLToPath} from 'node:url';
+const root=process.env.LOCALAPPDATA||process.env.TEMP; const dir=path.join(root,'EVERSHINE-ERP'); const file=path.join(dir,'telegram-bot.dpapi');
+function codec(op,input){return new Promise((resolve,reject)=>{const p=spawn('powershell.exe',['-NoProfile','-NonInteractive','-File',fileURLToPath(new URL('./telegram-secret-codec.ps1',import.meta.url)),op],{windowsHide:true});const a=[];p.stdout.on('data',x=>a.push(x));p.stderr.resume();p.on('close',c=>c?reject(new Error('secret protection failed')):resolve(Buffer.from(Buffer.concat(a).toString().trim(),'base64')));p.stdin.end(input.toString('base64'));});}
+export async function writeTelegramToken(token){if(!/^\d{6,}:[A-Za-z0-9_-]{20,}$/.test(token))throw new Error('Invalid Telegram bot token');await fs.mkdir(dir,{recursive:true});const tmp=file+'.tmp';await fs.writeFile(tmp,await codec('Protect',Buffer.from(token,'utf8')),{flag:'wx'});await fs.rename(tmp,file);}
+export async function readTelegramToken(){return (await codec('Unprotect',await fs.readFile(file))).toString('utf8');}
+export {file as telegramSecretFile};

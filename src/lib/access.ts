@@ -13,6 +13,11 @@ export type Access = {
 };
 export const getAccess = cache(async (): Promise<Access | null> => {
   const db = await createClient();
+  const {
+    data: { user },
+  } = await db.auth.getUser();
+  if (!user) return null;
+
   const { data, error } = await db.rpc("my_access");
   if (error)
     throw new Error("Account access could not be verified. Please retry.");

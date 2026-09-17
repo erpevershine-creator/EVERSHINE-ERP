@@ -1,0 +1,5 @@
+import fs from 'node:fs/promises'; import path from 'node:path'; import {readTelegramToken} from './telegram-secret-store.mjs';
+const root=process.env.LOCALAPPDATA; const dir=path.join(root,'EVERSHINE-ERP'); const file=path.join(dir,'telegram-channel.json'); const chatId='-1004383383153';
+const token=await readTelegramToken(); const text=`EVERSHINE ERP Backup delivery verification — ${new Date().toISOString()}`;
+const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({chat_id:chatId,text})}); const j=await r.json(); if(!j.ok)throw new Error('Telegram delivery failed');
+await fs.mkdir(dir,{recursive:true}); await fs.writeFile(file,JSON.stringify({chatId,title:'EVERSHINE ERP Backup & Reports',botUsername:'EVERSHINEERP_bot',lastVerifiedMessageId:j.result.message_id,verifiedAt:new Date().toISOString()},null,2),{mode:0o600}); console.log(JSON.stringify({chatId,messageId:j.result.message_id,delivered:true},null,2));

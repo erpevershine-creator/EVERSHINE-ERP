@@ -19,6 +19,10 @@
     "supabase:status": "supabase status",
     "supabase:reset": "node scripts/local-supabase.mjs reset",
     "supabase:env": "node scripts/sync-local-supabase-env.mjs",
+    "supplier:browser:prepare": "node scripts/supplier-browser-stack.mjs start",
+    "supplier:browser:reset": "node scripts/supplier-browser-stack.mjs reset",
+    "supplier:browser:server": "node scripts/supplier-browser-server.mjs",
+    "supplier:browser:check": "node scripts/supplier-browser-check.mjs",
     "db:test": "supabase test db --local --network-id evershine-local-loopback",
     "db:lint": "supabase db lint --local --level warning"
   },

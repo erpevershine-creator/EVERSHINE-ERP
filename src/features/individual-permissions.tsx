@@ -18,6 +18,8 @@ export type IndividualAccess = {
   extraActions: Record<string, string[]>;
 };
 const actions = [
+  "submit",
+  "import",
   "view",
   "create",
   "edit",

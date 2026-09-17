@@ -108,3 +108,14 @@ Owner deferred Main Backup OAuth re-verification until the next day and asked to
 ## Supplier contract and foundation gates — 2026-09-10
 
 Persisted D144–D154 and docs/SUPPLIER-CONTRACT.md from the Owner's conversation decisions. Latest clarification: user configures Financial Formula sequence by viewing and adjusting Sample Calculation; D153 confirms Deposit as the actual amount prepaid per Purchase; D154 rejects Deposit above Sub Total. Active Formula changes still require revision/approval. Requirements only: no Supplier runtime/schema/UI was implemented. docs/FOUNDATION-GATE-REVIEW.md records an open candidate checklist; no formal freeze, fresh test run, security closure or disaster-recovery acceptance occurred in this documentation update. Preserve existing Owner/data and all earlier runtime evidence.
+
+## F0 baseline review — 2026-09-14
+Current review: D:/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910/docs/FOUNDATION-F0-REVIEW-20260914.md. Fresh technical baseline passes: 39 unit tests, 400 SQL assertions, 11 isolated Auth workflows, typecheck/lint/build. Complete source manifest and preservation bundle recorded. Owner F0 acceptance remains pending; this does not close F1–F6 or authorize applying the candidate to main. This entry supersedes stale F0 runtime totals above only.
+
+## F0 Owner acceptance — 2026-09-14
+Owner explicitly accepted the presented F0 baseline review package with “လက်ခံအတည်ပြုပါတယ်။”. F0-20260914 is COMPLETE / OWNER ACCEPTED. See docs/FOUNDATION-F0-ACCEPTANCE-20260914.md. This accepts F0 only; F1–F6 and Production remain unaccepted. The frozen manifest remains unchanged; these acceptance documentation edits postdate its capture. No runtime or database changes accompany this record.
+
+## Supplier execution progress — 2026-09-14 (D156)
+Owner authorized Supplier completion and confirmed no-adjustment packages. Added CNY/INR currency definitions, removed invented default discount/step, migrated calculator to finite six-decimal fixed-point internals with final two-decimal rounding, added strict package validation and 9 focused tests. Added local migration 20260914051509_supplier_governed_packages.sql: country identity column/uniqueness, one contact/address constraints, composite formula-agreement ownership, RLS/grants/policies and no-adjustment validator. Migration applied to evershine-erp-m2-local without resetting volumes or Owner/Auth.
+
+Supplier is still NOT COMPLETE: durable server actions/read model, single-package approval RPC/activation, UI-to-live database wiring, full revision/history lifecycle and isolated SQL security tests remain. Product requirements discovery may continue; Product implementation should wait for stable Supplier package/version IDs.

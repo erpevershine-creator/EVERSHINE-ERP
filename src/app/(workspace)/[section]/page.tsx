@@ -7,6 +7,7 @@ import { Accounts, Permissions } from "@/features/administration";
 import { Audit, Notifications } from "@/features/history-notifications";
 import { Settings, Backups, Usage } from "@/features/settings";
 import { Suppliers } from "@/features/suppliers";
+import { getSuppliers } from "@/app/suppliers/actions";
 const pages = {
   dashboard: Dashboard,
   approvals: Approvals,
@@ -17,7 +18,7 @@ const pages = {
   settings: Settings,
   backups: Backups,
   usage: Usage,
-  suppliers: Suppliers,
+  suppliers: Dashboard,
 };
 const titles: Record<string, string> = {
   dashboard: "Workspace",
@@ -54,6 +55,7 @@ export default async function Section({
         <p>This page is outside your assigned permissions.</p>
       </section>
     );
+  if (section === "suppliers") return <Suppliers initialRecords={await getSuppliers()} access={access} />;
   if (
     [
       "accounts",

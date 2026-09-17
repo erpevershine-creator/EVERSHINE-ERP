@@ -16,16 +16,16 @@ test("normalizeLegalName removes special characters, whitespace and converts to 
 
 test("generateSupplierCode creates sequence per city correctly", () => {
   const ygn1 = generateSupplierCode("Yangon", []);
-  assert.equal(ygn1, "SUP-YANG-00001");
+  assert.equal(ygn1, "SUP-YGN-00001");
 
-  const ygn2 = generateSupplierCode("Yangon", ["SUP-YANG-00001", "SUP-YANG-00002"]);
-  assert.equal(ygn2, "SUP-YANG-00003");
+  const ygn2 = generateSupplierCode("Yangon", ["SUP-YGN-00001", "SUP-YGN-00002"]);
+  assert.equal(ygn2, "SUP-YGN-00003");
 
-  const mdy1 = generateSupplierCode("Mandalay", ["SUP-YANG-00001", "SUP-YANG-00002"]);
-  assert.equal(mdy1, "SUP-MAND-00001");
+  const mdy1 = generateSupplierCode("Mandalay", ["SUP-YGN-00001", "SUP-YGN-00002"]);
+  assert.equal(mdy1, "SUP-MDY-00001");
 
-  const mdy2 = generateSupplierCode("Mandalay", ["SUP-MAND-00005"]);
-  assert.equal(mdy2, "SUP-MAND-00006");
+  const mdy2 = generateSupplierCode("Mandalay", ["SUP-MDY-00005"]);
+  assert.equal(mdy2, "SUP-MDY-00006");
 });
 
 test("evaluateFinancialFormula computes steps with backward references and checks deposit bounds", () => {
@@ -142,4 +142,28 @@ test("validateSupplierPackage checks required fields across supplier, agreement 
   assert.equal(invalidRes.valid, false);
   assert.ok(invalidRes.errors.some((e) => e.includes("Contact Person phone is required")));
   assert.ok(invalidRes.errors.some((e) => e.includes("cannot exceed Sub Total")));
+});
+test("no-adjustment package computes Total = Sub Total and subtracts deposit", () => {
+  const result = evaluateFinancialFormula({basePrice:100,quantity:3,deposit:50,titles:[],steps:[]});
+  assert.equal(result.total,300);
+  assert.equal(result.subTotal,300);
+  assert.equal(result.grandTotal,250);
+});
+test("six-decimal internals survive until final rounding", () => {
+  const result = evaluateFinancialFormula({basePrice:0.014,quantity:1,deposit:0,titles:[{id:"t",name:"Fee",valueType:"amount",value:0.004}],steps:[{stepNumber:1,titleId:"t",basis:"total",operator:"+"}]});
+  assert.equal(result.total,0.014);
+  assert.equal(result.subTotal,0.02);
+  assert.equal(result.stepDetails[0].runningTotal,0.018);
+});
+test("nonfinite numbers and duplicate sequence identities are rejected", () => {
+  for (const bad of [NaN,Infinity,-Infinity]) assert.throws(()=>evaluateFinancialFormula({basePrice:bad,quantity:1,deposit:0,titles:[],steps:[]}));
+  assert.throws(()=>evaluateFinancialFormula({basePrice:100,quantity:1,deposit:0,titles:[{id:"t",name:"Fee",valueType:"amount",value:1}],steps:[{stepNumber:2,titleId:"t",basis:"total",operator:"+"}]}));
+});
+test("CNY and INR no-adjustment packages validate; mismatched currency names fail", () => {
+  for (const [currencyCode,currencyName] of [["CNY","Chinese Yuan"],["INR","Indian Rupee"]]) {
+    const input={city:"Yangon",legalName:"Supplier",contact:{name:"U Ba",phone:"0912345678"},address:{addressLine:"Main Road",cityTownship:"Hlaing",stateRegion:"Yangon",country:"Myanmar"},agreement:{currencyCode,currencyName,titles:[]},formula:{steps:[]},sampleBasePrice:100,sampleQuantity:1,sampleDeposit:0};
+    assert.equal(validateSupplierPackage(input).valid,true);
+    assert.equal(validateSupplierPackage({...input,agreement:{...input.agreement,currencyName:"Wrong"}}).valid,false);
+    assert.equal(validateSupplierPackage({...input,address:{...input.address,addressLine:" "}}).valid,false);
+  }
 });

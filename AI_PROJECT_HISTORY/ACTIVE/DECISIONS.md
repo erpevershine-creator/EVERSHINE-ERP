@@ -210,3 +210,12 @@ Phase sequence: foundation (Login, accounts, permissions, audit, approval, setti
 
 ## Historical conditional preference — resolved for login by D23
 Owner prefers company-assigned Gmail-address login plus ERP password IF free email notifications/automatic report sending meet needs; otherwise company-assigned @evershine.com-style identifier plus password. The identifier choice is now confirmed by D23; outbound provider/integration remains unconfirmed. Login identifiers, recipient emails, outbound sender and Google sign-in are separate concerns. Gmail password is never the ERP password. Daily delivery volume, schedule and recipient scope remain unknown; no email sending/integration is authorized by this requirements discussion.
+
+## F0 Owner acceptance — 2026-09-14
+Owner explicitly accepted the presented F0 baseline review package with “လက်ခံအတည်ပြုပါတယ်။”. F0-20260914 is COMPLETE / OWNER ACCEPTED. See docs/FOUNDATION-F0-ACCEPTANCE-20260914.md. This accepts F0 only; F1–F6 and Production remain unaccepted. The frozen manifest remains unchanged; these acceptance documentation edits postdate its capture. No runtime or database changes accompany this record.
+
+## D156 — Supplier completion authorized (2026-09-14)
+Owner authorizes continuing Supplier completion after the audit. A Supplier with no Discount, Tax or Fee may submit with zero Financial Titles and zero formula steps: Total = Sub Total; Grand Total = Sub Total - the actual per-Purchase Deposit. No fabricated zero-value title is required. Preserve Deposit <= Sub Total. Add CNY — Chinese Yuan and INR — Indian Rupee to supported Supplier currencies. This authorizes local Supplier implementation and isolated validation; it does not accept unverified Supplier behavior, F1–F6 or Production.
+
+## D157 — City identity and Supplier execution (2026-09-14)
+Owner corrects the prior country-based implementation: Supplier code is city-based, Yangon = SUP-YGN-00001, with an independent sequence per City. This supersedes D145/D156 country-based code allocation. Keep Country as address data. Owner explicitly requests UI/server-action persistence, one Supplier+Agreement+Formula approval, activation only after approval, immutable Active/revision/archive history, unauthorized/self-approval/replay/concurrency SQL tests and isolated browser/database Create → Submit → Approve → Active → Revise evidence. Whole-package revisions implement that explicitly requested single-package workflow; Owner self-approval exception remains preserved.
