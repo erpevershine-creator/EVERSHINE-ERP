@@ -1,5 +1,6 @@
 "use client";
 import { useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Search,
   Columns3,
@@ -22,6 +23,9 @@ export type ServerPagination = {
   total: number;
   previousHref?: string;
   nextHref?: string;
+  query?: string;
+  sort?: string;
+  descending?: boolean;
 };
 export function DataTable<T extends { id: string }>({
   rows,
@@ -47,10 +51,28 @@ export function DataTable<T extends { id: string }>({
   serverPagination?: ServerPagination;
 }) {
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState(initialSort ?? columns[0].key);
-  const [descending, setDescending] = useState(false);
+  const [sort, setSort] = useState(serverPagination?.sort ?? initialSort ?? columns[0].key);
+  const [descending, setDescending] = useState(serverPagination?.descending ?? false);
   const [hidden, setHidden] = useState<string[]>([]);
   const [page, setPage] = useState(0);
+  const router = useRouter();
+  const pathname = usePathname();
+  function updateServerQuery(next: { q?: string; sort?: string; dir?: string; page?: string }) {
+    if (!serverPagination) return;
+    const params = new URLSearchParams();
+    const current = new URLSearchParams(window.location.search);
+    current.forEach((value, key) => params.set(key, value));
+    params.delete("page");
+    if (next.q !== undefined) {
+      if (next.q) params.set("q", next.q);
+      else params.delete("q");
+    }
+    if (next.sort !== undefined) params.set("sort", next.sort);
+    if (next.dir !== undefined) params.set("dir", next.dir);
+    if (next.page !== undefined) params.set("page", next.page);
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+  const effectiveQuery = serverPagination?.query ?? query;
   const visible = columns.filter((c) => !hidden.includes(c.key));
   const matched = rows.filter((row) =>
     columns.some((c) =>
@@ -99,9 +121,11 @@ export function DataTable<T extends { id: string }>({
           <input
             aria-label={`Search ${name}`}
             placeholder="Search…"
-            value={query}
+            value={effectiveQuery}
             onChange={(e) => {
-              setQuery(e.target.value);
+              const value = e.target.value;
+              setQuery(value);
+              if (serverPagination) updateServerQuery({ q: value });
               setPage(0);
             }}
           />
@@ -114,7 +138,9 @@ export function DataTable<T extends { id: string }>({
             aria-label={`Sort ${name}`}
             value={sort}
             onChange={(e) => {
-              setSort(e.target.value);
+              const value = e.target.value;
+              setSort(value);
+              if (serverPagination) updateServerQuery({ sort: value });
               setPage(0);
             }}
           >
@@ -128,7 +154,11 @@ export function DataTable<T extends { id: string }>({
         <button
           title="Reverse sort order"
           aria-label="Reverse sort order"
-          onClick={() => setDescending(!descending)}
+          onClick={() => {
+            const value = !descending;
+            setDescending(value);
+            if (serverPagination) updateServerQuery({ dir: value ? "desc" : "asc" });
+          }}
         >
           {descending ? "↓" : "↑"}
         </button>

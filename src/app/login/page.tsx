@@ -5,6 +5,7 @@ import { LockKeyhole } from "lucide-react";
 import { ThemeControl } from "@/components/theme";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { LoginForm } from "./login-form";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +20,11 @@ export default async function LoginPage() {
   if (ownerError) throw new Error("Owner setup status could not be verified.");
   if (!owner) redirect("/setup/owner");
 
-  const access = await getAccess();
-  if (access) redirect("/dashboard");
+  // Do not call the authorization RPC for an anonymous browser. Its failure
+  // policy is intentionally strict; login must still render before a session exists.
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
+  if (user && await getAccess()) redirect("/dashboard");
 
   return (
     <main className="login-layout">

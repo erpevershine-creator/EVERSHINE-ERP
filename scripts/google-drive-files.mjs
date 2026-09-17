@@ -52,22 +52,45 @@ async function context({ client, connection, purpose }, fetcher) {
   return { token: refreshed.accessToken, identity: refreshed.identity };
 }
 
-async function listFiles(token, query, fetcher) {
+export async function listFiles(token, query, fetcher = fetch) {
   const url = new URL(`${driveApi}/files`);
   url.search = new URLSearchParams({
     q: query,
     spaces: "drive",
     pageSize: "100",
-    fields: "files(id,name,mimeType,size,md5Checksum,appProperties,parents,trashed)",
+    fields: "nextPageToken,incompleteSearch,files(id,name,mimeType,size,md5Checksum,appProperties,parents,trashed)",
   });
-  const response = await driveFetch(
-    url,
-    { headers: { Authorization: `Bearer ${token}` } },
-    fetcher,
-  );
-  const body = await responseJson(response);
-  if (!Array.isArray(body.files)) throw Error("INVALID_GOOGLE_RESPONSE");
-  return body.files;
+  const files=[],ids=new Set(),tokens=new Set();
+  for(let page=0;page<1000;page++) {
+    const response = await driveFetch(url,{headers:{Authorization:`Bearer ${token}`}},fetcher);
+    const body=await responseJson(response);
+    if(!Array.isArray(body.files)||body.incompleteSearch) throw Error("GOOGLE_DRIVE_LIST_INCOMPLETE");
+    for(const file of body.files) {
+      if(typeof file.id!=="string"||ids.has(file.id)) throw Error("GOOGLE_DRIVE_LIST_CHANGED");
+      ids.add(file.id);files.push(file);
+    }
+    if(!body.nextPageToken) return files;
+    if(typeof body.nextPageToken!=="string"||tokens.has(body.nextPageToken)) throw Error("GOOGLE_DRIVE_LIST_INCOMPLETE");
+    tokens.add(body.nextPageToken);url.searchParams.set("pageToken",body.nextPageToken);
+  }
+  throw Error("GOOGLE_DRIVE_LIST_INCOMPLETE");
+}
+
+export async function listDestinationFiles({client,connection,purpose,parentId},fetcher=fetch) {
+  const {token}=await context({client,connection,purpose},fetcher);
+  const parent=await getFile(token,parentId,fetcher);
+  if(parent.trashed||parent.mimeType!=="application/vnd.google-apps.folder"||parent.appProperties?.evershinePurpose!==purpose) throw Error("GOOGLE_DRIVE_DESTINATION_MISMATCH");
+  const files=await listFiles(token,`'${escapeQuery(parentId)}' in parents and trashed = false`,fetcher);
+  if(files.some(file=>!file.parents?.includes(parentId))) throw Error("GOOGLE_DRIVE_DESTINATION_MISMATCH");
+  return files;
+}
+
+export async function discoverDestination({client,connection,purpose},fetcher=fetch) {
+  const {token}=await context({client,connection,purpose},fetcher);
+  const role=purpose==="backup"?"backup-root":"recovery-root";
+  const found=await listFiles(token,`trashed = false and mimeType = 'application/vnd.google-apps.folder' and appProperties has { key='evershineRole' and value='${role}' }`,fetcher);
+  if(found.length!==1||found[0].appProperties?.evershinePurpose!==purpose) throw Error("GOOGLE_DRIVE_DESTINATION_MISMATCH");
+  return found[0];
 }
 
 async function getFile(token, id, fetcher) {

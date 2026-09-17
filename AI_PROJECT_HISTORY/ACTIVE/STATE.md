@@ -186,3 +186,6 @@ Owner deferred Main Backup OAuth re-verification until the next day and asked to
 ## Supplier contract and foundation gates — 2026-09-10
 
 Persisted D144–D154 and docs/SUPPLIER-CONTRACT.md from the Owner's conversation decisions. Latest clarification: user configures Financial Formula sequence by viewing and adjusting Sample Calculation; D153 confirms Deposit as the actual amount prepaid per Purchase; D154 rejects Deposit above Sub Total. Active Formula changes still require revision/approval. Requirements only: no Supplier runtime/schema/UI was implemented. docs/FOUNDATION-GATE-REVIEW.md records an open candidate checklist; no formal freeze, fresh test run, security closure or disaster-recovery acceptance occurred in this documentation update. Preserve existing Owner/data and all earlier runtime evidence.
+
+## F0 Owner acceptance — 2026-09-14
+Owner explicitly accepted the presented F0 baseline review package with “လက်ခံအတည်ပြုပါတယ်။”. F0-20260914 is COMPLETE / OWNER ACCEPTED. See docs/FOUNDATION-F0-ACCEPTANCE-20260914.md. This accepts F0 only; F1–F6 and Production remain unaccepted. The frozen manifest remains unchanged; these acceptance documentation edits postdate its capture. No runtime or database changes accompany this record.

@@ -1,0 +1,1167 @@
+{
+  "created": "2026-09-14T00:41:11.6167719Z",
+  "root": "D:\\EVERSHINE-ERP-WORKTREES\\foundation-gates-20260910",
+  "head": "bfa3c427dc780c595361deafbfdf55e37f614bbf",
+  "status": [
+    " M AI_PROJECT_HISTORY/ACTIVE/DECISIONS.md",
+    " M AI_PROJECT_HISTORY/ACTIVE/START_HERE.md",
+    " M docs/FOUNDATION-GATE-REVIEW.md",
+    " M package.json",
+    " M scripts/foundation-auth-check.mjs",
+    " M scripts/foundation-db-check.mjs",
+    " M scripts/google-drive-connect.mjs",
+    " M scripts/google-drive-files.mjs",
+    " M scripts/local-backup.mjs",
+    " M scripts/offsite-backup.mjs",
+    " M scripts/prune-backups.mjs",
+    " M src/app/api/profile-photo/[id]/route.ts",
+    " M src/app/live/actions.ts",
+    " M src/app/login/page.tsx",
+    " M src/components/table.tsx",
+    " M src/features/live-administration.tsx",
+    " M src/features/live-pages.tsx",
+    " M supabase/migrations/20260910210000_permanent_handover.sql",
+    " M supabase/tests/019_permanent_handover.test.sql",
+    " M tests/retention-files.test.mjs",
+    "?? docs/FOUNDATION-CONTINUATION-20260913.md",
+    "?? docs/FOUNDATION-CONTINUATION-20260914.md",
+    "?? docs/FOUNDATION-LINUX-ACCEPTANCE-20260913.md",
+    "?? scripts/foundation-browser-check.mjs",
+    "?? scripts/foundation-browser-server.mjs",
+    "?? scripts/foundation-linux-check.mjs",
+    "?? scripts/foundation-remote-recovery-check.mjs",
+    "?? scripts/offsite-recovery.mjs",
+    "?? scripts/offsite-retry.mjs",
+    "?? scripts/offsite-share-plan.mjs",
+    "?? scripts/recovery-bundle-check.mjs",
+    "?? scripts/remote-retention-review.mjs",
+    "?? src/features/permanent-handover.tsx",
+    "?? supabase/migrations/20260913040325_governed_profile_changes.sql",
+    "?? supabase/migrations/20260913084041_permanent_handover_security.sql",
+    "?? supabase/tests/020_profile_changes.test.sql",
+    "?? supabase/tests/021_permanent_handover_security.test.sql",
+    "?? tests/google-drive-files.test.mjs",
+    "?? tests/offsite-retry.test.mjs",
+    "?? tests/offsite-share-plan.test.mjs",
+    "?? tests/recovery-bundle.test.mjs"
+  ],
+  "node": "v26.1.0",
+  "npm": "11.13.0",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "03e72630921241c23f4438f36dd5b379e42d69dc740d001a668cdec30ed2ea42",
+      "bytes": 300
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "36500da4ddb7eb7f1fc185ca3ae641bf765913506815a55d518298f807e54705",
+      "bytes": 59
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "3379df63a5571d9b17059bad54295d79f14888ad483b7a77e5873a8f9f9b5f36",
+      "bytes": 131
+    },
+    {
+      "path": ".node-version",
+      "sha256": "68ca3fba3b7e864770cb61aeb306d4bd4354b68ab4dd38450860c5d823e42a53",
+      "bytes": 3
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "a5c98aac429db63fc3beab4fd0726453cd2d73a7bfd1abf24ef4183c88465896",
+      "bytes": 1489
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/ACTIVE/DECISIONS.md",
+      "sha256": "8cc4c04271ff16863737785857787fb930dde34054c971ff86d81df72eac66aa",
+      "bytes": 42128
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/ACTIVE/OPEN_ITEMS.md",
+      "sha256": "5da7a95c856990e4e58d52f72874d5b6de67945a24cdf485400cf1694ae2cc36",
+      "bytes": 6092
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/ACTIVE/START_HERE.md",
+      "sha256": "855302ff3f7cf2ce69f08c310d22ff8bc6571d8faceb04576c7d5aedd5dd56cf",
+      "bytes": 2909
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/ACTIVE/STATE.md",
+      "sha256": "f9404c1056e382d37531ddc0be0c9d2928ad43f1aaa406c8c4741701a8dc4793",
+      "bytes": 33425
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-OPEN_ITEMS.md",
+      "sha256": "8ed37717854834a6b0ab2b91424628c14c7a73497f650ff23ee10c54c66e4f07",
+      "bytes": 2668
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-START_HERE.md",
+      "sha256": "fc370cbeefd27116e1d7632fbd9c018271db9799a0aeefe020c1450e6e1d10cf",
+      "bytes": 2416
+    },
+    {
+      "path": "AI_PROJECT_HISTORY/legacy-snapshot-20260908/pre-m22-STATE.md",
+      "sha256": "3358d3115abbaa74915d4c144402cc31032aa77efcd01523dceb854c5b55cfa0",
+      "bytes": 13260
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "e3deb89008c5bfc7399efbaf4944dde15194bd1878da4f3e05f8eafcdc5ade16",
+      "bytes": 3635
+    },
+    {
+      "path": "docs/BUSINESS-PHASE-START.md",
+      "sha256": "c57b4a17c83f64cb1e53644af0c3f27f0e3db393896bfd67b8b8eeba1edd0d3c",
+      "bytes": 2701
+    },
+    {
+      "path": "docs/ERP-ROLES.md",
+      "sha256": "d37781c0eac93c4cf31c178e52565d54d12b2ae6740dacc01ee6f18c568d8207",
+      "bytes": 4035
+    },
+    {
+      "path": "docs/evidence/account-form-desktop.png",
+      "sha256": "2e741e986517299888f497e5b1109064edf974cf95b475c8e6a0d6a6ce6569d9",
+      "bytes": 150665
+    },
+    {
+      "path": "docs/evidence/account-form-mobile-end.png",
+      "sha256": "28e01d23ed12eae5d1291086381963600d6345737589a72e8f5f574085ca91a9",
+      "bytes": 27331
+    },
+    {
+      "path": "docs/evidence/account-form-mobile.png",
+      "sha256": "af4175b3e9ca20141dc042f889205e8e585a55d89fa00b5433387ea9b2852fcc",
+      "bytes": 28435
+    },
+    {
+      "path": "docs/evidence/approval-deadlines-20260910.json",
+      "sha256": "178d0077c7d0e374ee93d1ba989463c61faae0784eca74fdde233203891532d6",
+      "bytes": 10091
+    },
+    {
+      "path": "docs/evidence/approval-detail.png",
+      "sha256": "0c54f3ca295097375649f6592f2d4cef697cdabef02ff19e0283d8ba3e32381b",
+      "bytes": 127926
+    },
+    {
+      "path": "docs/evidence/device-heartbeat-20260910.json",
+      "sha256": "58de2b900de4f00de68ff36ab775457b2cbc78b08b48bb3ebbed273332b3cede",
+      "bytes": 7902
+    },
+    {
+      "path": "docs/evidence/foundation-db-check.json",
+      "sha256": "6dea794ea4a5b563e531f8f3efbba28f2f0d1877a5771b57e77bf27b99750dac",
+      "bytes": 10536
+    },
+    {
+      "path": "docs/evidence/foundation-device-approval-20260910.json",
+      "sha256": "bfecba12aaa27b3b8707b435f48ff8f2fa4b9aa1cd3af2ee437165dc5f180de6",
+      "bytes": 7502
+    },
+    {
+      "path": "docs/evidence/handover-20260910.json",
+      "sha256": "de77b67893b1e1f9d2beef7163f71d1a501ef158f40d7fa7dea0c2ae0bf0f231",
+      "bytes": 8482
+    },
+    {
+      "path": "docs/evidence/mobile-approvals.png",
+      "sha256": "25dcd26c95cb985520b0c1bc9903f1e1d1e3c2bbe64f5b5ce0edf65ef83ebcd9",
+      "bytes": 37331
+    },
+    {
+      "path": "docs/evidence/page-visibility-desktop.png",
+      "sha256": "ee6c3ae4450b8ce82d1b80bb31622c348156fde2560351951b2e6b089f580e19",
+      "bytes": 99458
+    },
+    {
+      "path": "docs/evidence/password-expiry-reminders-20260910.json",
+      "sha256": "d79c0c0c6fea980c0ebd1bc82b73b1bbad2f5b6d94d0e96eee65ce69f4474499",
+      "bytes": 9666
+    },
+    {
+      "path": "docs/evidence/password-recovery-20260910.json",
+      "sha256": "4901141cb3f2beb52918277f569fed6cbe347d774bd5e22f7bc2034131b7f5d2",
+      "bytes": 7316
+    },
+    {
+      "path": "docs/evidence/permission-request-revision-20260910.json",
+      "sha256": "6dea794ea4a5b563e531f8f3efbba28f2f0d1877a5771b57e77bf27b99750dac",
+      "bytes": 10536
+    },
+    {
+      "path": "docs/evidence/sidebar-scrolled-mobile.png",
+      "sha256": "50a9dee01fbf7371982c9d0010e422c559172c9008b56458fe8b3a06048f695a",
+      "bytes": 22201
+    },
+    {
+      "path": "docs/evidence/stable-device-identity-20260910.json",
+      "sha256": "cf574daf8f907bd0fa7a28cc7e52f1679f5c1be768b5c8397b78ab085e9d7158",
+      "bytes": 8088
+    },
+    {
+      "path": "docs/evidence/workspace-dark.png",
+      "sha256": "25324a7f1263d5593f64708b50168425a310115cd8d802b2f7682cb61015cf09",
+      "bytes": 91134
+    },
+    {
+      "path": "docs/evidence/workspace-light.png",
+      "sha256": "44015cc96912615ca9179f1a0f4e0e0d5c185ef85c56250db37bf05d4a17cd9c",
+      "bytes": 90351
+    },
+    {
+      "path": "docs/FOUNDATION-APPROVAL-DEADLINES.md",
+      "sha256": "d7485f068be93bf909894dc3e6b8b77d3a93cd9bf4c96e0760784a2ac35362bf",
+      "bytes": 2434
+    },
+    {
+      "path": "docs/FOUNDATION-APPROVAL-REVISION.md",
+      "sha256": "3a4d99927d95ba425e71fca3db86161b2f1f2318111769ebcca4d2143202613c",
+      "bytes": 2046
+    },
+    {
+      "path": "docs/FOUNDATION-BASELINE-20260910.json",
+      "sha256": "2261bf0a2601ca3a3096b61e5d18c155f7fa4d6035fd4bd0685739bdaf29a3d6",
+      "bytes": 21884
+    },
+    {
+      "path": "docs/FOUNDATION-BASELINE-20260910.md",
+      "sha256": "cc4549983b04ac5d20464c5e61eb5784d590c555b051f1ce2f42bc8e20903bf3",
+      "bytes": 2316
+    },
+    {
+      "path": "docs/FOUNDATION-CONTINUATION-20260913.md",
+      "sha256": "2321fc35ebe5521131346752f5474f957b42eac870f91f71a8e2bab6c6731a3a",
+      "bytes": 5528
+    },
+    {
+      "path": "docs/FOUNDATION-CONTINUATION-20260914.md",
+      "sha256": "6d0194f4b5cbcdffdb3d56800f7b5fe8df0c3ba9708a42fd655bbab1d9c521aa",
+      "bytes": 3782
+    },
+    {
+      "path": "docs/FOUNDATION-DEVICE-APPROVAL-EVIDENCE.md",
+      "sha256": "6fd92d210c5ade3277a65ae65aed829c2881e2535459b5e8bf947b1230f79676",
+      "bytes": 1377
+    },
+    {
+      "path": "docs/FOUNDATION-EXECUTION-PLAN.md",
+      "sha256": "09464f161fc112d8f06525023312f375e3ec6cad23c32179d6a94f8bd057d1e7",
+      "bytes": 5878
+    },
+    {
+      "path": "docs/FOUNDATION-FAILURE-PATH-REVIEW.md",
+      "sha256": "4079166a8749f4077f529357f604bd75c32c647ff190eb366f161c2abcdbae48",
+      "bytes": 4182
+    },
+    {
+      "path": "docs/FOUNDATION-GATE-REVIEW.md",
+      "sha256": "78722af87a1dcf47ed7a50a13dbd30d609424cd97b73095309fd57e0d4406d9f",
+      "bytes": 4218
+    },
+    {
+      "path": "docs/FOUNDATION-HANDOVER-EVIDENCE.md",
+      "sha256": "ef99614f3b245126b8a0bdc64af9f320dcd55c9f107f764fbeea85aa03178c86",
+      "bytes": 3341
+    },
+    {
+      "path": "docs/FOUNDATION-LINUX-ACCEPTANCE-20260913.md",
+      "sha256": "5b5b7ffe18dd28d555c6f9ba3e3aa55d013d147b2bda91ebd80b0a9f001d6862",
+      "bytes": 2461
+    },
+    {
+      "path": "docs/FOUNDATION-PASSWORD-EXPIRY-REMINDERS.md",
+      "sha256": "c821f0b72499b14269e92b1e50185e82d54168e3696bbc5c9deba149e22a0875",
+      "bytes": 2856
+    },
+    {
+      "path": "docs/FOUNDATION-PASSWORD-RECOVERY-EVIDENCE.md",
+      "sha256": "91849b01c5f2398b863daa8421e1436aef56818d1315a66d3ff6616693f4a55e",
+      "bytes": 3551
+    },
+    {
+      "path": "docs/FOUNDATION-STABLE-DEVICE-EVIDENCE.md",
+      "sha256": "64006dc16d305f06d6a260c8ba36c593b882d576490f62614458835ceb834c62",
+      "bytes": 1542
+    },
+    {
+      "path": "docs/GOOGLE-LOCAL-CONNECTION.md",
+      "sha256": "ed1c60689844ea67f11f8f775dcb345eeb1cd17c14dfe98a1ecd6d6a17d608c6",
+      "bytes": 2066
+    },
+    {
+      "path": "docs/INDIVIDUAL-PERMISSIONS.md",
+      "sha256": "d221804bc74b1f6afd5d945f17e983435fd03af053a7f9bf70943247b1e969cf",
+      "bytes": 4016
+    },
+    {
+      "path": "docs/LOCAL-BACKUPS.md",
+      "sha256": "0ce075dc9d099c1943a7960009253feb79973c5dcef4b7b35011cae1b7b64a56",
+      "bytes": 11286
+    },
+    {
+      "path": "docs/MILESTONE-1.md",
+      "sha256": "3f0eb5a00e76d3b73a0ea8e8dcca4bd0a6f5d77329250f7fb2fc5eeaa13d79a3",
+      "bytes": 7213
+    },
+    {
+      "path": "docs/MILESTONE-2.2.md",
+      "sha256": "493cd6cd3918aae4925831622ae02fd24380eeb26eba5248c947fd1e6d74a82b",
+      "bytes": 3200
+    },
+    {
+      "path": "docs/MILESTONE-2.md",
+      "sha256": "09cf0ad24df4c9acccc135d836307eeaffaedfed6da012ba560e83522828f15c",
+      "bytes": 5299
+    },
+    {
+      "path": "docs/OFFSITE-BACKUP-SETUP.md",
+      "sha256": "433e376fc4d24f7b20a3a3620d70e35d8b0e622e162286ecf011b4fd8c29db9a",
+      "bytes": 13964
+    },
+    {
+      "path": "docs/SUPPLIER-CONTRACT.md",
+      "sha256": "aeec0f6dfdd36de22fb81929b9a428e2a90ffc5bb1a3e071223fa44ebc831ccb",
+      "bytes": 8891
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "687bab19eee24477709866ad3289ba20fc0452255a8bc2acfb134197382794ee",
+      "bytes": 321
+    },
+    {
+      "path": "next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b",
+      "bytes": 288
+    },
+    {
+      "path": "next.config.ts",
+      "sha256": "a4271004436a8efe086a751b5363b57b0fcce8a59b728ad33e7f71744609ee66",
+      "bytes": 712
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "fa9f0df8938f6ccb359c9a226cfa9c379c2b4a3b6e73302dbfb211fca9daabd5",
+      "bytes": 234804
+    },
+    {
+      "path": "package.json",
+      "sha256": "59b6cef7c026786914a466314aa5a3f701d3cbd2326a0d16a5544d0fbc2405f0",
+      "bytes": 1767
+    },
+    {
+      "path": "playwright.config.ts",
+      "sha256": "d07187c437aca37d67b1e17450eaaa117c7840bde69a18a7ce1a8b72c59d2ddf",
+      "bytes": 380
+    },
+    {
+      "path": "README.md",
+      "sha256": "8d2c7c9e371bfcdd7479e90f6a3a42e752cdd9c0f234512e9fed5cf72c4b4e2c",
+      "bytes": 4426
+    },
+    {
+      "path": "scripts/approval-deadline-jobs.mjs",
+      "sha256": "ca4c6ae098eb2c2efc91acff0473466be95b7b6bd03cafdf84eb1e302ad0a1d9",
+      "bytes": 1049
+    },
+    {
+      "path": "scripts/backup-crypto.mjs",
+      "sha256": "8073f5457235f0ffd22405d1e26203f9996e866d802211bfa755aa529b09da7d",
+      "bytes": 2257
+    },
+    {
+      "path": "scripts/backup-folder.mjs",
+      "sha256": "fb3e97bb4f60b78bbc481abe7ae75fa72565e119a49622d5621de29e8a36284f",
+      "bytes": 464
+    },
+    {
+      "path": "scripts/backup-key.ps1",
+      "sha256": "3502070aad67c62244a19ba49f134b2df177284bcf198f2350822ebb244a200c",
+      "bytes": 1138
+    },
+    {
+      "path": "scripts/backup-lock.mjs",
+      "sha256": "423efeaba6d6823828b48c0d89fb68fa21afff4507e26082074e7ad210ad0653",
+      "bytes": 1691
+    },
+    {
+      "path": "scripts/backup-lock.ps1",
+      "sha256": "e6dd10c00082aaca5c96ed68f41c488f58a726b5b0950855491340a40b49e9ee",
+      "bytes": 406
+    },
+    {
+      "path": "scripts/backup-scheduler.mjs",
+      "sha256": "10d597bcc3cea6846d8c37b7421977a008961677e5664505b3c63ce2adeb321f",
+      "bytes": 1021
+    },
+    {
+      "path": "scripts/capture-refinements.mjs",
+      "sha256": "00a0e43d8ee4d37ebd508f0dd9c29efbfc304645a320a764400affcfea23ff3b",
+      "bytes": 2230
+    },
+    {
+      "path": "scripts/capture-review.mjs",
+      "sha256": "f4dbb85a8e6c0fc73845b3260df92df9035b9ba862a75651c710f7fef2c562eb",
+      "bytes": 1653
+    },
+    {
+      "path": "scripts/dev.mjs",
+      "sha256": "5567749f4e0080629c21b97ecda79080566b687c60bbc716c5cf7bf557d8bd93",
+      "bytes": 1328
+    },
+    {
+      "path": "scripts/foundation-auth-check.mjs",
+      "sha256": "67ba7ef3ce4643ae70955e549d5d12bd35559ef6274724d6fa326296120d83dd",
+      "bytes": 10953
+    },
+    {
+      "path": "scripts/foundation-browser-check.mjs",
+      "sha256": "bb66d99c9805121e6ba83dfcbd2d57823f938306e4074c6cab62ef90b81a6bda",
+      "bytes": 10482
+    },
+    {
+      "path": "scripts/foundation-browser-server.mjs",
+      "sha256": "5dedb33503be0f9c7183a784c83ebd40224d7d8f901bd4c367804fe9aece5845",
+      "bytes": 1643
+    },
+    {
+      "path": "scripts/foundation-db-check.mjs",
+      "sha256": "700e677f10ff115ddf973522e72f3c9e498de8b308ee244624131f267a2a9380",
+      "bytes": 7302
+    },
+    {
+      "path": "scripts/foundation-linux-check.mjs",
+      "sha256": "8b7e9b22bedc5ac057653ada68e671a5a102341fe3e5c9b0c567a51b91bd3478",
+      "bytes": 3230
+    },
+    {
+      "path": "scripts/foundation-remote-recovery-check.mjs",
+      "sha256": "b05b225ba33023afef8a2fac659e71f0c59eb8b7c2d502da83761ed65a96545b",
+      "bytes": 7018
+    },
+    {
+      "path": "scripts/google-client-import.mjs",
+      "sha256": "74c5587517391202df1297eca02f1db2444bebf33933928dac8e0910d2daf6c1",
+      "bytes": 4884
+    },
+    {
+      "path": "scripts/google-drive-connect.mjs",
+      "sha256": "bccc1ee76f9a7196d632d7daee435f10032da1fa7f2951d90576a496c39c9257",
+      "bytes": 5180
+    },
+    {
+      "path": "scripts/google-drive-files.mjs",
+      "sha256": "662dfa7fede776432be7144586002b8cbab7df0456eb1ee975ece5ad4d52e5c2",
+      "bytes": 13316
+    },
+    {
+      "path": "scripts/google-drive-oauth.mjs",
+      "sha256": "292441eaec2ed6fd48dff28f3f010546788bbb340c5815a0e060ff36a4067ca0",
+      "bytes": 6576
+    },
+    {
+      "path": "scripts/google-secret-codec.ps1",
+      "sha256": "a803c74be06cc6ba8caf42fc74739a1c24c0e33afc1f499c5162f5302090d90d",
+      "bytes": 912
+    },
+    {
+      "path": "scripts/google-secret-store.mjs",
+      "sha256": "f02f85c4af7b6d21a962f661d23a312203e67ccf1c4fb321fb549f8b16029b0b",
+      "bytes": 2671
+    },
+    {
+      "path": "scripts/local-backup.mjs",
+      "sha256": "c4749cffa8562dbf6b0076a5c5326a35e1773bf81451c99636a39bb85ec8bf0e",
+      "bytes": 18807
+    },
+    {
+      "path": "scripts/local-supabase.mjs",
+      "sha256": "b7f3506a6bb1773878191161485fa6f9f0a5447a3072b00e8bad17dda4e5e5fc",
+      "bytes": 2838
+    },
+    {
+      "path": "scripts/offsite-backup.mjs",
+      "sha256": "8d07b6e04f18f8e8e7a5f7afd73a38acda3ad3dd96e14a3bc8e89ddfab8aef44",
+      "bytes": 10985
+    },
+    {
+      "path": "scripts/offsite-key-shares.mjs",
+      "sha256": "c33dc4629d39445356ec0fa0fcc8d8f0d866da5e329c69cfc6946a6bfcee23ae",
+      "bytes": 2746
+    },
+    {
+      "path": "scripts/offsite-recovery.mjs",
+      "sha256": "89d4ff3ee31b8281ddedde5119867e73fa1601ce7f834093a787746a28594acb",
+      "bytes": 2233
+    },
+    {
+      "path": "scripts/offsite-retry.mjs",
+      "sha256": "583c0a8ea9577d9e8d740e53b0cf33ff0dc16eb90c45914424c16081a2caa2df",
+      "bytes": 2112
+    },
+    {
+      "path": "scripts/offsite-share-plan.mjs",
+      "sha256": "5b22bdeb148a4a78015a1b2aab395ef48a0b132c6972c3064224041cfa735b2c",
+      "bytes": 2731
+    },
+    {
+      "path": "scripts/password-expiry-reminders.mjs",
+      "sha256": "29abd1b7643c5c518a33ad925f85f14fa6404b51e9fad01cc4454786a5722846",
+      "bytes": 986
+    },
+    {
+      "path": "scripts/prune-backups.mjs",
+      "sha256": "48b9f8b0964f85d8e102e6dc8bfed188dacc9baa85a15de79e3fa6ecf773719e",
+      "bytes": 6560
+    },
+    {
+      "path": "scripts/recovery-bundle-check.mjs",
+      "sha256": "3317bb56f5619ec0ba330c9aec0d4c53df3d2ecece9bb52214f4d9e765ec2872",
+      "bytes": 3290
+    },
+    {
+      "path": "scripts/remote-retention-review.mjs",
+      "sha256": "fab9bee3fb015b359503a828cda6e5dcf18bfe9426ab6a962979268cf85ffb73",
+      "bytes": 2672
+    },
+    {
+      "path": "scripts/sync-local-supabase-env.mjs",
+      "sha256": "2cf848673b576e8c6affdf0bc75fd65b222df51e754a112ab1a2e23295423525",
+      "bytes": 1686
+    },
+    {
+      "path": "src/app/(workspace)/[section]/page.tsx",
+      "sha256": "c39be522bca2130ab462fc164b3d7781027c963a7d53f5a51d507bff0468bc22",
+      "bytes": 2071
+    },
+    {
+      "path": "src/app/(workspace)/layout.tsx",
+      "sha256": "c9c18a2f4428e6bbe3f95d30a793dd5d961291bc4b87cbdc133777eae535a12d",
+      "bytes": 458
+    },
+    {
+      "path": "src/app/api/profile-photo/[id]/route.ts",
+      "sha256": "90916e134c3062f8483f155abb5e64bbfeb88362664e094377c06295657c1047",
+      "bytes": 1690
+    },
+    {
+      "path": "src/app/backups/actions.ts",
+      "sha256": "091cb7e00619ad80373a9dee3a9bb01f89420630f6af2aa2baeef2a0b9abb21d",
+      "bytes": 3791
+    },
+    {
+      "path": "src/app/error.tsx",
+      "sha256": "4d1cb2c0b208ea2e3a9b7e67bd4d296d9b9e718a922916048efef6e91e4c79b7",
+      "bytes": 273
+    },
+    {
+      "path": "src/app/globals.css",
+      "sha256": "751fdf0ea36a0d4b7312078119bb344d66ad8065e6f84bac89aa3b94ca1f5246",
+      "bytes": 36565
+    },
+    {
+      "path": "src/app/icon.svg",
+      "sha256": "fa711620d4297b9c714cd29b381f51bd25053c9f195a617190865011c570479a",
+      "bytes": 177
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "sha256": "ef2cc88290da18d150c4c4a598fa41f53ccfa7247c4e3479a1fd6b9c2ab58d1a",
+      "bytes": 918
+    },
+    {
+      "path": "src/app/live/actions.ts",
+      "sha256": "194217471a106aee4a01d606e6da063082aca22e13485c930324369efd15faa4",
+      "bytes": 19886
+    },
+    {
+      "path": "src/app/login/actions.ts",
+      "sha256": "55399b8af832afefdaad089192d56fdb30e4a5cd20542081931508ca2b83d050",
+      "bytes": 4551
+    },
+    {
+      "path": "src/app/login/login-form.tsx",
+      "sha256": "ed1e63f6e03ab192b41393553a5d1e81d6b8c3fbd1129047a6d99f71817d0ffd",
+      "bytes": 2207
+    },
+    {
+      "path": "src/app/login/page.tsx",
+      "sha256": "e781a088b99f3f5607299f66ff1101e0649345b4992f46721f80cb3a3320200e",
+      "bytes": 1846
+    },
+    {
+      "path": "src/app/not-found.tsx",
+      "sha256": "72c96af31646ce5505eefc129875e25c3e03708f6bf0d4fdf9328273b7e6c2e9",
+      "bytes": 261
+    },
+    {
+      "path": "src/app/page.tsx",
+      "sha256": "ea03288859c3777df7473aab3bc0fd470d2d34d323b66b0406a8a799f404c274",
+      "bytes": 105
+    },
+    {
+      "path": "src/app/recover/actions.ts",
+      "sha256": "93144baa67be232685a77d283ff643b434a651962426d9f207c911170580a060",
+      "bytes": 2375
+    },
+    {
+      "path": "src/app/recover/page.tsx",
+      "sha256": "f561b806023d5f7ced67e67fe4c65545d755922e811a6e7c0bcb177b2c5e2ddc",
+      "bytes": 419
+    },
+    {
+      "path": "src/app/recover/recovery-form.tsx",
+      "sha256": "86aa1b90cfb6900eee9a5a06f7f3d0d63e17b6bbace8cff12827d49ccba6fffe",
+      "bytes": 1682
+    },
+    {
+      "path": "src/app/setup/owner/actions.ts",
+      "sha256": "47e9bae7320cdef76ee5624de38f59f6d1537a7a456e215975dd9ba3b0684bbe",
+      "bytes": 6826
+    },
+    {
+      "path": "src/app/setup/owner/owner-setup-form.tsx",
+      "sha256": "24fe33b43486af1a1eca4ea5ca964f24668d1edfcdcbccb623b8219bff92f45f",
+      "bytes": 4612
+    },
+    {
+      "path": "src/app/setup/owner/page.tsx",
+      "sha256": "2bfec085af68d5a2fc19fe11497e008f0a399bc19087aed5d0e173747bae539a",
+      "bytes": 1489
+    },
+    {
+      "path": "src/components/review-provider.tsx",
+      "sha256": "0e66ffaf760d8ce574c50a51b0e7eae757ddf316ab619cd8029eb34d2de50562",
+      "bytes": 13060
+    },
+    {
+      "path": "src/components/shell.tsx",
+      "sha256": "75e0e240d5d4c6dc28eb82f6baec72f57716be339206cc7f453182596514365b",
+      "bytes": 7153
+    },
+    {
+      "path": "src/components/table.tsx",
+      "sha256": "71ac7870ef68af37a9305e19db0454ab660d21d20cfa11925b2d573b98ec609a",
+      "bytes": 10391
+    },
+    {
+      "path": "src/components/theme.tsx",
+      "sha256": "a2f4dac0a5a3ad34d471b6fba9dea3e0a0a1d41c425a783760601c67c2578bb4",
+      "bytes": 2242
+    },
+    {
+      "path": "src/components/ui.tsx",
+      "sha256": "e10aac85262cd9727145dc14a3bf688e914fd8d243a75ec70b5ebf467cda6f28",
+      "bytes": 1964
+    },
+    {
+      "path": "src/features/administration.tsx",
+      "sha256": "fcbd12d035ec1e5f0961d71ed598d52e39acd61c3b28914294521d31edf878ac",
+      "bytes": 20845
+    },
+    {
+      "path": "src/features/approvals.tsx",
+      "sha256": "8a39d1a5967c310600250ee0ba42acb8615562852baac4b7064301ac33e3abf7",
+      "bytes": 13681
+    },
+    {
+      "path": "src/features/dashboard.tsx",
+      "sha256": "3af3c182de3b565d464c4d2f79410f3685e4d7d22773aee916672cf753420994",
+      "bytes": 6929
+    },
+    {
+      "path": "src/features/history-notifications.tsx",
+      "sha256": "55e9c1d0e3fe07ddd888de79ae5e73df2db2630b76d6fe5c06165fe2435f3da6",
+      "bytes": 5401
+    },
+    {
+      "path": "src/features/individual-permissions.tsx",
+      "sha256": "1e68ac4e82b858f6fa89623dc97641f78bfad6dccd582433e0c50819742cbbc2",
+      "bytes": 7795
+    },
+    {
+      "path": "src/features/live-administration.tsx",
+      "sha256": "04fc4b307d9126c963a283c51a9d99a6866569cf809791bb2f82b876b519c098",
+      "bytes": 34000
+    },
+    {
+      "path": "src/features/live-backups.tsx",
+      "sha256": "370bd37a4b5f06b56121354dcc3dfcd4070a6274e8b075933c23dfff5138ff84",
+      "bytes": 9020
+    },
+    {
+      "path": "src/features/live-pages.tsx",
+      "sha256": "d4e9bd731aa2ee9cbc50864447dc7188c2c10b1c314db73c49a22ebe0c4815d6",
+      "bytes": 15865
+    },
+    {
+      "path": "src/features/permanent-handover.tsx",
+      "sha256": "4c5bcb4d487bcdf7cddf2b3a15f0cc1b1393d8d64762da1acb307a79c29599e8",
+      "bytes": 2542
+    },
+    {
+      "path": "src/features/settings.tsx",
+      "sha256": "cfd63150dce4268afbfb4cf9f6965a5148d5974bd75e0cb78c803f2ab68c6f13",
+      "bytes": 10504
+    },
+    {
+      "path": "src/lib/access.ts",
+      "sha256": "8351268e1caa679a6c73558e23a9372a5b4663b1c3feaf9dc6a6a6e900c4d223",
+      "bytes": 1081
+    },
+    {
+      "path": "src/lib/administration.ts",
+      "sha256": "35496d5301b02c2de11099d2d90928c9baa9655b8ca6a4d458e704886a00e3f4",
+      "bytes": 5505
+    },
+    {
+      "path": "src/lib/backup-retention.ts",
+      "sha256": "decb9d4856b54812988b1bf3adeffbbc2da20437386ccc419ea56f714b177b9d",
+      "bytes": 3389
+    },
+    {
+      "path": "src/lib/erp-roles.ts",
+      "sha256": "2a149b773eede3f184e49c78f76054366b86caef9fe489728c523451cc124b69",
+      "bytes": 592
+    },
+    {
+      "path": "src/lib/governed-password.ts",
+      "sha256": "0b315e3d37f23c12e672d85b017c34dfb4953b669056f3f21b42a34f6957ffa5",
+      "bytes": 1109
+    },
+    {
+      "path": "src/lib/policy.ts",
+      "sha256": "79cb1f83249917daf22e7db6d59c4870d2f2d3935044a8765e1d3b61113665d8",
+      "bytes": 2646
+    },
+    {
+      "path": "src/lib/review-data.ts",
+      "sha256": "97d88863627178c792ff1991820bd1b7fa8ec3e52105b5fe2c6b8d5a3d8b3fb0",
+      "bytes": 10511
+    },
+    {
+      "path": "src/lib/supabase/admin.ts",
+      "sha256": "54035a34712f66df67290469205ed154ce8e5c95e391eb4c48198f6266700d03",
+      "bytes": 420
+    },
+    {
+      "path": "src/lib/supabase/client.ts",
+      "sha256": "79858df75a20785f715f2ce79c0c3d312572b5ae497142d4ff5350282feab062",
+      "bytes": 388
+    },
+    {
+      "path": "src/lib/supabase/env.ts",
+      "sha256": "ad3df261d580d58848a1ce2352187e356988d3f29ef85bd164fcb322b57eee3f",
+      "bytes": 918
+    },
+    {
+      "path": "src/lib/supabase/proxy.ts",
+      "sha256": "337e31258bde02ca8344f331838af0823800cea28248d7e73eb77abcb0573ea5",
+      "bytes": 1175
+    },
+    {
+      "path": "src/lib/supabase/server.ts",
+      "sha256": "fc98a5d072baa73833a45aca597caf695d89b3f41db2f3ed5acd5be323106167",
+      "bytes": 728
+    },
+    {
+      "path": "src/proxy.ts",
+      "sha256": "83a1a972e7c7790cd483a21743109e996ca56fca8a13e9169a82a4edced2b005",
+      "bytes": 1514
+    },
+    {
+      "path": "Start-Local.cmd",
+      "sha256": "6061aac314e570eed34f825627433b339ba7baa2777dc95ea5b66e2a26a175e3",
+      "bytes": 98
+    },
+    {
+      "path": "Start-Local.ps1",
+      "sha256": "522b74ef6d6c20012b90435ba048c5330540dbff8cb14571d65b19e70ff1f87d",
+      "bytes": 1055
+    },
+    {
+      "path": "Stop-Local.cmd",
+      "sha256": "db50ebd94a5ffd43c9b134fe8e88d4153ab7dcb9768feb7534619d99dacb4dc2",
+      "bytes": 97
+    },
+    {
+      "path": "Stop-Local.ps1",
+      "sha256": "10108afeee54d4cb67b1b04e329a48a710100d459a80726242a54640ce7a5521",
+      "bytes": 585
+    },
+    {
+      "path": "supabase/.gitignore",
+      "sha256": "507699eb91144818edf61d3a079212cacf31d8db520eae428e3b48fcf0d6919c",
+      "bytes": 72
+    },
+    {
+      "path": "supabase/config.toml",
+      "sha256": "4415658304c19136cd3a5993ab333c97edd38316cd9e8e6bd93934f99ce4cc54",
+      "bytes": 15481
+    },
+    {
+      "path": "supabase/migrations/20260907020914_foundation_identity_access.sql",
+      "sha256": "142b6f0b08d0454ac8d980b2e7553581add696ef8f2bcb21e573934861ce5ff7",
+      "bytes": 23974
+    },
+    {
+      "path": "supabase/migrations/20260907143000_initial_owner_provisioning.sql",
+      "sha256": "d4dba311b77a119a4001fb6d57f790c8f737f4a4044bdf21f65b4ab582b50795",
+      "bytes": 3746
+    },
+    {
+      "path": "supabase/migrations/20260907175923_live_account_permissions_recovery.sql",
+      "sha256": "228999d9f3d8a0e606d3722444e4b1e4eaa6c8c5b691721f23ce35c05404950c",
+      "bytes": 24590
+    },
+    {
+      "path": "supabase/migrations/20260907182018_live_access_hardening.sql",
+      "sha256": "7c8e52b931d89771f5da1a75f6949eb5b569d5b3ca27d3a73196c1f97cd22b9e",
+      "bytes": 7511
+    },
+    {
+      "path": "supabase/migrations/20260908011724_permission_action_alias_fix.sql",
+      "sha256": "7ab5155d36fbc3b74a972413f9910e66c02d6759c3d373390f69c6b6747682a1",
+      "bytes": 3521
+    },
+    {
+      "path": "supabase/migrations/20260908012427_explicit_session_revocation.sql",
+      "sha256": "6d2ebdf4d20abdfc89b1ab8dd8f769b594fbd881f53be6b87aafdc8ec127c41c",
+      "bytes": 1060
+    },
+    {
+      "path": "supabase/migrations/20260908025914_company_positions_erp_roles.sql",
+      "sha256": "86f1d0da8146f857e1213f91e06f182c44a611c7848b700dca4fa8df9b1f7f29",
+      "bytes": 5766
+    },
+    {
+      "path": "supabase/migrations/20260908052249_owner_individual_permissions.sql",
+      "sha256": "ff1ad99cd3bacc996ec9def8ad57a7e990a831a39d6f2c30c32fa33ec6b63ce9",
+      "bytes": 19108
+    },
+    {
+      "path": "supabase/migrations/20260908113048_local_verified_backups.sql",
+      "sha256": "2d77aa06dfa10be4e714b1e08aecc1855dac28413b6e409edb1f3e6825557ead",
+      "bytes": 2943
+    },
+    {
+      "path": "supabase/migrations/20260908114400_backup_worker_authority.sql",
+      "sha256": "31d8cd44bc0c985651899823670c38563ae00ad75141ce42e59a7f310951dd9e",
+      "bytes": 2231
+    },
+    {
+      "path": "supabase/migrations/20260908151454_scheduled_local_backups.sql",
+      "sha256": "045141d1e41e9bdef930cee10d1d15f102b7a215c2cd3755830155a2c747d326",
+      "bytes": 7003
+    },
+    {
+      "path": "supabase/migrations/20260909013759_backup_retention_tracking.sql",
+      "sha256": "f3a2bc6f1f32abbf31ee5d73103555b9700481795884ef71864412947382cfd4",
+      "bytes": 796
+    },
+    {
+      "path": "supabase/migrations/20260910010000_login_admission.sql",
+      "sha256": "5fb9195f8a14c4823fa6af31bce7d9623a4449cb0e1cc45f778ca0d7f61ff0f0",
+      "bytes": 5876
+    },
+    {
+      "path": "supabase/migrations/20260910020000_third_device_approval.sql",
+      "sha256": "4670e621610718bb424ee3be5c329858daccd310edf8f4d40a275c7c85f2fbee",
+      "bytes": 8001
+    },
+    {
+      "path": "supabase/migrations/20260910030000_fix_device_pending_status.sql",
+      "sha256": "fd5004415b50c4acb731665848749e5642a42a86e3029784e8ed73a50b5020dc",
+      "bytes": 4680
+    },
+    {
+      "path": "supabase/migrations/20260910040000_restore_login_audit.sql",
+      "sha256": "72ea24c065b952b04e406614c91b66e870f95dd8d75baadd9e93d6c9db7f7390",
+      "bytes": 4621
+    },
+    {
+      "path": "supabase/migrations/20260910050000_idle_login_reapproval.sql",
+      "sha256": "aed0a406df2bed8f47d6cc805d826f91c984bb48b628a233d813a9a299dc0eb4",
+      "bytes": 7970
+    },
+    {
+      "path": "supabase/migrations/20260910060000_device_approval_visibility.sql",
+      "sha256": "991ee22d862555c856a62ec510053a65bc60a80c9fd9953a2e7f4abbc6a54084",
+      "bytes": 589
+    },
+    {
+      "path": "supabase/migrations/20260910070000_password_administration.sql",
+      "sha256": "b66aeeb5e04112242c7bb565a133a86d10d574840f5c5bf241e2e78455a653f3",
+      "bytes": 4335
+    },
+    {
+      "path": "supabase/migrations/20260910080000_password_access_fence.sql",
+      "sha256": "70bab8065e2646c4dc23c20fc5fd9c5460fbf1ea173ed7812c8a35ae1e6b1a62",
+      "bytes": 13089
+    },
+    {
+      "path": "supabase/migrations/20260910090000_password_provider_receipts.sql",
+      "sha256": "4c87cca9c03020a09b02157f4d027003225a57e627d83ad2a19ebc75dca342de",
+      "bytes": 12539
+    },
+    {
+      "path": "supabase/migrations/20260910100000_pending_device_session.sql",
+      "sha256": "1bf139d08e988083bcf6e20446dd35658adab99da8dd4dc31d17932a4c644800",
+      "bytes": 1252
+    },
+    {
+      "path": "supabase/migrations/20260910110000_device_heartbeat.sql",
+      "sha256": "f3e85689e29360ea1fb50a9722d2fdd0898946db00be2afab7ca1efe75695c9b",
+      "bytes": 1635
+    },
+    {
+      "path": "supabase/migrations/20260910120000_stable_device_identity.sql",
+      "sha256": "f985c953d546f2539a2842605d5f9431ad3482b71d14364cb290eb270c362649",
+      "bytes": 10646
+    },
+    {
+      "path": "supabase/migrations/20260910130000_scoped_handover.sql",
+      "sha256": "c493efae8b797dacf0131d9a0db44e10517ac3154a037ace45ac86ddb0feb3ff",
+      "bytes": 8983
+    },
+    {
+      "path": "supabase/migrations/20260910140000_permission_handover_scope.sql",
+      "sha256": "31d6443de6560ca993c186c5de2f9ae4c7376bdadfd06b744e7ce72ee86f0f60",
+      "bytes": 3743
+    },
+    {
+      "path": "supabase/migrations/20260910150000_db_lint_cleanup.sql",
+      "sha256": "309df6113af9e6da98299c11609cc8c25d2f02977a21320096ec999c7de27281",
+      "bytes": 580
+    },
+    {
+      "path": "supabase/migrations/20260910160000_handover_session_fence.sql",
+      "sha256": "e7adb9bc444c5d9907b65d897c1adb58d0e6104398e262fb0a5d1ee8f311fb7b",
+      "bytes": 1843
+    },
+    {
+      "path": "supabase/migrations/20260910170000_handover_request_visibility.sql",
+      "sha256": "9c830d6cebb1d1e7f748d22746cee61a568595347b53650b3f0914060d39665b",
+      "bytes": 2537
+    },
+    {
+      "path": "supabase/migrations/20260910180000_password_expiry_reminders.sql",
+      "sha256": "e0cba241de851ec06e2a6c563735ecb8d6dd8e5e79efdfaca267e3b960ba0ffe",
+      "bytes": 6059
+    },
+    {
+      "path": "supabase/migrations/20260910190000_approval_deadline_jobs.sql",
+      "sha256": "f4a9801ae419220dfdcaee89c1feb7a59856532a02f33f4e790ba297d12de1f8",
+      "bytes": 16791
+    },
+    {
+      "path": "supabase/migrations/20260910200000_permission_request_revision.sql",
+      "sha256": "c29f930ead1953365aba7f92a1ea63975a4f1e9a037346e65b879fc0da727628",
+      "bytes": 14096
+    },
+    {
+      "path": "supabase/migrations/20260910210000_permanent_handover.sql",
+      "sha256": "963d1a8294035fd9e2f9125bccfd52f37c8b46db5ce839f0d7f7d6104a69765b",
+      "bytes": 2819
+    },
+    {
+      "path": "supabase/migrations/20260913040325_governed_profile_changes.sql",
+      "sha256": "12fc8d59dda0a99d99aa2679e4e8c5e042eec0ea90ff444eda4823737f4cc31d",
+      "bytes": 20561
+    },
+    {
+      "path": "supabase/migrations/20260913084041_permanent_handover_security.sql",
+      "sha256": "4dbc026ab32c379198dde57aaf150f3dc60c25baba975a93924bd8cc6df7e3b1",
+      "bytes": 11667
+    },
+    {
+      "path": "supabase/seed.sql",
+      "sha256": "458384f52496c2dafdb95607623bc25834d406bd4a918e5b1af4806215ffc27b",
+      "bytes": 83
+    },
+    {
+      "path": "supabase/tests/001_foundation_rls.test.sql",
+      "sha256": "1aaeb4610c675b3aa1adb57890039f3d2674c4970917ba2946373fa4f475a416",
+      "bytes": 4367
+    },
+    {
+      "path": "supabase/tests/002_owner_provisioning.test.sql",
+      "sha256": "ee878d50395c95575d93f4c36096c5f05c76e27ffda6720e7866670a487103fb",
+      "bytes": 3498
+    },
+    {
+      "path": "supabase/tests/003_live_access.test.sql",
+      "sha256": "f7fc72b21120b7de4e4a4a5a6bef721cdad0ba50070eb3809b5895997c53c970",
+      "bytes": 13024
+    },
+    {
+      "path": "supabase/tests/004_role_contract.test.sql",
+      "sha256": "844bd8fd1063c5d688aab6dd52704eee5453c3ffca7c5d4554e50548e0c6aeb0",
+      "bytes": 7470
+    },
+    {
+      "path": "supabase/tests/005_individual_permissions.test.sql",
+      "sha256": "5c89e9dcf7a37453053d270771789f6b9e7e0fd35fae4b27a22087b5f5eccf2d",
+      "bytes": 10201
+    },
+    {
+      "path": "supabase/tests/006_local_backups.test.sql",
+      "sha256": "a9fd3cade83a1aa0c7be8d8eb2ff0c330bd9efb322de9c4e0df99be16379ac73",
+      "bytes": 6666
+    },
+    {
+      "path": "supabase/tests/007_backup_schedule.test.sql",
+      "sha256": "336d1379b0ee0432caa9b03e2465db0bb2e9bb5395824207fe354fb9b16b4bcf",
+      "bytes": 4378
+    },
+    {
+      "path": "supabase/tests/008_retention_tracking.test.sql",
+      "sha256": "3641705f30d2e5068fb6ab3c7bc1f0b5b6c157339ab18e487b569048bd46292c",
+      "bytes": 2125
+    },
+    {
+      "path": "supabase/tests/009_login_admission.test.sql",
+      "sha256": "c308bb655786d445e456877371e55fb9bd0b17518ff9c774ed3222c952551419",
+      "bytes": 7513
+    },
+    {
+      "path": "supabase/tests/010_third_device.test.sql",
+      "sha256": "b26616f269979af9e70d768b9432b1e3439ca8579a4498338af465c33912fff3",
+      "bytes": 7037
+    },
+    {
+      "path": "supabase/tests/011_idle_reapproval.test.sql",
+      "sha256": "6d83bbb9aefbb0698fee3a952c8376769fd62602e89780d3336369afd3b6253a",
+      "bytes": 3913
+    },
+    {
+      "path": "supabase/tests/012_password_administration.test.sql",
+      "sha256": "532df5237248f3107fde46494b09e0883b21a7699dec75585c9dad23af96eac7",
+      "bytes": 7714
+    },
+    {
+      "path": "supabase/tests/013_password_provider_receipts.test.sql",
+      "sha256": "3dfb397f7097218b5153cee6045249a9d45ad565df1e5308a86adede96e7c0bb",
+      "bytes": 6262
+    },
+    {
+      "path": "supabase/tests/014_device_heartbeat.test.sql",
+      "sha256": "901221fab7ea92a78a9c1fefa01c1154bb5f85332c27b74ffc9dbba03787b177",
+      "bytes": 2153
+    },
+    {
+      "path": "supabase/tests/015_handover_scope.test.sql",
+      "sha256": "04274f2cdd862c97cf3f54a7a744e03b4e6979c5591a85d236163b85c6db2321",
+      "bytes": 11162
+    },
+    {
+      "path": "supabase/tests/016_password_expiry_reminders.test.sql",
+      "sha256": "6998132ca287f2e332522a005d868ba7b912fd25bb65d588911bf3f9e9d77ee4",
+      "bytes": 6751
+    },
+    {
+      "path": "supabase/tests/017_approval_deadline_jobs.test.sql",
+      "sha256": "bba7f2e491e18720b031f319907ae52c47c022c4020610e47fcd3a00154c295d",
+      "bytes": 9481
+    },
+    {
+      "path": "supabase/tests/018_permission_request_revision.test.sql",
+      "sha256": "de7ff0f0a02d9957467198df5f2cfad650084c46b527737307d8976b6ad4ee09",
+      "bytes": 11580
+    },
+    {
+      "path": "supabase/tests/019_permanent_handover.test.sql",
+      "sha256": "ea936baff2ac329fd858811fc4ea7b0aca57ef50d365cd69f80224eb012d8dcd",
+      "bytes": 604
+    },
+    {
+      "path": "supabase/tests/020_profile_changes.test.sql",
+      "sha256": "d28132afc1e1e54996b1f12b01ea60d5d792858d9d1f5c8e67e53591b4065339",
+      "bytes": 7369
+    },
+    {
+      "path": "supabase/tests/021_permanent_handover_security.test.sql",
+      "sha256": "8186dea91ad4a2b4db6d9101eb957790276ed648ddb4bf94d11f76c5133f8e5d",
+      "bytes": 8733
+    },
+    {
+      "path": "tests/backup-crypto.test.mjs",
+      "sha256": "bd323a14161581bb36c809832277e873c3f66f0d9d98602e6fe9aab18cecede4",
+      "bytes": 2876
+    },
+    {
+      "path": "tests/backup-lock.test.mjs",
+      "sha256": "4d0be8446138995b98440d091a6916a066ee0c6d528053922bd54f838251e8b7",
+      "bytes": 1383
+    },
+    {
+      "path": "tests/e2e/foundation.spec.ts",
+      "sha256": "9b9676e2243338cc29bb18ffe5cc3a956a486f035ddd7014a7071146436ea574",
+      "bytes": 9098
+    },
+    {
+      "path": "tests/e2e/refinements.spec.ts",
+      "sha256": "b8dd23b348f78bd8672167c4b2d808b717d81e6fba8b72910957a97c2b87c318",
+      "bytes": 10505
+    },
+    {
+      "path": "tests/google-drive-files.test.mjs",
+      "sha256": "b124ca23efae50dab10252a54c8bc72b98c8858bfbd13739a40e462ef4ad7a59",
+      "bytes": 1344
+    },
+    {
+      "path": "tests/google-drive-oauth.test.mjs",
+      "sha256": "f26e92d508f94d8c00cf15e8fa273ca164abc93221f8ead4f7f3bd5b06ffe71c",
+      "bytes": 8268
+    },
+    {
+      "path": "tests/governed-password.test.ts",
+      "sha256": "3ed0aecd65ad2fc310af5393d995ba703ad75512ef7183683c9f4b91435be2f9",
+      "bytes": 2094
+    },
+    {
+      "path": "tests/offsite-key-shares.test.mjs",
+      "sha256": "ac26407761e68007c8278da497b0e84a1434e0d437ebe3880fd78ec3743a6fa8",
+      "bytes": 1442
+    },
+    {
+      "path": "tests/offsite-retry.test.mjs",
+      "sha256": "efbc6aaa1afa65466d2fc18d0d346105a3f90fe2c91d81272d51181a26e924f6",
+      "bytes": 1810
+    },
+    {
+      "path": "tests/offsite-share-plan.test.mjs",
+      "sha256": "ddc99754a960089377fab16edc6782845cb389c7eb85b821c90dcebc97eb71b0",
+      "bytes": 1406
+    },
+    {
+      "path": "tests/policy.test.ts",
+      "sha256": "46b9a0a7c0517d63e7cf6f43ecb89894050386bff0460536f8ab619c18109570",
+      "bytes": 4682
+    },
+    {
+      "path": "tests/recovery-bundle.test.mjs",
+      "sha256": "cdc4963d38f0c8f17dfe17cd647cb6ee74a83d8fce8246df5d2c3bd03fc5e5c2",
+      "bytes": 2570
+    },
+    {
+      "path": "tests/retention-files.test.mjs",
+      "sha256": "71436e80b73edb27fd9024c94dd1e7c286c8cc9c71b3735ee7105b3370f39e60",
+      "bytes": 5674
+    },
+    {
+      "path": "tests/retention.test.ts",
+      "sha256": "9dd7527ad60fdf1b09ac4686f579daee9b844c7ba30653035b77aaf684d50e2e",
+      "bytes": 2980
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "d84f8b7d49fe9439f4be18ab89168012a82a6ef0f655965e589e5669c9859d16",
+      "bytes": 659
+    }
+  ]
+}

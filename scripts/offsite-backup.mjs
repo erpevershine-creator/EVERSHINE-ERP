@@ -2,13 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { getSharePlan } from "./offsite-share-plan.mjs";
 import { readGoogleSecret } from "./google-secret-store.mjs";
 import {
-  createShareEnvelope,
   parseShareEnvelope,
   combineBackupKey,
-  splitBackupKey,
 } from "./offsite-key-shares.mjs";
 import {
   downloadVerifiedFile,
@@ -76,6 +75,14 @@ async function readConnection(name) {
 }
 
 async function publish(id) {
+  validBackupId(id);
+  let prior;
+  try { prior = JSON.parse(await fs.readFile(path.join(receiptRoot, id + ".json"), "utf8")); }
+  catch (error) { if (error.code !== "ENOENT") throw error; }
+  if (prior) {
+    await verifyOffsite(id);
+    return prior;
+  }
   const archive = await findArchive(id);
   const saved = archive.manifest;
   if (!saved.manifest || saved.manifest.id !== id || !saved.signature)
@@ -83,6 +90,10 @@ async function publish(id) {
   const key = await getLocalKey();
   try {
     verifyManifest(saved.manifest, saved.signature, key);
+    const sharePlan = await getSharePlan({
+      directory: path.join(receiptRoot, "key-plans"), backupId: id, key,
+      manifestSha256: createHash("sha256").update(Buffer.from(JSON.stringify(saved, null, 2) + "\n")).digest("hex"),
+    });
     const client = await readGoogleSecret("client");
     const mainConnection = await readConnection("connection");
     const recoveryConnection = await readConnection("recovery-connection");
@@ -125,6 +136,7 @@ async function publish(id) {
     );
     for (const name of Object.keys(saved.manifest.artifacts).sort()) {
       const artifact = path.join(archive.folder, name + ".enc");
+      await decryptStream(artifact, saved.manifest.artifacts[name], key);
       const content = await fs.readFile(artifact);
       uploaded.push(
         await uploadVerifiedFile({
@@ -137,17 +149,7 @@ async function publish(id) {
         }),
       );
     }
-    const { main, recovery } = splitBackupKey(key);
-    const common = {
-      backupId: id,
-      manifestSha256: createHash("sha256").update(manifestBytes).digest("hex"),
-    };
-    const mainShare = createShareEnvelope({ ...common, purpose: "backup", share: main });
-    const recoveryShare = createShareEnvelope({
-      ...common,
-      purpose: "recovery",
-      share: recovery,
-    });
+    const mainShare = sharePlan.main, recoveryShare = sharePlan.recovery;
     const mainKeyFile = await uploadVerifiedFile({
       ...mainContext,
       parentId: backupFolder.id,
@@ -183,7 +185,7 @@ async function publish(id) {
       verifiedAt: new Date().toISOString(),
     };
     await fs.mkdir(receiptRoot, { recursive: true });
-    const temp = path.join(receiptRoot, id + ".tmp");
+    const temp = path.join(receiptRoot, id + "." + randomUUID() + ".tmp");
     await fs.writeFile(temp, JSON.stringify(receipt, null, 2) + "\n", {
       flag: "wx",
       mode: 0o600,
@@ -214,6 +216,9 @@ async function verifyOffsite(id) {
   const manifestFile = receipt.archiveFiles.find(
     (file) => file.name === "manifest.json",
   );
+  const expectedFiles = ["manifest.json", "database.enc", "roles.enc", "storage.enc", "storageIndex.enc", "runtimeConfiguration.enc"].sort();
+  if (!Array.isArray(receipt.archiveFiles) || receipt.archiveFiles.map(file => file.name).sort().join(",") !== expectedFiles.join(","))
+    throw Error("OFFSITE_RECEIPT_INVALID");
   const mainShareFile = receipt.keyShareFiles?.main;
   const recoveryShareFile = receipt.keyShareFiles?.recovery;
   if (!manifestFile || !mainShareFile || !recoveryShareFile)
@@ -248,6 +253,7 @@ async function verifyOffsite(id) {
   const temp = await fs.mkdtemp(path.join(receiptRoot, "verify-"));
   try {
     verifyManifest(saved.manifest, saved.signature, key);
+
     if (createHash("sha256").update(manifestDownload.content).digest("hex") !== receipt.manifestSha256)
       throw Error("OFFSITE_MANIFEST_MISMATCH");
     for (const file of receipt.archiveFiles) {

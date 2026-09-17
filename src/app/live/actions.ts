@@ -18,6 +18,31 @@ function failure(message: string): Result {
   return { status: "error", message };
 }
 
+export async function getPermanentHandoverOptions(source: string) {
+  const access=await requireAccess("accounts");
+  if(!allows(access,"Account Management","handover")) throw Error("Handover authority required");
+  const db=await createClient();
+  const [people,work]=await Promise.all([
+    db.from("profiles").select("id,employee_name,erp_role,version").eq("status","active").neq("erp_role","owner").neq("id",source).order("employee_name").limit(1001),
+    db.from("approval_requests").select("id,reason,module").eq("requester_id",source).eq("status","pending").gt("deadline_at",new Date().toISOString()).order("id").limit(101),
+  ]);
+  if(people.error||work.error||people.data.length>1000||work.data.length>100) throw Error("Handover list unavailable or exceeds review limit");
+  return {people:people.data,items:work.data};
+}
+
+export async function requestPermanentHandover(form: FormData): Promise<Result> {
+  await requireAccess("accounts");
+  const db=await createClient();
+  const {error}=await db.rpc("request_permanent_handover",{
+    p_source:value(form,"source"),p_successor:value(form,"successor"),
+    p_source_version:Number(value(form,"sourceVersion")),p_successor_version:Number(value(form,"successorVersion")),
+    p_items:form.getAll("item").map(Number),p_reason:value(form,"reason"),
+  });
+  if(error) return failure("Handover was not requested. Reload and check account status, selected responsibilities and your scope.");
+  refresh();
+  return {status:"success",message:"Permanent handover sent to Owner for merged permission review."};
+}
+
 export async function createAccount(
   _previous: Result,
   form: FormData,
@@ -266,6 +291,21 @@ export async function decideRequest(form: FormData): Promise<Result> {
   const db = await createClient();
   const submit = value(form, "decision") === "submit";
   const requestType = value(form, "requestType");
+  if (requestType === "permanent_handover") {
+    const {data,error}=await db.rpc("decide_permanent_handover",{p_request:Number(value(form,"id")),p_approve:value(form,"decision")==="approve",p_reason:value(form,"reason")});
+    if(error) return failure("Handover decision rejected. Owner review and unchanged accounts/responsibilities are required.");
+    refresh();
+    return {status:"success",message:`Handover ${data}.`};
+  }
+  if (requestType === "profile_change") {
+    const { data, error } = await db.rpc("decide_profile_change", {
+      p_request: Number(value(form, "id")),
+      p_approve: value(form, "decision") === "approve",
+      p_reason: value(form, "reason"),
+    });
+    if (error) return failure("Profile decision rejected. Check authority, reason and whether the profile changed.");
+    return executeProfileResult(data);
+  }
   const { error } = await db.rpc(
     submit
       ? "submit_permission_change"
@@ -289,6 +329,70 @@ export async function decideRequest(form: FormData): Promise<Result> {
     status: "success",
     message: submit ? "Request submitted." : "Decision recorded.",
   };
+}
+
+type ProfileExecution = { status: string; operation?: string; target?: string; username?: string };
+async function executeProfileResult(result: ProfileExecution): Promise<Result> {
+  if (result.status === "provider_pending") {
+    if (!result.operation || !result.target || !result.username) return failure("Profile execution is incomplete.");
+    const admin = createAdminClient();
+    try {
+      await admin.auth.admin.updateUserById(result.target, {
+        email: result.username, email_confirm: true,
+        app_metadata: { erp_profile_operation: result.operation },
+      });
+    } catch { /* Committed receipt determines the outcome after a lost response. */ }
+    const proof = await admin.rpc("profile_provider_applied", { p_operation: result.operation });
+    refresh();
+    if (proof.error || proof.data !== true)
+      return failure("Profile application is not confirmed. The original approver can retry this exact approved request.");
+  }
+  refresh();
+  return { status: "success", message: result.status === "rejected" ? "Profile request rejected." : result.status === "expired" ? "Request expired without changing the profile." : "Approved profile changes applied." };
+}
+
+export async function retryProfileChange(form: FormData): Promise<Result> {
+  await requireAccess("approvals");
+  const db = await createClient();
+  const { data, error } = await db.rpc("retry_profile_change", {
+    p_request: Number(value(form, "id")), p_reason: value(form, "reason"),
+  });
+  if (error) return failure("Retry rejected. The original approver must have current authority and the profile must still match the approved snapshot.");
+  return executeProfileResult(data);
+}
+
+export async function requestProfileChange(form: FormData): Promise<Result> {
+  const access = await requireAccess("accounts");
+  if (!["owner", "admin"].includes(access.role) || !allows(access, "Account Management", "edit"))
+    return failure("Profile editing is outside your permissions.");
+  const target = value(form, "id");
+  if (!/^[0-9a-f-]{36}$/.test(target)) return failure("Invalid account.");
+  const proposed: Record<string, string> = Object.fromEntries(
+    ["employeeName", "companyPosition", "department", "contact", "username", "erpRole"].map(key => [key, value(form, key)]),
+  );
+  const db = await createClient();
+  const scope = await db.rpc("check_profile_edit", { p_target: target, p_expected: Number(value(form,"version")), p_role: proposed.erpRole });
+  if (scope.error || scope.data !== true) return failure("Account is unavailable or outside your editing authority.");
+  const photo = form.get("photo");
+  if (photo instanceof File && photo.size) {
+    if (photo.size > 2097152 || !["image/jpeg", "image/png", "image/webp"].includes(photo.type))
+      return failure("Select a JPEG, PNG or WebP photo up to 2 MB.");
+    const bytes = Buffer.from(await photo.arrayBuffer());
+    const valid = photo.type === "image/jpeg" ? bytes.subarray(0, 3).equals(Buffer.from([255,216,255]))
+      : photo.type === "image/png" ? bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))
+      : bytes.toString("ascii",0,4) === "RIFF" && bytes.toString("ascii",8,12) === "WEBP";
+    if (!valid) return failure("The photo file is invalid.");
+    const ext = photo.type === "image/jpeg" ? "jpg" : photo.type === "image/png" ? "png" : "webp";
+    proposed.avatar = `${target}/${randomUUID()}.${ext}`;
+    const upload = await createAdminClient().storage.from("profile-photos").upload(proposed.avatar, bytes, { contentType: photo.type, upsert: false });
+    if (upload.error) return failure("Photo could not be uploaded.");
+  }
+  const { error } = await db.rpc("request_profile_change", {
+    p_target: target, p_expected: Number(value(form,"version")), p_proposed: proposed, p_reason: value(form,"reason"),
+  });
+  if (error) return failure("Profile request rejected. Reload and check the fields, role authority and reason.");
+  refresh();
+  return { status: "success", message: "Profile change sent to Approval Center. The current account remains unchanged until applied." };
 }
 export async function markNotificationRead(form: FormData) {
   await requireAccess("notifications");

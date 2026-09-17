@@ -1,14 +1,14 @@
 # Foundation gate review — candidate evidence only
 
-Updated 2026-09-10. Status: OPEN — baseline checkpoint exists; Owner acceptance is still pending.
+Updated 2026-09-13. Status: OPEN — candidate increments exist; Owner acceptance and live migration approval are still pending.
 
 Failure-path correction: see [current review](FOUNDATION-FAILURE-PATH-REVIEW.md). Prior fixture results do not establish operational password fencing or a usable pending-device approval flow. Those gates remain OPEN.
 
 ## Source identity
 
-- Project: C:/Users/DELL/Desktop/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910
+- Project: D:/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910
 - Branch: codex/foundation-gates-20260910
-- Foundation starting checkpoint: a0d3072 (parent 7a5a422fb82351578adc4dbc32eed6845701d0e5)
+- Foundation starting checkpoint: current candidate manifest foundation-candidate-manifest-20260913.json
 - The checkpoint identifies the starting candidate; subsequent admission remediation remains uncommitted until its full application checks are reviewed.
 - Package version: 2.1.0-m2. This is not a newly accepted release version.
 - No Owner data, Auth account, database volume or credentials were copied into the worktree. The incremental admission migration was applied to the existing local schema without a reset; the real Owner remains preserved.
@@ -24,7 +24,7 @@ The starting source manifest is [FOUNDATION-BASELINE-20260910.json](FOUNDATION-B
 | Database enforcement | Migration application evidence, RLS/ACL bypass tests, server/RPC authority, stale/replay/concurrency and audit verification | Historical local evidence exists; full candidate validation pending |
 | Local backups | Encrypted capture, 18:00 Yangon/catch-up, retention, preserved manual archives, isolated restore evidence | Existing local evidence in LOCAL-BACKUPS.md; not full application disaster recovery |
 | Offsite/DR | No-source-profile retrieval/restore, remote retry/retention, live restore maintenance/failure/retry, Telegram delivery | OPEN: one authenticated Main/Recovery split-key integrity proof only |
-| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 33/33 Node tests, optimized build, and 348/348 isolated SQL assertions plus eight Auth workflows pass; DB lint has only two pre-existing unused-parameter warnings |
+| Runtime verification | Typecheck/lint/tests/build/database tests against exact frozen candidate | Current worktree: typecheck, lint, 35/35 Node tests, optimized build, 348/348 assertions across suites 001-018 plus 24/24 profile-change assertions and 11 isolated Auth workflows pass; permanent handover suite 019 fails and browser harness login stage is blocked |
 | Owner acceptance | Review known limits and record explicit baseline acceptance | PENDING: the Owner authorized the work, not a completed freeze |
 | Business entry | Accepted foundation/DR gates plus module contract and vertical-slice acceptance | CLOSED pending above gates |
 
@@ -36,4 +36,4 @@ The current totals are evidence for this worktree candidate. They do not close t
 - Fast Mode was not changed; it is optional and is not treated as a foundation control.
 - Documentation and source changes remain separate from Owner acceptance, live restore, data reset, Production deployment and paid resources.
 
-Next execution work: complete governed profile editing, then close remaining F2/F3 controls with isolated negative tests. Supplier questions stay paused under D155.
+Next execution work: repair browser harness login stage, finish permanent handover security/negative tests, then complete independent-profile recovery and live restore evidence. Supplier questions stay paused under D155.

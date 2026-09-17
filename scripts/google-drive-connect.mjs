@@ -14,12 +14,14 @@ import {
 import { readGoogleSecret, writeGoogleSecret } from "./google-secret-store.mjs";
 const root = fileURLToPath(new URL("../", import.meta.url));
 async function main() {
+  const mode = process.argv[2];
+  const mainRoot = path.resolve(root) === path.resolve("D:/EVERSHINE-ERP");
+  const candidateStatus = mode === "status" && path.resolve(root) === path.resolve("D:/EVERSHINE-ERP-WORKTREES/foundation-gates-20260910");
   if (
     process.platform !== "win32" ||
-    path.resolve(root) !== path.resolve("C:/Users/DELL/Desktop/EVERSHINE-ERP")
+    (!mainRoot && !candidateStatus)
   )
     throw Error("LOCAL_GOOGLE_SETUP_ONLY");
-  const mode = process.argv[2];
   if (mode === "import-browser") return importClientInBrowser();
   if (mode === "import") {
     const source = process.argv[3];

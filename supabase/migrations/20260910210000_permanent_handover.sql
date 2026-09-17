@@ -19,7 +19,7 @@ begin
   perform private.require_admin('Account Management','handover');
   select * into source from public.profiles where id=p_source for update;
   select * into successor from public.profiles where id=p_successor for update;
-  if not found or source.status <> 'active' or successor.status <> 'active' then
+  if source.id is null or successor.id is null or source.status <> 'active' or successor.status <> 'active' then
     raise exception 'Handover account unavailable';
   end if;
   if successor.erp_role not in ('admin','owner') then raise exception 'Successor must be an Admin or Owner'; end if;

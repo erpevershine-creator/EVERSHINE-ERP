@@ -18,15 +18,59 @@ function pageNumber(searchParams?: LiveSearchParams) {
   const parsed = Number(Array.isArray(value) ? value[0] : value);
   return Number.isInteger(parsed) && parsed > 0 ? Math.min(parsed, 100000) : 1;
 }
-function pagination(section: string, page: number, total: number): ServerPagination {
+type QueryState = { q: string; sort: string; descending: boolean };
+function param(searchParams: LiveSearchParams | undefined, key: string) {
+  const value = searchParams?.[key];
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+function queryState(section: string, searchParams?: LiveSearchParams): QueryState {
+  const defaults: Record<string, string> = {
+    accounts: "employee_name",
+    approvals: "id",
+    audit: "id",
+    notifications: "id",
+    backups: "created_at",
+  };
+  const allowed = {
+    accounts: ["employee_name", "company_position", "department", "erp_role", "username", "status"],
+    approvals: ["id", "request_type", "target_id", "status", "reason"],
+    audit: ["id", "actor_name", "action", "entity_type", "reason"],
+    notifications: ["id", "title", "message", "created_at"],
+    backups: ["created_at", "status", "stage", "origin"],
+  }[section] ?? ["id"];
+  const requested = param(searchParams, "sort");
+  return {
+    q: param(searchParams, "q").trim().slice(0, 80),
+    sort: allowed.includes(requested) ? requested : defaults[section] ?? "id",
+    descending: param(searchParams, "dir") === "desc",
+  };
+}
+function searchPattern(q: string) {
+  return q.replace(/[\\%_]/g, "\\$&").replace(/[(),]/g, " ");
+}
+function searchOr(fields: string[], q: string) {
+  const pattern = `*${searchPattern(q)}*`;
+  return fields.map((field) => `${field}.ilike.${pattern}`).join(",");
+}
+function pagination(section: string, page: number, total: number, state?: QueryState): ServerPagination {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
+  const params = (n: number) => {
+    const search = new URLSearchParams({ page: String(n) });
+    if (state?.q) search.set("q", state.q);
+    if (state?.sort) search.set("sort", state.sort);
+    if (state?.descending) search.set("dir", "desc");
+    return `/${section}?${search.toString()}`;
+  };
   return {
     page: safePage,
     pageSize: PAGE_SIZE,
     total,
-    previousHref: safePage > 1 ? `/${section}?page=${safePage - 1}` : undefined,
-    nextHref: safePage < pageCount ? `/${section}?page=${safePage + 1}` : undefined,
+    previousHref: safePage > 1 ? params(safePage - 1) : undefined,
+    nextHref: safePage < pageCount ? params(safePage + 1) : undefined,
+    query: state?.q,
+    sort: state?.sort,
+    descending: state?.descending,
   };
 }
 function ServerPager({
@@ -74,17 +118,19 @@ export async function LivePage({
   const access = await requireAccess(section);
   const db = await createClient();
   const page = pageNumber(searchParams);
+  const state = queryState(section, searchParams);
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   if (section === "backups") {
-    const { data, count, error } = await db
+    const backups = db
       .from("local_backup_runs")
       .select(
         "id,reason,status,stage,created_at,finished_at,archive_bytes,table_count,storage_files,manifest_sha256,error_code,origin,scheduled_for,archive_state,pruned_at,prune_error_code",
         { count: "exact" },
       )
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      .order(state.sort, { ascending: !state.descending });
+    if (state.q) backups.or(searchOr(["status", "stage", "origin"], state.q));
+    const { data, count, error } = await backups.range(from, to);
     if (error) throw new Error("Backup history could not be loaded.");
     const { data: schedule, error: scheduleError } = await db
       .from("local_backup_schedule")
@@ -194,11 +240,14 @@ export async function LivePage({
         .not("erp_role_code", "is", null)
         .order("id"),
       section === "accounts"
-        ? db
-            .from("profiles")
-            .select(profileColumns, { count: "exact" })
-            .order("employee_name")
-            .range(from, to)
+        ? (() => {
+            const profiles = db
+              .from("profiles")
+              .select(profileColumns, { count: "exact" })
+              .order(state.sort, { ascending: !state.descending });
+            if (state.q) profiles.or(searchOr(["employee_name", "company_position", "department", "erp_role", "username", "status"], state.q));
+            return profiles.range(from, to);
+          })()
         : db
             .from("profiles")
             .select(profileColumns)
@@ -213,7 +262,7 @@ export async function LivePage({
           positions={ps.data}
           profiles={people.data}
           access={access}
-          serverPagination={pagination(section, page, people.count ?? people.data.length)}
+          serverPagination={pagination(section, page, people.count ?? people.data.length, state)}
         />
       );
     const [pages, pp, ap] = await Promise.all([
@@ -243,14 +292,32 @@ export async function LivePage({
       db
         .from("approval_requests")
         .select(
-          "id,request_type,requester_id,target_id,reason,status,current_data,proposed_data,decision_reason,source_request_id,return_reason,version",
+          "id,request_type,requester_id,decided_by,target_id,reason,status,current_data,proposed_data,decision_reason,source_request_id,return_reason,version",
           { count: "exact" },
         )
-        .in("request_type", ["position_permissions", "individual_permissions", "device_login"])
-        .order("id", { ascending: false })
+        .in("request_type", ["position_permissions", "individual_permissions", "device_login", "profile_change", "permanent_handover"])
+        .order(state.sort, { ascending: !state.descending })
         .range(from, to),
       db.from("pages").select("id,label").order("display_order"),
     ]);
+    if (state.q) {
+      const filtered = db
+        .from("approval_requests")
+        .select(
+          "id,request_type,requester_id,decided_by,target_id,reason,status,current_data,proposed_data,decision_reason,source_request_id,return_reason,version",
+          { count: "exact" },
+        )
+        .in("request_type", ["position_permissions", "individual_permissions", "device_login", "profile_change", "permanent_handover"])
+        .or(searchOr(["request_type", "target_id", "status", "reason"], state.q))
+        .order(state.sort, { ascending: !state.descending })
+        .range(from, to);
+      const replacement = await filtered;
+      if (!replacement.error) {
+        rs.data = replacement.data;
+        rs.count = replacement.count;
+        rs.error = replacement.error;
+      }
+    }
     if (rs.error || ps.error)
       throw new Error("Approval requests could not be loaded.");
     const capabilities = await db.rpc("request_decision_capabilities", {
@@ -274,17 +341,18 @@ export async function LivePage({
         }))}
         pages={ps.data}
         access={access}
-        serverPagination={pagination(section, page, rs.count ?? rs.data.length)}
+        serverPagination={pagination(section, page, rs.count ?? rs.data.length, state)}
       />
     );
   }
   const isAudit = section === "audit";
   if (isAudit) {
-    const { data, count, error } = await db
+    const audit = db
       .from("audit_events")
       .select("id,actor_name,action,entity_type,entity_id,reason,occurred_at", { count: "exact" })
-      .order("id", { ascending: false })
-      .range(from, to);
+      .order(state.sort, { ascending: !state.descending });
+    if (state.q) audit.or(searchOr(["actor_name", "action", "entity_type", "entity_id", "reason"], state.q));
+    const { data, count, error } = await audit.range(from, to);
     if (error) throw new Error("Audit history could not be loaded.");
     return (
       <>
@@ -315,15 +383,16 @@ export async function LivePage({
           </table>
           {!data.length && <p>No events yet.</p>}
         </div>
-        <ServerPager section={section} page={page} total={count ?? data.length} label="Audit history" />
+      <ServerPager section={section} page={page} total={count ?? data.length} label="Audit history" />
       </>
     );
   }
-  const { data, count, error } = await db
+  const notifications = db
     .from("notifications")
     .select("id,title,message,read_at,created_at", { count: "exact" })
-    .order("id", { ascending: false })
-    .range(from, to);
+    .order(state.sort, { ascending: !state.descending });
+  if (state.q) notifications.or(searchOr(["title", "message"], state.q));
+  const { data, count, error } = await notifications.range(from, to);
   if (error) throw new Error("Notifications could not be loaded.");
   return (
     <>

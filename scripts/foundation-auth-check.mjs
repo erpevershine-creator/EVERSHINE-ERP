@@ -90,5 +90,27 @@ export async function checkIsolatedAuth({ run, clone, sql, label, register }) {
   await sql(`select set_config('request.jwt.claims','{"role":"service_role"}',false); select public.finish_owner_recovery('${reuse.operation}',true);`);
   assert.equal((await http("/token?grant_type=password", "POST", { email, password })).status, 200);
   checks.push("Confirmed password reuse policy works with new receipt");
+  const profileSession = randomUUID();
+  await sql(`insert into auth.sessions(id,user_id,created_at,updated_at) values('${profileSession}','${id}',clock_timestamp(),clock_timestamp());
+    insert into public.device_sessions(id,profile_id,device_fingerprint_hash,device_label,started_at,last_seen_at) values('${profileSession}','${id}',extensions.digest('${profileSession}','sha256'),'Profile fixture',clock_timestamp(),clock_timestamp());`);
+  const profileEmail = "isolated.provider.changed@gmail.com";
+  const request = (await sql(`select set_config('request.jwt.claims','{"sub":"${id}","role":"authenticated","session_id":"${profileSession}"}',false);
+    select public.request_profile_change('${id}',(select version from public.profiles where id='${id}'),'{"username":"${profileEmail}","department":"Reviewed department"}','Profile provider proof');`)).trim().split(/\r?\n/).at(-1);
+  assert.match(request, /^\d+$/);
+  const operation = JSON.parse((await sql(`select set_config('request.jwt.claims','{"sub":"${id}","role":"authenticated","session_id":"${profileSession}"}',false);
+    select public.decide_profile_change(${request},true,'Owner approves complete snapshot');`)).trim().split(/\r?\n/).at(-1));
+  const illegalEmail = await http(`/admin/users/${id}`, "PUT", { email: "unapproved.provider@gmail.com", email_confirm: true });
+  assert.ok(illegalEmail.status >= 400, "direct provider email update rejected");
+  const profileUpdate = await http(`/admin/users/${id}`, "PUT", { email: profileEmail, email_confirm: true, app_metadata: { erp_profile_operation: operation.operation } });
+  assert.equal(profileUpdate.status, 200, "approved email provider update commits");
+  assert.equal((await sql(`select username::text||'|'||department from public.profiles where id='${id}';`)).trim(), `${profileEmail}|Reviewed department`);
+  assert.equal((await sql(`select applied_at is not null from private.profile_change_execution where request_id=${request};`)).trim(), "t");
+  checks.push("Real Auth email and complete approved profile commit atomically");
+  assert.equal((await http("/token?grant_type=password", "POST", { email: profileEmail, password })).status, 200);
+  assert.ok((await http("/token?grant_type=password", "POST", { email, password })).status >= 400);
+  assert.equal((await sql(`select status from public.device_sessions where id='${profileSession}';`)).trim(), "logged_out");
+  checks.push("New Gmail signs in; previous Gmail and old ERP session are rejected");
+  assert.ok((await http(`/admin/users/${id}`, "PUT", { email, email_confirm: true, app_metadata: { erp_profile_operation: operation.operation } })).status >= 400);
+  checks.push("Consumed profile provider operation cannot replay");
   return { image, checks, status: "pass", noHostPorts: true, syntheticAccountsOnly: true };
 }

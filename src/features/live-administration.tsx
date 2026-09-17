@@ -7,6 +7,8 @@ import {
   createAccount,
   accountStatus,
   changeAccountPassword,
+  requestProfileChange,
+  retryProfileChange,
   savePermissionDraft,
   revisePermissionDraft,
   copyExpiredPermissionRequest,
@@ -16,6 +18,7 @@ import {
 } from "@/app/live/actions";
 import { erpRoles, roleLabel, permissionLabel } from "@/lib/erp-roles";
 import { IndividualPermissions } from "./individual-permissions";
+import { PermanentHandover } from "./permanent-handover";
 import type { Access } from "@/lib/access";
 
 export type Profile = {
@@ -51,6 +54,7 @@ export type ActionPermission = {
   allowed: boolean;
 };
 export type Request = {
+  decided_by?: string | null;
   can_decide?: boolean;
   can_copy?: boolean;
   id: number;
@@ -63,12 +67,14 @@ export type Request = {
   reason: string;
   status: string;
   current_data: {
+    [key: string]: unknown;
     pages: Record<string, boolean>;
     actions: Record<string, string[]>;
     extraPages?: Record<string, boolean>;
     extraActions?: Record<string, string[]>;
   };
   proposed_data: {
+    [key: string]: unknown;
     pages: Record<string, boolean>;
     actions: Record<string, string[]>;
     extraPages?: Record<string, boolean>;
@@ -224,6 +230,31 @@ export function LiveAccounts({
             {selected.department} · {selected.contact}
           </p>
           <Badge>{selected.status}</Badge>
+          {selected.status==="active" && selected.erp_role!=="owner" && can(access,"Account Management","handover") && <PermanentHandover source={selected.id} version={selected.version}/>}
+          {["owner", "admin"].includes(access.role) && can(access, "Account Management", "edit") && (
+            <details>
+              <summary>Request profile changes</summary>
+              <ActionForm run={requestProfileChange} label="Send to Approval Center">
+                <input name="id" type="hidden" value={selected.id} />
+                <input name="version" type="hidden" value={selected.version} />
+                {([
+                  ["employeeName", "Employee name", selected.employee_name],
+                  ["companyPosition", "Company Position", selected.company_position],
+                  ["department", "Department", selected.department],
+                  ["contact", "Contact", selected.contact],
+                  ["username", "Company Gmail username", selected.username],
+                ] as const).map(([name, label, initialValue]) => (
+                  <label key={name}>{label}<input name={name} defaultValue={initialValue} required maxLength={120} /></label>
+                ))}
+                <label>ERP Role<select name="erpRole" defaultValue={selected.erp_role}>
+                  {(selected.erp_role === "owner" ? ["owner"] : ["admin","sales","delivery","finance","inventory"]).map(role => <option key={role} value={role}>{roleLabel(role)}</option>)}
+                </select></label>
+                <p className="muted">Role changes include individual permissions for explicit Owner reapproval.</p>
+                <label>New profile photo (optional)<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+                <label>Reason<textarea name="reason" maxLength={1000} required /></label>
+              </ActionForm>
+            </details>
+          )}
           {(selected.id !== access.id || access.role === "owner") &&
             can(access, "Account Management", "change_password") && (
               <ActionForm run={changeAccountPassword} label="Change password">
@@ -787,12 +818,39 @@ export function LiveApprovals({
       />
       {selected && (
         <Modal
-          title={`${selected.request_type === "device_login" ? "Device sign-in request" : "Permission request"} ${selected.id}`}
+          title={`${selected.request_type === "permanent_handover" ? "Permanent handover request" : selected.request_type === "profile_change" ? "Profile change request" : selected.request_type === "device_login" ? "Device sign-in request" : "Permission request"} ${selected.id}`}
           onClose={() => setId(null)}
           wide
         >
           <Badge>{selected.status}</Badge>
           <p>{selected.reason}</p>
+          {selected.request_type === "permanent_handover" && <section>
+            <h3>Owner handover review</h3>
+            <p>Transfer role: {String(selected.proposed_data.erpRole)} · Company Position: {String(selected.proposed_data.companyPosition)}</p>
+            <p>The source account becomes inactive. Successor identity is preserved. Included accounts and their before/after access are shown below.</p>
+            <h3>Merged individual permissions for reapproval</h3>
+            <PermissionSummary data={{pages:selected.proposed_data.extraPages??{},actions:selected.proposed_data.extraActions??{}}} pages={pages}/>
+            <h3>Selected unfinished approvals</h3>
+            {Array.isArray(selected.current_data.items) && selected.current_data.items.map((item: {id:number;module:string;reason:string})=><p key={item.id}>#{item.id} · {item.module} · {item.reason}</p>)}
+          </section>}
+          {selected.request_type === "profile_change" && (
+            <section>
+              <table><thead><tr><th>Field</th><th>Current</th><th>Requested</th></tr></thead><tbody>
+                {["employeeName","companyPosition","department","contact","username","erpRole"].map(field => (
+                  <tr key={field}><th>{field}</th><td>{String(selected.current_data[field] ?? "")}</td><td>{String(selected.proposed_data[field] ?? "")}</td></tr>
+                ))}
+              </tbody></table>
+              <p>Requested photo</p><img src={`/api/profile-photo/${selected.target_id}?request=${selected.id}`} alt="Requested profile photo" width={96} height={96} />
+              <h3>Individual permissions for reapproval</h3>
+              <PermissionSummary data={{pages: selected.proposed_data.extraPages ?? {}, actions: selected.proposed_data.extraActions ?? {}}} pages={pages} />
+              {selected.status === "approved" && selected.decided_by === access.id && (
+                <ActionForm run={retryProfileChange} label="Check or retry application">
+                  <input name="id" type="hidden" value={selected.id} />
+                  <label>Retry reason<textarea name="reason" required maxLength={1000} /></label>
+                </ActionForm>
+              )}
+            </section>
+          )}
           {selected.source_request_id && (
             <p>
               Linked to request #{selected.source_request_id}

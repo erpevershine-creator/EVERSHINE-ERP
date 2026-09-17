@@ -79,6 +79,7 @@ export async function maintainBackupRetention({
   getKey,
   replacementId = null,
   now = new Date(),
+  canPrune = async () => true,
 }) {
   const rows = JSON.parse(
     (
@@ -108,6 +109,7 @@ export async function maintainBackupRetention({
     const id = validBackupId(b.id),
       replacement = byId.get(b.prune_replacement_id ?? replacementId);
     try {
+      if (!(await canPrune(b))) throw Error("OFFSITE_COPY_PENDING");
       if (
         b.origin !== "scheduled" ||
         b.status !== "verified" ||

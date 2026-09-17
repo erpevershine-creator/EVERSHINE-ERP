@@ -210,3 +210,11 @@ Phase sequence: foundation (Login, accounts, permissions, audit, approval, setti
 
 ## Historical conditional preference — resolved for login by D23
 Owner prefers company-assigned Gmail-address login plus ERP password IF free email notifications/automatic report sending meet needs; otherwise company-assigned @evershine.com-style identifier plus password. The identifier choice is now confirmed by D23; outbound provider/integration remains unconfirmed. Login identifiers, recipient emails, outbound sender and Google sign-in are separate concerns. Gmail password is never the ERP password. Daily delivery volume, schedule and recipient scope remain unknown; no email sending/integration is authorized by this requirements discussion.
+
+## Foundation continuation — 2026-09-13
+| D156 | Owner explicitly resumes the remaining Foundation work. Profile editing must include Photo, Employee Name, Company Position, Department, Contact, Gmail Username and ERP Role. This is implementation authorization, not acceptance of an incomplete Foundation or a real Owner credential change. |
+| D157 | On ERP Role change, individual permissions must also be reapproved together with the new role's base permissions. Do not silently retain individual grants under the new role. |
+| D158 | On 2026-09-13 Owner confirmed permanent handover merges the successor individual permissions with the transferred source permissions, with explicit Owner reapproval of the complete snapshot. Preserve distinct identities and historical actors; do not silently replace successor individual grants. |
+
+## F0 Owner acceptance — 2026-09-14
+Owner explicitly accepted the presented F0 baseline review package with “လက်ခံအတည်ပြုပါတယ်။”. F0-20260914 is COMPLETE / OWNER ACCEPTED. See docs/FOUNDATION-F0-ACCEPTANCE-20260914.md. This accepts F0 only; F1–F6 and Production remain unaccepted. The frozen manifest remains unchanged; these acceptance documentation edits postdate its capture. No runtime or database changes accompany this record.

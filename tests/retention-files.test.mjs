@@ -92,6 +92,17 @@ async function fixture() {
     },
   };
 }
+test("retention preserves a local archive until its remote copy is verified", async () => {
+  const f = await fixture();
+  try {
+    await maintainBackupRetention({...f,getKey:async()=>f.key,replacementId:f.rows[7].id,now,canPrune:async()=>false});
+    assert.equal(f.rows[0].archive_state,"present");
+    await fs.stat(f.folder(f.rows[0]));
+    await maintainBackupRetention({...f,getKey:async()=>f.key,replacementId:f.rows[7].id,now,canPrune:async()=>true});
+    assert.equal(f.rows[0].archive_state,"pruned");
+    await assert.rejects(fs.stat(f.folder(f.rows[0])),{code:"ENOENT"});
+  } finally { await f.cleanup(); }
+});
 test("retention validates replacement before deletion and keeps corrupt replacement fail-closed", async () => {
   const f = await fixture();
   try {

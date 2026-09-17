@@ -1,5 +1,6 @@
+import { retryOneOffsite } from "./offsite-retry.mjs";
 import { maintainBackupRetention } from "./prune-backups.mjs";
-import { publish as publishOffsite } from "./offsite-backup.mjs";
+import { publish as publishOffsite, verifyOffsite } from "./offsite-backup.mjs";
 import { backupRelativePath } from "./backup-folder.mjs";
 import { acquireBackupLock } from "./backup-lock.mjs";
 import fs from "node:fs";
@@ -83,6 +84,14 @@ function command(args, input, exe = docker) {
   });
 }
 const query = (sql) => command(psql, sql);
+async function canPruneOffsite(backup) {
+  try {
+    const proof = await verifyOffsite(validBackupId(backup.id));
+    return proof.status === "verified" && proof.backupId === backup.id;
+  } catch {
+    return false;
+  }
+}
 function streamCommand(args) {
   const child = spawn(docker, args, {
     windowsHide: true,
@@ -215,7 +224,7 @@ async function main() {
     );
   try {
     if (process.argv[2] === "tick") {
-      await maintainBackupRetention({ root, query, getKey }).catch(() => {});
+      await maintainBackupRetention({ root, query, getKey, canPrune: canPruneOffsite }).catch(() => {});
       const tick = JSON.parse(
         (await query("select private.prepare_local_backup_tick();"))
           .toString()
@@ -235,14 +244,19 @@ async function main() {
           .trim();
         if (label === abandonedId) await command(["rm", "-f", "-v", oldClone]);
       }
-      if (!tick.job) return;
+      if (!tick.job) {
+        const candidates = JSON.parse((await query("select coalesce(jsonb_agg(jsonb_build_object('id',id) order by created_at), '[]') from public.local_backup_runs where status='verified' and archive_state='present';")).toString());
+        const retry = await retryOneOffsite({ root, candidates, publish: publishOffsite });
+        if (retry.status !== "idle") console.log(JSON.stringify(retry));
+        return;
+      }
       id = validBackupId(tick.job);
     }
     clone = "evershine-restorecheck-" + id;
     const claimed = JSON.parse(
       (
         await query(
-          `update public.local_backup_runs set status='running',stage='Preparing' where id='${id}' and status='queued' returning jsonb_build_object('id',id,'createdAt',created_at);`,
+          `update public.local_backup_runs set status='running',stage='Preparing' where id='${id}' and status='queued' returning jsonb_build_object('id',id,'createdAt',created_at,'origin',origin);`,
         )
       )
         .toString()
@@ -349,6 +363,7 @@ async function main() {
     const manifest = {
       format: 1,
       id,
+      origin: claimed.origin,
       createdAt: new Date().toISOString(),
       image,
       tables,
@@ -532,6 +547,7 @@ async function main() {
       query,
       getKey,
       replacementId: id,
+      canPrune: canPruneOffsite,
     }).catch(() => {
       console.error("RETENTION_CHECK_FAILED");
     });
