@@ -11,6 +11,7 @@ export type Access = {
   pages: Record<string, boolean>;
   actions: Record<string, string[]>;
 };
+
 export const getAccess = cache(async (): Promise<Access | null> => {
   const db = await createClient();
   const {
@@ -23,6 +24,7 @@ export const getAccess = cache(async (): Promise<Access | null> => {
     throw new Error("Account access could not be verified. Please retry.");
   return data as Access | null;
 });
+
 export async function requireAccess(page?: string) {
   const access = await getAccess();
   if (!access) redirect("/login");
@@ -30,6 +32,26 @@ export async function requireAccess(page?: string) {
     throw new Error("Access restricted for this account.");
   return access;
 }
+
+export async function requirePermission(permission: string) {
+  const db = await createClient();
+  const {
+    data: { user },
+  } = await db.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data, error } = await db.rpc("has_permission", {
+    permission_key: permission,
+  });
+
+  if (error || !data) {
+    throw new Error(`Missing permission: ${permission}`);
+  }
+
+  return true;
+}
+
 export function allows(access: Access, module: string, action: string) {
   return (
     access.role === "owner" ||
